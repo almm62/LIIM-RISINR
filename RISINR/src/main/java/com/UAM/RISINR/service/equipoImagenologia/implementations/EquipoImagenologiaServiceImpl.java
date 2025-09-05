@@ -10,6 +10,9 @@ import com.UAM.RISINR.model.dto.EquipoImagenologiaDTO;
 import com.UAM.RISINR.repository.EquipoImagenologiaRepository;
 import com.UAM.RISINR.service.areaDeServicio.AreaDeServicioService;
 import com.UAM.RISINR.service.equipoImagenologia.EquipoImagenologiaService;
+import com.UAM.RISINR.service.shared.RegistroEventoService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -26,17 +29,34 @@ public class EquipoImagenologiaServiceImpl implements EquipoImagenologiaService{
     
     private final AreaDeServicioService areaService; 
     private final EquipoImagenologiaRepository repository; 
+    private final RegistroEventoService registroEvento; 
+     private final ObjectMapper objMapper;
+    
+    
+    private static final int APLICACION_ID = 5;
+    private static final int EQUIPO_AGREGADO = 20;
+    private static final int EQUIPO_EDITADO = 21  ;
+    private static final int  CATALOGO_CONSULTADO = 22;
+    private static final int NUM_SERIE_EXISTENTE = 1020;
+    
+    
+    private long hora = 0;
+    
 
-    public EquipoImagenologiaServiceImpl(AreaDeServicioService areaService, EquipoImagenologiaRepository repository ) {
+
+    public EquipoImagenologiaServiceImpl(AreaDeServicioService areaService, EquipoImagenologiaRepository repository, RegistroEventoService registroEvento,ObjectMapper objtMapper ) {
         this.areaService = areaService;
         this.repository = repository;
+        this.registroEvento = registroEvento;
+        this.objMapper = objtMapper; 
     }
     
     
     @Transactional(readOnly = true)
     @Override
     public List<EquipoImagenologiaDTO> consultarTodos(){
- 
+        
+        hora =  System.currentTimeMillis();
         List<EquipoImagenologia> equipos = repository.findAll();
         List<EquipoImagenologiaDTO> equiposDTO = new ArrayList();
         
@@ -44,18 +64,33 @@ public class EquipoImagenologiaServiceImpl implements EquipoImagenologiaService{
             EquipoImagenologiaDTO equipoDTO = convertirDTO(eqp);
             equiposDTO.add(equipoDTO);
         }
+        
+       
+        registroEvento.log(CATALOGO_CONSULTADO, APLICACION_ID, hora, "{}");
         return equiposDTO;
     }   
     
     @Override
     public EquipoImagenologiaDTO add(Map<String, String> formData){  
+        hora =  System.currentTimeMillis();
         String nSerie = formData.get("nserEQP");
         EquipoImagenologia equipo;
+        String datos = "";
         if(validarEquipo(nSerie) == null){
             equipo = extraerDatos(formData);
             repository.save(equipo);
-            return convertirDTO(equipo);
+            EquipoImagenologiaDTO equipoDTO = convertirDTO(equipo);
+            try {
+                 datos = objMapper.writeValueAsString(equipoDTO); // JSON correcto
+                 System.out.println(datos);
+            } catch (JsonProcessingException e) {
+                e.printStackTrace(); 
+                     datos = "{}"; // valor por defecto para no romper la app
+            }
+            registroEvento.log(EQUIPO_AGREGADO, APLICACION_ID, hora, datos);
+            return equipoDTO;
         } else{
+            registroEvento.log(NUM_SERIE_EXISTENTE, APLICACION_ID, hora, datos);
             return null;
         } 
     }
