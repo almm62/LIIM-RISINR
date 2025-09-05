@@ -3,24 +3,34 @@ package com.UAM.RISINR.model.dto.userManager;
 import java.util.List;
 
 public class ActualizarUsuarioDTO {
+    private String UsuarioID; // Solo para identificar, no tiene Setter
     private String nombre;
     private String apellidoPaterno;
     private String apellidoMaterno;
-    private String curp;
+    private String CorreoElectronico;
     private Integer area;
     private List<Integer> roles;
     
     public ActualizarUsuarioDTO(){
     }
     
-    public ActualizarUsuarioDTO(String nombre, String apellidoPaterno, String apellidoMaterno, String curp, Integer area, List<Integer> roles){
+    public ActualizarUsuarioDTO(String UsuarioID, String nombre, String apellidoPaterno, String apellidoMaterno, String CorreoElectronico, Integer area, List<Integer> roles){
+        this.UsuarioID=UsuarioID;
         this.nombre=nombre;
         this.apellidoPaterno=apellidoPaterno;
         this.apellidoMaterno=apellidoMaterno;
-        this.curp=curp;
+        this.CorreoElectronico=CorreoElectronico;
         this.area=area;
         this.roles=roles;
     } 
+    
+    public String getUsuarioID(){
+        return UsuarioID;
+    }
+    
+    public void setUsuarioID(String UsuarioID){
+        this.UsuarioID = UsuarioID;
+    }
     
     public String getNombre(){
         return nombre;
@@ -43,11 +53,11 @@ public class ActualizarUsuarioDTO {
         this.apellidoMaterno=apellidoMaterno;
     }
     
-    public String getCurp(){
-        return curp;
+    public String getCorreoElectronico(){
+        return CorreoElectronico;
     }
-    public void setCurp( String curp){
-        this.curp=curp;
+    public void setCorreoElectronico(String CorreoElectronico){
+        this.CorreoElectronico=CorreoElectronico;
     }
     
     public Integer getArea(){

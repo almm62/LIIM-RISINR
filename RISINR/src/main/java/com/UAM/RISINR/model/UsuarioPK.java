@@ -6,6 +6,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import java.util.Objects;
 
 
 @Embeddable
@@ -45,20 +46,17 @@ public class UsuarioPK implements Serializable {
     }
 
     @Override
-    public int hashCode() {
-        int hash = 0;
-        hash += (int) numEmpleado;
-        hash += (curp != null ? curp.hashCode() : 0);
-        return hash;
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof UsuarioPK)) return false;
+        UsuarioPK that = (UsuarioPK) o;
+        return Objects.equals(numEmpleado, that.numEmpleado)
+            && Objects.equals(curp, that.curp);
     }
 
     @Override
-    public boolean equals(Object object) {
-        if (this == object) return true;
-        if (!(object instanceof UsuarioPK)) return false;
-        UsuarioPK other = (UsuarioPK) object;
-        return this.numEmpleado == other.numEmpleado &&
-               java.util.Objects.equals(this.curp, other.curp);
+    public int hashCode() {
+        return Objects.hash(numEmpleado, curp);
     }
 
     @Override

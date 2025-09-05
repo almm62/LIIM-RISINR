@@ -33,6 +33,19 @@ public class AccessController {
 
         String ip = extraerIp(httpReq);
         LoginResponseDTO resp = accessService.login(request, ip);
+        if (resp.getTokenJWT() != null){
+            ResponseCookie cookie = ResponseCookie.from("token", resp.getTokenJWT())
+            .httpOnly(true)   
+            .secure(false)   
+            .path("/")
+            .sameSite("Lax")
+            .build();
+            
+            return ResponseEntity
+                .ok()
+                .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                .body(resp);
+        }
         return ResponseEntity.ok(resp);
     }
 
@@ -43,7 +56,16 @@ public class AccessController {
 
         String ip = extraerIp(httpReq);
         LoginResponseDTO resp = accessService.seleccionarRol(request, ip);
-        return ResponseEntity.ok(resp);
+        ResponseCookie cookie = ResponseCookie.from("token", resp.getTokenJWT())
+            .httpOnly(true)           
+            .secure(false)          
+            .path("/")
+            .sameSite("Lax")
+            .build();
+        return ResponseEntity
+                .ok()
+                .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                .body(resp);
     }
 
     // ---------- LOGOUT ----------

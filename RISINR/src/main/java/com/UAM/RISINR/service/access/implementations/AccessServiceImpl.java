@@ -14,7 +14,6 @@ import com.UAM.RISINR.repository.PerfilRepository;
 import com.UAM.RISINR.repository.RegistroEventoRepository;
 import com.UAM.RISINR.repository.RolRepository;
 import com.UAM.RISINR.repository.SesionRepository;
-import com.UAM.RISINR.repository.projection.PerfilRolView;
 import com.UAM.RISINR.repository.projection.RolView;
 import com.UAM.RISINR.service.access.AccessService;
 import com.UAM.RISINR.service.access.AccountLockedService;
@@ -33,7 +32,6 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Service
 public class AccessServiceImpl implements AccessService {
@@ -158,15 +156,13 @@ public class AccessServiceImpl implements AccessService {
                 );
 
         // 4) Roles: ids/estado (Perfil) → detalle (Rol)
-        var perfiles = perfilRepo.findByPerfilPKUsuarioNumEmpleadoAndPerfilPKUsuarioCURP(usuario.getnumEmpleado(), usuario.getcurp()); //List con Roles del usuario
+        var perfiles = perfilRepo.findByPerfilPKUsuarioNumEmpleadoAndPerfilPKUsuarioCURP(usuario.getnumEmpleado(), usuario.getcurp()); //List con Perfiles del usuario
         if (perfiles.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "El usuario no tiene roles asignados");
         }
         List<Integer> rolIds = perfiles.stream()
-                .map(PerfilRolView::getPerfilPKRolidRol)
-                .distinct()
-                .collect(Collectors.toList());
-
+        .map(p -> p.getPerfilPK().getRolidRol())
+        .toList();
         var rolRows = rolRepo.findByIdRolIn(rolIds);
         Map<Integer, RolView> byId = new LinkedHashMap<>();
         rolRows.forEach(r -> byId.put(r.getIdRol(), r));
