@@ -2,18 +2,18 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package com.UAM.RISINR.service;
+package com.UAM.RISINR.service.equipoImagenologia.implementations;
 
 import com.UAM.RISINR.model.AreaDeServicio;
 import com.UAM.RISINR.model.EquipoImagenologia;
 import com.UAM.RISINR.model.dto.EquipoImagenologiaDTO;
-import com.UAM.RISINR.repository.AreaDeServicioRepository;
 import com.UAM.RISINR.repository.EquipoImagenologiaRepository;
+import com.UAM.RISINR.service.areaDeServicio.AreaDeServicioService;
+import com.UAM.RISINR.service.equipoImagenologia.EquipoImagenologiaService;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,16 +22,19 @@ import org.springframework.transaction.annotation.Transactional;
  * @author vsfs2
  */
 @Service
-public class EquipoImagenologiaManager {
+public class EquipoImagenologiaServiceImpl implements EquipoImagenologiaService{
     
-    @Autowired
-    private EquipoImagenologiaRepository repository; 
-    
-    @Autowired
-    private AreaDeServicioManager areaManager;
+    private final AreaDeServicioService areaService; 
+    private final EquipoImagenologiaRepository repository; 
+
+    public EquipoImagenologiaServiceImpl(AreaDeServicioService areaService, EquipoImagenologiaRepository repository ) {
+        this.areaService = areaService;
+        this.repository = repository;
+    }
     
     
     @Transactional(readOnly = true)
+    @Override
     public List<EquipoImagenologiaDTO> consultarTodos(){
  
         List<EquipoImagenologia> equipos = repository.findAll();
@@ -44,7 +47,7 @@ public class EquipoImagenologiaManager {
         return equiposDTO;
     }   
     
-    
+    @Override
     public EquipoImagenologiaDTO add(Map<String, String> formData){  
         String nSerie = formData.get("nserEQP");
         EquipoImagenologia equipo;
@@ -57,6 +60,7 @@ public class EquipoImagenologiaManager {
         } 
     }
     
+    @Override
     public EquipoImagenologia  edit(Map<String, String> formData){
        String nSerie = formData.get("nserEQP");
        EquipoImagenologia equipo = validarEquipo(nSerie);
@@ -72,7 +76,7 @@ public class EquipoImagenologiaManager {
             case "modalEQP": equipo.setModalidad(valor); break;
             case "edoEqp": equipo.setEstado(valor); break;
             case "areEqp":
-                var area = areaManager.consultarPorID(valor);
+                var area = areaService.consultarPorID(valor);
                 if (area != null) {
                     equipo.setAreaDeServicioidArea(area);
                 }
@@ -84,7 +88,7 @@ public class EquipoImagenologiaManager {
    }
      
 
-    
+    @Override
     public EquipoImagenologiaDTO convertirDTO(EquipoImagenologia eqp){
         String nSerie = eqp.getnSerie();
         String nombreEquipo = eqp.getNombre();
@@ -107,7 +111,7 @@ public class EquipoImagenologiaManager {
         String marca = formData.get("marcaEQP");
         String modelo = formData.get("modeloEQP");
         String modalidad = formData.get("modalEQP");
-        AreaDeServicio area = areaManager.consultarPorID(formData.get("areEqp"));  
+        AreaDeServicio area = areaService.consultarPorID(formData.get("areEqp"));  
         String estado = formData.get("edoEqp");
         
         EquipoImagenologia equipo = new EquipoImagenologia(nSerie, nombre, marca, modelo, modalidad, estado, area);
@@ -121,7 +125,6 @@ public class EquipoImagenologiaManager {
         return equipo;
  
    }
-   
-   
-   
+    
+    
 }
