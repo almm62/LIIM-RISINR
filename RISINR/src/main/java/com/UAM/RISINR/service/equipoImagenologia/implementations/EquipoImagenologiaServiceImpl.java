@@ -30,14 +30,19 @@ public class EquipoImagenologiaServiceImpl implements EquipoImagenologiaService{
     private final AreaDeServicioService areaService; 
     private final EquipoImagenologiaRepository repository; 
     private final RegistroEventoService registroEvento; 
-     private final ObjectMapper objMapper;
+    private final ObjectMapper objMapper;
     
+    // Aplicaciones
+    private static final int APLICACION_CONSULTA = 2;
+    private static final int APLICACION_EDITAR = 3;
+    private static final int APLICACION_CREAR = 4;
     
-    private static final int APLICACION_ID = 5;
-    private static final int EQUIPO_AGREGADO = 20;
-    private static final int EQUIPO_EDITADO = 21  ;
-    private static final int  CATALOGO_CONSULTADO = 22;
-    private static final int NUM_SERIE_EXISTENTE = 1020;
+    //Eventos
+    private static final int EQUIPO_AGREGADO_EXITOSAMENTE = 5;
+    private static final int EQUIPO_EDITADO_EXITOSAMENTE = 6  ;
+    private static final int  CATALOGO_CONSULTADO_EXITOSAMENTE = 7;
+    private static final int NUM_SERIE_EXISTENTE = 1004;
+    private static final int EQUIPO_EDITADO_FALLIDAMENTE = 1005;
     
     
     private long hora = 0;
@@ -64,9 +69,7 @@ public class EquipoImagenologiaServiceImpl implements EquipoImagenologiaService{
             EquipoImagenologiaDTO equipoDTO = convertirDTO(eqp);
             equiposDTO.add(equipoDTO);
         }
-        
-       
-        registroEvento.log(CATALOGO_CONSULTADO, APLICACION_ID, hora, "{}");
+        registroEvento.log(CATALOGO_CONSULTADO_EXITOSAMENTE, APLICACION_CONSULTA, hora, "{}");
         return equiposDTO;
     }   
     
@@ -75,7 +78,7 @@ public class EquipoImagenologiaServiceImpl implements EquipoImagenologiaService{
         hora =  System.currentTimeMillis();
         String nSerie = formData.get("nserEQP");
         EquipoImagenologia equipo;
-        String datos = "";
+        String datos = "{}";
         if(validarEquipo(nSerie) == null){
             equipo = extraerDatos(formData);
             repository.save(equipo);
@@ -87,19 +90,22 @@ public class EquipoImagenologiaServiceImpl implements EquipoImagenologiaService{
                 e.printStackTrace(); 
                      datos = "{}"; // valor por defecto para no romper la app
             }
-            registroEvento.log(EQUIPO_AGREGADO, APLICACION_ID, hora, datos);
+            registroEvento.log(EQUIPO_AGREGADO_EXITOSAMENTE, APLICACION_CREAR, hora, datos);
             return equipoDTO;
         } else{
-            registroEvento.log(NUM_SERIE_EXISTENTE, APLICACION_ID, hora, datos);
+            registroEvento.log(NUM_SERIE_EXISTENTE, APLICACION_CREAR, hora, datos);
             return null;
         } 
     }
     
     @Override
-    public EquipoImagenologia  edit(Map<String, String> formData){
+    public EquipoImagenologiaDTO  edit(Map<String, String> formData){
+       hora =  System.currentTimeMillis();
+       String datos = "";
        String nSerie = formData.get("nserEQP");
        EquipoImagenologia equipo = validarEquipo(nSerie);
        if(equipo == null){
+           registroEvento.log(EQUIPO_EDITADO_FALLIDAMENTE, APLICACION_EDITAR, hora, nSerie);
            return null;
        }
            
@@ -119,7 +125,17 @@ public class EquipoImagenologiaServiceImpl implements EquipoImagenologiaService{
         }
     });      
         repository.save(equipo);
-        return equipo;
+        EquipoImagenologiaDTO equipoDTO = convertirDTO(equipo);
+        try {
+                 datos = objMapper.writeValueAsString(equipoDTO); // JSON correcto
+                 System.out.println(datos);
+        } catch (JsonProcessingException e) {
+                e.printStackTrace(); 
+                     datos = "{}"; // valor por defecto para no romper la app
+            }
+        
+        registroEvento.log(EQUIPO_EDITADO_EXITOSAMENTE, APLICACION_EDITAR, hora, datos);
+        return equipoDTO;
    }
      
 
