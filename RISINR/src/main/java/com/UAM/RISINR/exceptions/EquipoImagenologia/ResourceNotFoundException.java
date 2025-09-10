@@ -10,8 +10,8 @@ package com.UAM.RISINR.exceptions.EquipoImagenologia;
  * @author vsfs2
  */
 
-public class EquipoNotFoundException extends RuntimeException{
-  public EquipoNotFoundException(String message) {
+public class ResourceNotFoundException extends RuntimeException{
+  public ResourceNotFoundException(String message) {
       super(message);
   }
 }

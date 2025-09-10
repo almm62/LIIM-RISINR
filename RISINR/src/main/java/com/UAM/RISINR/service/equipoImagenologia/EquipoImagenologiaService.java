@@ -17,7 +17,7 @@ public interface EquipoImagenologiaService {
     
     List<EquipoImagenologiaDTO> consultarTodos();
     EquipoImagenologiaDTO add(EquipoImagenologiaDTO equipoDTO);
-    EquipoImagenologiaDTO  edit(Map<String, String> formData);
+    EquipoImagenologiaDTO  edit(EquipoImagenologiaDTO equipoDTO);
     EquipoImagenologiaDTO convertirDTO(EquipoImagenologia eqp);
     
 }

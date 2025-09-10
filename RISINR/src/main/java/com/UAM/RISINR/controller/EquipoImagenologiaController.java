@@ -60,8 +60,8 @@ public class EquipoImagenologiaController {
     
     
     @PostMapping("/editEquipo")
-    public ResponseEntity<Object> editEquipo(@RequestParam Map<String, String> formData) {
-            EquipoImagenologiaDTO equipo = service.edit(formData);
+    public ResponseEntity<Object> editEquipo(@RequestBody EquipoImagenologiaDTO equipoDTO) {
+            EquipoImagenologiaDTO equipo = service.edit(equipoDTO);
             List<Object> equipos = new ArrayList();
             
             if (equipo == null) {

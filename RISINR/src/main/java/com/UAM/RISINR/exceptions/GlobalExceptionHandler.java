@@ -4,7 +4,7 @@
  */
 package com.UAM.RISINR.exceptions;
 
-import com.UAM.RISINR.exceptions.EquipoImagenologia.EquipoNotFoundException;
+import com.UAM.RISINR.exceptions.EquipoImagenologia.ResourceNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -18,9 +18,14 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
     
-    @ExceptionHandler(EquipoNotFoundException.class)
-    public ResponseEntity<String> handleEquipoNotFound(EquipoNotFoundException ex) {
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<String> handleEquipoNotFound(ResourceNotFoundException ex) {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
     }
     
+    @ExceptionHandler(ResourceFoundException.class)
+    public ResponseEntity<String> handleResourceFoundException(ResourceFoundException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
+    }
+  
 }
