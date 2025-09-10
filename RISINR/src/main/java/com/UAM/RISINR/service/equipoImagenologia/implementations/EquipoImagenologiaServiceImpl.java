@@ -4,6 +4,7 @@
  */
 package com.UAM.RISINR.service.equipoImagenologia.implementations;
 
+import com.UAM.RISINR.exceptions.EquipoImagenologia.EquipoNotFoundException;
 import com.UAM.RISINR.model.AreaDeServicio;
 import com.UAM.RISINR.model.EquipoImagenologia;
 import com.UAM.RISINR.model.dto.EquipoImagenologiaDTO;
@@ -17,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -74,32 +76,41 @@ public class EquipoImagenologiaServiceImpl implements EquipoImagenologiaService{
     }   
     
     @Override
-    public EquipoImagenologiaDTO add(Map<String, String> formData){  
+    public EquipoImagenologiaDTO add(EquipoImagenologiaDTO equipoDTO){  
         hora =  System.currentTimeMillis();
-        String nSerie = formData.get("nserEQP");
         EquipoImagenologia equipo;
+        AreaDeServicio area;
         String datos = "{}";
-        if(validarEquipo(nSerie) == null){
-            equipo = extraerDatos(formData);
+        String nSerie = equipoDTO.getnSerie();
+        
+        if(validarEquipo(nSerie) != null){
+            registroEvento.log(NUM_SERIE_EXISTENTE, APLICACION_CREAR, hora, datos);
+            throw new EquipoNotFoundException("El equipo con numero de serie "+ nSerie +  " ya ha sido registrado");
+           
+        }else{
+            
+            area = validarArea(equipoDTO.getIdArea());
+            if(area == null){
+                registroEvento.log(NUM_SERIE_EXISTENTE, APLICACION_CREAR, hora, datos);
+                return null;   
+            }
+            equipo = extraerDatos(equipoDTO, area);
             repository.save(equipo);
-            EquipoImagenologiaDTO equipoDTO = convertirDTO(equipo);
             try {
                  datos = objMapper.writeValueAsString(equipoDTO); // JSON correcto
                  System.out.println(datos);
             } catch (JsonProcessingException e) {
-                e.printStackTrace(); 
-                     datos = "{}"; // valor por defecto para no romper la app
+                e.printStackTrace();  // valor por defecto para no romper la app
             }
             registroEvento.log(EQUIPO_AGREGADO_EXITOSAMENTE, APLICACION_CREAR, hora, datos);
             return equipoDTO;
-        } else{
-            registroEvento.log(NUM_SERIE_EXISTENTE, APLICACION_CREAR, hora, datos);
-            return null;
-        } 
+        }
     }
+    
     
     @Override
     public EquipoImagenologiaDTO  edit(Map<String, String> formData){
+        
        hora =  System.currentTimeMillis();
        String datos = "";
        String nSerie = formData.get("nserEQP");
@@ -116,12 +127,7 @@ public class EquipoImagenologiaServiceImpl implements EquipoImagenologiaService{
             case "marcaEQP": equipo.setMarca(valor); break;
             case "modalEQP": equipo.setModalidad(valor); break;
             case "edoEqp": equipo.setEstado(valor); break;
-            case "areEqp":
-                var area = areaService.consultarPorID(valor);
-                if (area != null) {
-                    equipo.setAreaDeServicioidArea(area);
-                }
-                break;
+           
         }
     });      
         repository.save(equipo);
@@ -156,26 +162,56 @@ public class EquipoImagenologiaServiceImpl implements EquipoImagenologiaService{
         return equipoDTO;  
     }
 
-   public EquipoImagenologia extraerDatos(Map<String, String> formData){
+   public EquipoImagenologia extraerDatosFormulario(Map<String, String> formData){
         String nSerie = formData.get("nserEQP");
         String nombre = formData.get("nomEQP");
         String marca = formData.get("marcaEQP");
         String modelo = formData.get("modeloEQP");
         String modalidad = formData.get("modalEQP");
-        AreaDeServicio area = areaService.consultarPorID(formData.get("areEqp"));  
+        //AreaDeServicio area = areaService.consultarPorID(formData.get("areEqp"));  
         String estado = formData.get("edoEqp");
         
-        EquipoImagenologia equipo = new EquipoImagenologia(nSerie, nombre, marca, modelo, modalidad, estado, area);
+        EquipoImagenologia equipo = new EquipoImagenologia(nSerie, nombre, marca, modelo, modalidad, estado);
        
        return equipo;
    }
    
    public EquipoImagenologia  validarEquipo(String nSerie){
-       
         EquipoImagenologia equipo = repository.findBynSerie(nSerie);
         return equipo;
- 
    }
+   
+   public AreaDeServicio  validarArea(Integer idArea){
+        AreaDeServicio area = areaService.consultarPorID(idArea);
+        return area;
+   }
+   
+   /*
+    public EquipoImagenologia extraerDatos(EquipoImage){
     
+    }
+    */
+   
+   public boolean validacion(){
+       
+       
+       return true;
+   
+   }
+   
+   public EquipoImagenologia extraerDatos(EquipoImagenologiaDTO equipoDTO, AreaDeServicio area){
+       EquipoImagenologia equipo = new EquipoImagenologia();
+       
+       equipo.setnSerie(equipoDTO.getnSerie());
+       equipo.setNombre(equipoDTO.getNombreEquipo());
+       equipo.setMarca(equipoDTO.getMarca());
+       equipo.setModalidad(equipoDTO.getModalidad());
+       equipo.setModelo(equipoDTO.getModelo());
+       equipo.setEstado(equipoDTO.getEstado());
+       equipo.setAreaDeServicioidArea(area);
+       equipo.setFechaInstalacion(equipoDTO.getFechaInstalacion());
+
+       return equipo;
+   }
     
 }

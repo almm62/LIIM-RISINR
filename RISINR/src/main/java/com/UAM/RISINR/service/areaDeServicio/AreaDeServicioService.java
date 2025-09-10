@@ -11,5 +11,5 @@ import com.UAM.RISINR.model.AreaDeServicio;
  * @author vsfs2
  */
 public interface AreaDeServicioService {
-        AreaDeServicio consultarPorID(String id); 
+        AreaDeServicio consultarPorID(Integer id); 
 }

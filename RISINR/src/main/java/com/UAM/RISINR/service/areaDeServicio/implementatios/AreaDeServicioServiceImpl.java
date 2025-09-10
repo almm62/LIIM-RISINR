@@ -25,8 +25,7 @@ public class AreaDeServicioServiceImpl implements AreaDeServicioService{
     }
     
     @Override
-    public AreaDeServicio consultarPorID(String id){
-        Integer idArea = Integer.parseInt(id);
+    public AreaDeServicio consultarPorID(Integer idArea){
         return areaRepository.findByIdArea(idArea);  
     }
     

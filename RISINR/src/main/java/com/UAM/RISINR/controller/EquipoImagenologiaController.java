@@ -50,17 +50,12 @@ public class EquipoImagenologiaController {
     }
     
     @PostMapping("/addEquipo")
-    public ResponseEntity<Object> addEquipo(@RequestParam Map<String, String> formData) {
-            System.out.println("Entró al controlador para agreagar");
-        
-        EquipoImagenologiaDTO equipoDTO = service.add(formData);
-            
+    public ResponseEntity<Object> addEquipo(@RequestBody EquipoImagenologiaDTO equipoDTO) {
+        System.out.println("Entró al controlador para agreagar");
+        EquipoImagenologiaDTO equipoImgDTO = service.add(equipoDTO); 
         System.out.println("Salio del service");
-            if(equipoDTO != null){
-                 return ResponseEntity.ok(equipoDTO);
-            }else{
-                return ResponseEntity.status(HttpStatus.CONFLICT).body("El equipo ya está registrado con ese número de serie.");
-            }
+        return ResponseEntity.ok(equipoImgDTO);
+           
         }
     
     
