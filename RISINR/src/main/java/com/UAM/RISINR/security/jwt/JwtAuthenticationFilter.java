@@ -89,7 +89,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 if (!skipRenew) {
                     String nuevo = cybersecurity.encriptarDatos(subjectJson);
                     ResponseCookie refresh = ResponseCookie.from("token", nuevo)
-                        .httpOnly(true)           
+                        .httpOnly(false)           
                         .secure(false)            
                         .path("/")
                         .sameSite("Lax")

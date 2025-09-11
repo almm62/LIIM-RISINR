@@ -47,11 +47,11 @@ public class AccessServiceImpl implements AccessService {
     private final ObjectMapper objectMapper;
     private String datos;
 
-    private static final int EVENTO_LOGIN_EXITOSO = 2;     // "Login Exitoso"
+    private static final int EVENTO_LOGIN_EXITOSO = 1;     // "Login Exitoso"
+    private static final int EVENTO_BLOQUEO_DE_USUARIO = 2;//"Cambio de Estado='Activo' -> Estado='Bloqueado'
     private static final int EVENTO_PWD_INCORRECTA = 1001; // "Contraseña Incorrecta en Login"
     private static final int EVENTO_USUARIO_INVALIDO = 1002; // "Usuario invalido"
     private static final int EVENTO_USUARIO_BLOQUEADO = 1003;//"Usuario con estado!=Activo"
-    private static final int EVENTO_BLOQUEO_DE_USUARIO = 3;//"Cambio de Estado='Activo' -> Estado='Bloqueado'
     // Aplicación que registra el evento
     private static final int APLICACION_ID = 0;
 
@@ -105,7 +105,7 @@ public class AccessServiceImpl implements AccessService {
             System.out.println("Usuario invalido");
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "USER_INVALID");
         }
-        if (!"Activo".equals(match.get().getEstado())){
+        if (!"Activo".equals(match.get().getEstado()) && !"Inicial".equals(match.get().getEstado())){
             registroEvento.log(EVENTO_USUARIO_BLOQUEADO, APLICACION_ID, hora, datos);
             System.out.println("Usuario Bloqueado");
             throw new ResponseStatusException(HttpStatus.LOCKED, "USER_LOCKED");

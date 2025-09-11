@@ -16,6 +16,10 @@ function activeTab(evt, opcionMenu) {
     strtablinks = evt.currentTarget.className;
     if (strtablinks === "tablinks")
         evt.currentTarget.className += " active";//solo para la clase del menu
+    if(opcionMenu==='USUARIOSTAB'){
+        CrudUSR('btnCatUSRtbl');
+        html_HideElement("btnEdtUsrtbl")
+    }
 }
 
 function agregarPreloader(servicio) {
@@ -274,8 +278,13 @@ function UpdateTableRows(tablename, jsonarray) {
     for (var i = 1; i < rowCount; i++) {
         tableref.deleteRow(1);
     }
-
+   
     var col =getKeysJsonArray(jsonarray);
+    
+    if (tablename==="tblusuarios"){
+        //Seleccionar orden en que aparecen en la tabla
+        var col =['numEmpleado','nombre','apellidoPaterno','apellidoMaterno','correoElectronico','areaHospitalaria','curp','perfiles', 'estado'];        
+    }
     // ADD JSON DATA TO THE TABLE AS ROWS.
     for (var i = 0; i < jsonarray.length; i++) {
         tr = tableref.insertRow(-1);
@@ -283,6 +292,8 @@ function UpdateTableRows(tablename, jsonarray) {
             var tabCell = document.createElement('td');          // TABLE DEFINITION.
             tabCell = tr.insertCell(-1);
             tabCell.innerHTML = jsonarray[i][col[j]];// ADD VALUES TO EACH CELL.
+            console.log(col[j]);
+            
         }
     }
 }

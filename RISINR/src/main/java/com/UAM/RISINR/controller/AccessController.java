@@ -35,7 +35,7 @@ public class AccessController {
         LoginResponseDTO resp = accessService.login(request, ip);
         if (resp.getTokenJWT() != null){
             ResponseCookie cookie = ResponseCookie.from("token", resp.getTokenJWT())
-            .httpOnly(true)   
+            .httpOnly(false)   
             .secure(false)   
             .path("/")
             .sameSite("Lax")
@@ -57,7 +57,7 @@ public class AccessController {
         String ip = extraerIp(httpReq);
         LoginResponseDTO resp = accessService.seleccionarRol(request, ip);
         ResponseCookie cookie = ResponseCookie.from("token", resp.getTokenJWT())
-            .httpOnly(true)           
+            .httpOnly(false)           
             .secure(false)          
             .path("/")
             .sameSite("Lax")

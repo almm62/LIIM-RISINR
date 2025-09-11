@@ -37,18 +37,20 @@ public class UserServiceImpl implements UserService{
     private final RolRepository rolRepo;
     private final ObjectMapper objectMapper;
     
-    private static final int USER_CREATE_SUCCESS=1;
-    private static final int USER_UPDATE_SUCCESS=2;
-    private static final int USER_DEACTIVATE_SUCCESS=4;
-    private static final int USER_UNLOCKED_SUCCESS=3;
-    private static final int DUPLICATE_USER_PK=1004;
-    private static final int USER_ID_LINKED_TO_ANOTHER=1005;
-    private static final int EMAIL_LINKED_TO_ANOTHER=1006;
-    private static final int INVALID_ROLE=1007;
-    private static final int INVALID_AREA=1008;
-    private static final int USER_ID_NOT_FOUND=1009;
+    private static final int USER_CREATE_SUCCESS=6;
+    private static final int USER_UPDATE_SUCCESS=7;
+    private static final int USER_DEACTIVATE_SUCCESS=8;
+    private static final int USER_UNLOCKED_SUCCESS=9;
+    private static final int USER_LOCKED_SUCCESS= 10;
+    private static final int DUPLICATE_USER_PK=1006;
+    private static final int USER_ID_LINKED_TO_ANOTHER=1007;
+    private static final int EMAIL_LINKED_TO_ANOTHER=1008;
+    private static final int INVALID_ROLE=1009;
+    private static final int INVALID_AREA=1010;
+    private static final int USER_PK_NOT_FOUND=1011;
     // Aplicación que registra el evento
-    private static final int APLICACION_ID = 1;
+    private static final int APLICACION_ALTA_USUARIOS = 6; // Separar por aplicaciones:
+    private static final int APLICACION_ACTUALIZACION_USUARIOS = 5; // Separar por aplicaciones:
     
     
 public UserServiceImpl(RegistroEventoService registroEvento, UsuarioRepository usuarioRepo, DatosAccesoRepository datosAccesoRepo, AreaDeServicioRepository areaDeServicioRepo, PerfilRepository perfilRepo, RolRepository rolRepo, ObjectMapper objectMapper){
@@ -96,24 +98,24 @@ public UserServiceImpl(RegistroEventoService registroEvento, UsuarioRepository u
                                                                         dto.getCurp());
         var matchUsuarioPK=usuarioRepo.findById(usrPK);
         if (matchUsuarioPK.isPresent()){
-            registroEvento.log(DUPLICATE_USER_PK, APLICACION_ID, hora, datos);
+            registroEvento.log(DUPLICATE_USER_PK, APLICACION_ALTA_USUARIOS, hora, datos);
             throw new ResponseStatusException(HttpStatus.CONFLICT, "UsuarioPK ya existente");
         }
         //Verificar que no exista Correo en la BD
         var matchCorreoElectronico=usuarioRepo.findByCorreoElectronico(dto.getCorreoElectronico());
         if (matchCorreoElectronico.isPresent()){
-            registroEvento.log(EMAIL_LINKED_TO_ANOTHER, APLICACION_ID, hora, datos);
+            registroEvento.log(EMAIL_LINKED_TO_ANOTHER, APLICACION_ALTA_USUARIOS, hora, datos);
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Correo vinculado a otro usuario");
         }
         //Verificar que no exista UsuarioID en la BD
         var matchID=datosAccesoRepo.findByIdUsuarioID(dto.getUsuarioID());
         if (matchID.isPresent()){
-            registroEvento.log(USER_ID_LINKED_TO_ANOTHER, APLICACION_ID, hora, datos);
+            registroEvento.log(USER_ID_LINKED_TO_ANOTHER, APLICACION_ALTA_USUARIOS, hora, datos);
             throw new ResponseStatusException(HttpStatus.CONFLICT, "UsuarioID ya existente");
         }
         var area=areaDeServicioRepo.findById(dto.getArea());
         if (area.isEmpty()){
-            registroEvento.log(INVALID_AREA, APLICACION_ID, hora, datos);
+            registroEvento.log(INVALID_AREA, APLICACION_ALTA_USUARIOS, hora, datos);
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Rol no existe");
         }
         
@@ -141,7 +143,7 @@ public UserServiceImpl(RegistroEventoService registroEvento, UsuarioRepository u
         for(Integer rol:dto.getRoles()){
             var matchRol=rolRepo.findById(rol);
             if(matchRol.isEmpty()){
-                registroEvento.log(INVALID_ROLE, APLICACION_ID, hora, datos);
+                registroEvento.log(INVALID_ROLE, APLICACION_ALTA_USUARIOS, hora, datos);
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Rol no existe");
             }
             perfiles.add(matchRol.get().getNombre());
@@ -149,7 +151,7 @@ public UserServiceImpl(RegistroEventoService registroEvento, UsuarioRepository u
             var perf = new Perfil(perfPK,0);
             perfilRepo.save(perf);
         }
-        registroEvento.log(USER_CREATE_SUCCESS, APLICACION_ID, hora, datos);
+        registroEvento.log(USER_CREATE_SUCCESS, APLICACION_ALTA_USUARIOS, hora, datos);
         return new UsuarioResumenDTO(dto.getNumEmpleado(),
                                                                              dto.getNombre(),
                                                                           dto.getApellidoPaterno(),
@@ -157,7 +159,8 @@ public UserServiceImpl(RegistroEventoService registroEvento, UsuarioRepository u
                                                                         dto.getCorreoElectronico(),
                                                                          area.get().getNombre(),
                                                                  dto.getCurp(),
-                                                                         perfiles
+                                                                         perfiles,
+                                                                        dto.getEstado()
         );
     }
 
@@ -177,26 +180,25 @@ public UserServiceImpl(RegistroEventoService registroEvento, UsuarioRepository u
         } catch (Exception e) {
             // Si el subject no se puede parsear, no podemos cerrar sesión
         }
-        
-        var usrMatch=datosAccesoRepo.findByIdUsuarioID(dto.getUsuarioID());
+        var usrMatch=usuarioRepo.findById(new UsuarioPK(dto.getNumEmpleado(), dto.getcurp()));
         if (usrMatch.isEmpty()){
-            registroEvento.log(USER_ID_NOT_FOUND, APLICACION_ID, hora, datos);
+            registroEvento.log(USER_PK_NOT_FOUND, APLICACION_ACTUALIZACION_USUARIOS, hora, datos);
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no existe");
         }
         //Verificar que no exista Correo en la BD
         var matchCorreoElectronico=usuarioRepo.findByCorreoElectronico(dto.getCorreoElectronico());
         if (matchCorreoElectronico.isPresent()){
-            if(!matchCorreoElectronico.get().getUsuarioPK().equals(usrMatch.get().getUsuario().getUsuarioPK())){
-            registroEvento.log(EMAIL_LINKED_TO_ANOTHER, APLICACION_ID, hora, datos);
+            if(!matchCorreoElectronico.get().getUsuarioPK().equals(usrMatch.get().getUsuarioPK())){
+            registroEvento.log(EMAIL_LINKED_TO_ANOTHER, APLICACION_ACTUALIZACION_USUARIOS, hora, datos);
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Correo vinculado a otro usuario");
             }
         }
-        //Obtenemos UsuarioPK para identificar al Usuario y editar
-        var usr= new Usuario (usrMatch.get().getUsuario().getUsuarioPK());
+        //Obtenemos Usuario para identificar al Usuario y editar
+        var usr= usrMatch.get();
         var area = areaDeServicioRepo.findById(dto.getArea());
         if (area.isEmpty()){
-            registroEvento.log(INVALID_AREA, APLICACION_ID, hora, datos);
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Rol no existe");
+            registroEvento.log(INVALID_AREA, APLICACION_ACTUALIZACION_USUARIOS, hora, datos);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Area no existe");
         }
         usr.setNombre(dto.getNombre());
         usr.setApellidoPaterno(dto.getApellidoPaterno());
@@ -204,6 +206,16 @@ public UserServiceImpl(RegistroEventoService registroEvento, UsuarioRepository u
         usr.setAreaidArea(area.get());
         usr.setCorreoElectronico(dto.getCorreoElectronico());
         usuarioRepo.save(usr);
+        
+        var edoAnterior=usr.getDatosAcceso().getEstado();
+        System.out.println("\n\n\n\n\n"+edoAnterior);
+        
+        
+        var acceso = usr.getDatosAcceso();
+        acceso.setEstado(dto.getEstado());
+        datosAccesoRepo.save(acceso);
+        var edoNuevo=usrMatch.get().getDatosAcceso().getEstado();
+        System.out.println(edoNuevo+usr.getDatosAcceso().getEstado()+"\n\n\n\n");
         
         List<String> perfiles= new ArrayList<>();
         //Borramos los Perfiles actuales
@@ -221,7 +233,7 @@ public UserServiceImpl(RegistroEventoService registroEvento, UsuarioRepository u
         for(Integer rol:perfilesNuevos){
             var matchRol=rolRepo.findById(rol);
             if(matchRol.isEmpty()){
-                registroEvento.log(INVALID_ROLE, APLICACION_ID, hora, datos);
+                registroEvento.log(INVALID_ROLE, APLICACION_ACTUALIZACION_USUARIOS, hora, datos);
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Rol no existe");
             }
             perfiles.add(matchRol.get().getNombre());
@@ -229,7 +241,17 @@ public UserServiceImpl(RegistroEventoService registroEvento, UsuarioRepository u
             var perf = new Perfil(perfPK,0);
             perfilRepo.save(perf);
         }
-        registroEvento.log(USER_UPDATE_SUCCESS, APLICACION_ID, hora, datos);
+        
+        //Analisis de Cambios de estado
+        if (!edoAnterior.equals(dto.getEstado())){
+            switch(dto.getEstado()){
+                case "Bloqueado" -> registroEvento.log(USER_LOCKED_SUCCESS, APLICACION_ACTUALIZACION_USUARIOS, hora+1, datos);
+                case "Dado de baja" -> registroEvento.log(USER_DEACTIVATE_SUCCESS, APLICACION_ACTUALIZACION_USUARIOS, hora+1, datos);
+                default -> { if("Bloqueado".equals(edoAnterior)){registroEvento.log(USER_UNLOCKED_SUCCESS, APLICACION_ACTUALIZACION_USUARIOS, hora+1, datos);}}
+            }
+        }             
+                          
+        registroEvento.log(USER_UPDATE_SUCCESS, APLICACION_ACTUALIZACION_USUARIOS, hora, datos);
         return new UsuarioResumenDTO(
                 usr.getUsuarioPK().getNumEmpleado(),
                 usr.getNombre(),
@@ -238,7 +260,8 @@ public UserServiceImpl(RegistroEventoService registroEvento, UsuarioRepository u
                 usr.getCorreoElectronico(),
                 usr.getAreaidArea().getNombre(),
                 usr.getUsuarioPK().getCurp(),
-                perfiles);
+                perfiles,
+                usr.getDatosAcceso().getEstado());
         
         
     }
@@ -253,7 +276,8 @@ public UserServiceImpl(RegistroEventoService registroEvento, UsuarioRepository u
         usuario.getCorreoElectronico(),
         usuario.getAreaidArea().getNombre(),
         usuario.getUsuarioPK().getCurp(),
-        roles
+        roles,
+        usuario.getDatosAcceso().getEstado()
         );
     }
     
