@@ -164,7 +164,7 @@ public class EquipoImagenologiaServiceImpl implements EquipoImagenologiaService{
         String estado = eqp.getEstado();
         Date fechaInstalacion = eqp.getFechaInstalacion();
 
-        EquipoImagenologiaDTO equipoDTO = new EquipoImagenologiaDTO(nSerie, nombreEquipo, marca, modelo, modalidad, idArea, nombreArea, estado,fechaInstalacion);
+        EquipoImagenologiaDTO equipoDTO = new EquipoImagenologiaDTO(nSerie, nombreEquipo, marca, modelo, modalidad, idArea, estado,fechaInstalacion);
 
         return equipoDTO;  
     }

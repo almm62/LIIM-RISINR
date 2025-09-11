@@ -19,19 +19,18 @@ public class EquipoImagenologiaDTO {
         private String modelo;
         private String modalidad;
         private Integer idArea;
-        private String nombreArea; 
         private String estado; 
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
         private Date fechaInstalacion;
 
-    public EquipoImagenologiaDTO(String nSerie, String nombreEquipo, String marca, String modelo, String modalidad, Integer idArea, String nombreArea, String estado, Date fechaInstalacion) {
+    public EquipoImagenologiaDTO(String nSerie, String nombreEquipo, String marca, String modelo, String modalidad, Integer idArea,String estado, Date fechaInstalacion) {
         this.nSerie = nSerie;
         this.nombreEquipo = nombreEquipo;
         this.marca = marca;
         this.modelo = modelo;
         this.modalidad = modalidad;
         this.idArea = idArea;
-        this.nombreArea = nombreArea;
+    
         this.estado = estado;
         this.fechaInstalacion = fechaInstalacion;
     }
@@ -96,13 +95,6 @@ public class EquipoImagenologiaDTO {
         this.idArea = idArea;
     }
 
-    public String getNombreArea() {
-        return nombreArea;
-    }
-
-    public void setNombreArea(String nombreArea) {
-        this.nombreArea = nombreArea;
-    }
 
     public Date getFechaInstalacion() {
         return fechaInstalacion;
