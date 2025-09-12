@@ -6,7 +6,9 @@ import com.UAM.RISINR.model.dto.userManager.UsuarioResumenDTO;
 import com.UAM.RISINR.service.user.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -33,28 +35,24 @@ public class UserController {
     @PostMapping("/create")
     public ResponseEntity<UsuarioResumenDTO> create(@RequestBody CrearUsuarioDTO dto,
                                                   HttpServletRequest httpReq) {
-        String ip = extraerIp(httpReq);
-        UsuarioResumenDTO resp=userService.create(dto, ip);
+        var auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || auth.getPrincipal() == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        String subjectJson = (String) auth.getPrincipal();
+        UsuarioResumenDTO resp=userService.create(dto, subjectJson);
         return ResponseEntity.ok(resp);
     }
 
     @PostMapping("/update")
-    public ResponseEntity<Void> update(@RequestBody ActualizarUsuarioDTO dto,
+    public ResponseEntity<UsuarioResumenDTO> update(@RequestBody ActualizarUsuarioDTO dto,
                                                   HttpServletRequest httpReq) {
-        String ip = extraerIp(httpReq);
-        userService.update(dto, ip);
-        return ResponseEntity.noContent().build();
-    }
-    
-    /** Extrae la primera IP válida (X-Forwarded-For o remoteAddr) y la acorta a 15 chars. */
-    private String extraerIp(HttpServletRequest req) {
-        String ip = req.getHeader("X-Forwarded-For");
-        if (ip != null && !ip.isBlank()) {
-            int coma = ip.indexOf(',');
-            return (coma > 0 ? ip.substring(0, coma) : ip).trim(); // sin truncar
+        var auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || auth.getPrincipal() == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        ip = req.getHeader("X-Real-IP");
-        if (ip != null && !ip.isBlank()) return ip.trim();
-        return req.getRemoteAddr();
+        String subjectJson = (String) auth.getPrincipal();
+        UsuarioResumenDTO resp=userService.update(dto, subjectJson);
+        return ResponseEntity.ok(resp);
     }
 }

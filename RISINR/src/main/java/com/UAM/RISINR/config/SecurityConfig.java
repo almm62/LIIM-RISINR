@@ -55,7 +55,6 @@ public class SecurityConfig {
                 .requestMatchers("/access/login", "/access/seleccionar-rol").permitAll()
                 .requestMatchers("/login.html", "/css/**", "/js/**", "/img/**").permitAll()
                 .requestMatchers("/RISFSM/**").permitAll()
-                .requestMatchers("/user/**").permitAll()
                 // /Todo lo demas -> REQUIERE autenticación
                 .anyRequest().authenticated()
            )

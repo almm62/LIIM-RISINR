@@ -1,4 +1,4 @@
-var uriserv = "/RISSERVER/rest/USRSesionRST";
+var uriserv = "/RISSERVER";
 var host = "http://" + location.host + "/RISSERVER/";
 
 
@@ -140,16 +140,15 @@ function postRestService(urlser, jsonData) {
     return $.ajax({
         url: urlser,
         type: 'POST', // Tipo de envio 
-        dataType: 'json', //Tipo de Respuesta
-        //contentType: "application/json",
-        //data: JSON.stringify(jsonData) // 👈 Convierte tu objeto JS a JSON
-        //data: jsonData //datos a enviar
-        data: null
+        contentType: 'application/json',
+        dataType: 'json',
+        data: JSON.stringify(jsonData)
     }).done(function (data, textStatus, jqXHR) {
     console.log("Todo funcionó increíble");    
     console.log(data);
     }).fail(function (jqXHR, textStatus, errorThrown) {
         alert("Error al procesar la respuesta " + errorThrown);
+        console.log(jsonData);
     }).always(function (jqXHROrData, textStatus, jqXHROrErrorThrown) {
     });
 }
@@ -379,55 +378,41 @@ window.onload = function () {
 function SelRadioButtonTablaUSR(){
     html_VisibleElement("btnAdtUsrtbl");
     html_VisibleElement("btnEdtUsrtbl");
-    html_VisibleElement("btnDelUsrtbl");    
 }
 
 function CrudUSR(e){
+    if(typeof e === "string"){
+        accion=e;
+    }else{
     var accion=e.target.id;
+    }
     switch (accion) {
         case "btnCatUSRtbl":
         //alert("Por implementar");
-            var columnaPKUSR = 5; //se toma como llave primaria para busquedas la columna 5 curp
+            html_HideElement("btnEdtUsrtbl")
+            var columnaPKUSR = 6; //se toma como llave primaria para busquedas la columna 5 curp
             var coleditarUSR = "Ref";
             var roweditarUSR = "Sel ";
             var tabladatosUSR="tblusuarios";
             //var actionListenerUSR = "SelRadioButtonTablaUSR('" + tabladatosUSR + "'," + columnaPKUSR + ")";
             var actionListenerUSR = "SelRadioButtonTablaUSR()";
-            var colsUSR = ["Empleado", "Nombre", "Apellido paterno", "Apellido materno", "Área hospitalaria", "CURP", "Perfil"];
+            var colsUSR = ["Empleado", "Nombre", "Apellido paterno", "Apellido materno", "Correo Electrónico","Área hospitalaria", "CURP", "Perfil", "Estado"];
             $.ajax({
-                url: uriserv + "/getAll/usersManager",
+                url: uriserv + "/user/getAll",
                 type: 'GET', // Tipo de envio 
                 dataType: 'json' //Tipo de Respuesta
             }).done(function (data, textStatus, jqXHR) {
                 
                 //Bloque de código para integrar la funcionalidad de JSON Webt Token
                 var datosjson = data; // Se guarda la información en la variable datosjson
-                var keypub = datosjson["llavepublica"];// Se obtiene la llave pública del objeto JSON
-                var isValid = KJUR.jws.JWS.verifyJWT(datosjson["JWT"], keypub, { alg: ['RS256'] });//  Se valida el JWT del Backend con la función KJUR
                 //A continuación se realiza un condicional para saber si es correcta la validación
-                if (isValid) {
-                  console.log('El token es válido.');
-                  // Analizar el JWT para obtener los claims
-                  var parsed = KJUR.jws.JWS.parse(datosjson["JWT"]);
-                  var payload = parsed.payloadObj; // Se obtiene la carga útil del JWT
-                  var subject = payload.sub; // Claim estándar: subject se obtiene
-                  console.log(datosjson["JWT"]);// Se muestra en consola el JWT  
-                
-                  console.log(subject);
-                  var objetojson = JSON.parse(subject);// Se convierte a objeto JavaScript la variable subject
-                  var resultSet = convertTojsonArray(objetojson);// Se aplica la función convertTojsonArray para convertirlo en Array de JSON
-                  console.log(resultSet);
+                  console.log('La data es:   ' + data);
                   
                   CreateTableFromJSON("showDataUser", "tblusuarios", colsUSR); //parametros referencia div, nombre tabla , arreglo json, cabecera
-                  UpdateTableRows("tblusuarios", resultSet);//Se colocan los resultados en la Tabla
+                  console.log('La data es:   ' + data);
+                  UpdateTableRows("tblusuarios", data);//Se colocan los resultados en la Tabla
                   tableHeaderSelection(tabladatosUSR, [1, 2, 3, 4, 5, 6]);
-                  addRadioButtonColumnPKTBL(tabladatosUSR, 7, roweditarUSR, coleditarUSR, actionListenerUSR, columnaPKUSR); //columna 5 PK RFC
-                  tableRowColorCellSelectionKlib(tabladatosUSR);
-            
-                } 
-                else {
-                    console.error('El token no es válido.');
-                }
+                  addRadioButtonColumnPKTBL(tabladatosUSR, 9, roweditarUSR, coleditarUSR, actionListenerUSR, columnaPKUSR); //columna 5 PK RFC
                 //console.log(data); //los datos llegan como un arreglo de cadenas ordenadas como se presentaran en la tabla
                 
             }).fail(function (jqXHR, textStatus, errorThrown) {
@@ -438,13 +423,50 @@ function CrudUSR(e){
             });  
             break;
         case "btnAdtUsrtbl": //Boton de barra de nuevo usuario
+            html_HideElement("Activo"); //boton del modal de edición.
+            html_HideElement("_Activo"); //boton del modal de edición.
+            html_HideElement("Suspendido"); //boton del modal de edición.
+            html_HideElement("_Suspendido"); //boton del modal de edición.
+            html_HideElement("Bloqueado"); //boton del modal de edición.
+            html_HideElement("_Bloqueado"); //boton del modal de edición.
+            html_HideElement("Dado_de_baja"); //boton del modal de edición.
+            html_HideElement("_Dado_de_baja"); //boton del modal de edición.
             html_HideElement("actualizaUSUARIO"); //boton del modal de edición.
             html_ShowElement("nuevoUSUARIO");
+            
+            
+            html_ShowElement("usrId"); //boton del modal de edición.
+            html_ShowElement("_usrId"); //boton del modal de edición.
+            html_ShowElement("_curp"); //boton del modal de edición.
+            html_ShowElement("curp"); //boton del modal de edición.
+            html_ShowElement("numEmpleado"); //boton del modal de edición.
+            html_ShowElement("_numEmpleado"); //boton del modal de edición.
+            
             html_HideElement("perfilupdate");    //seccion de numero de serie               
             cleanCheckboxValues("perfilapp"); //limpia todas las casilla para evitar previa seleccion 
+            
             cambiaEstadoModal(".modalUSUARIOS", true); //true =activaer               
             break;
         case "btnEdtUsrtbl": //Boton de barra de edición de usuario
+            html_ShowElement("Activo"); //boton del modal de edición.
+            html_ShowElement("_Activo"); //boton del modal de edición.
+            html_ShowElement("Suspendido"); //boton del modal de edición.
+            html_ShowElement("_Suspendido"); //boton del modal de edición.
+            html_ShowElement("Bloqueado"); //boton del modal de edición.
+            html_ShowElement("_Bloqueado"); //boton del modal de edición.
+            html_ShowElement("Inicial"); //boton del modal de edición.
+            html_ShowElement("_Inicial"); //boton del modal de edición.
+            html_ShowElement("Dado_de_baja"); //boton del modal de edición.
+            html_ShowElement("_Dado_de_baja"); //boton del modal de edición.
+            
+            html_HideElement("usrId"); //boton del modal de edición.
+            html_HideElement("_usrId"); //boton del modal de edición.
+            
+            html_HideElement("_curp"); //boton del modal de edición.
+            html_HideElement("curp"); //boton del modal de edición.
+            
+            html_HideElement("_numEmpleado"); //boton del modal de edición.
+            html_HideElement("numEmpleado"); //boton del modal de edición.
             var tabla = "tblusuarios";
             var valorRadioPK = getRadioValIndice("radio" + tabla) + 1;//valor de 0 a k-1, sumarle 1
             if ((valorRadioPK) > 0) {
@@ -453,17 +475,18 @@ function CrudUSR(e){
                 html_HideElement("perfilupdate");    //seccion de numero de serie                  
                 var columnasrow = getRowCells(valorRadioPK, tabla);
                 cleanCheckboxValues("perfilapp"); //limpia todas las casilla para evitar previa seleccion 
-                var cadperfil = columnasrow[6].innerHTML; //columna del perfil es la 6
+                var cadperfil = columnasrow[7].innerHTML; //columna del perfil es la 6
                 //codigo para activar los push buttons de los perfiles del usuario en la tabla del dialogo modal.
-                cadperfil = cadperfil.substring(1, cadperfil.length - 1);//remover:[]
+                console.log(cadperfil);
                 var arregloroles = cadperfil.split(",");
+                console.log(arregloroles)
                 let renglones = [];//arreglo de seleccion
                 for (var i = 0; i < arregloroles.length; i++) {
                     var rolk = arregloroles[i];
-                    rolk = rolk.substring(1, rolk.length - 1);//remover:""
                     var renglonk = compareTableColumns("roles", 1, rolk) - 1; //columna 1 de tabla roles = perfil 
                     renglones.push(renglonk);
                 }
+                console.log(renglones);
                 if(renglones[0]!==-1)
                   setSelectedCheckboxValues("perfilapp", renglones); //activar checkboxes de acuerdo al contenido de la tabla, si no tiene perfil no hay selección   
                 document.querySelector("#USRrowid").value = valorRadioPK;
@@ -471,9 +494,11 @@ function CrudUSR(e){
                 document.getElementById("uname").value = columnasrow[1].innerHTML;
                 document.getElementById("apaterno").value = columnasrow[2].innerHTML;
                 document.getElementById("amaterno").value = columnasrow[3].innerHTML;
-                document.getElementById("curp").value = columnasrow[5].innerHTML;
-                setSelectedIndex(document.getElementById("perf2"), columnasrow[4].innerHTML); //poner en  el listbox el dato del englon seleccionado
-                document.getElementById("perfil").innerHTML = "CURP: " + columnasrow[5].innerHTML;
+                document.getElementById("correo").value = columnasrow[4].innerHTML;
+                setSelectedIndex(document.getElementById("perf2"), columnasrow[5].innerHTML); //poner en  el listbox el dato del englon seleccionado
+                document.getElementById("perfil").innerHTML = "CURP: " + columnasrow[6].innerHTML;
+                var valor=columnasrow[8].innerHTML;
+                document.querySelector(`input[name="estado"][value="${valor}"]`).checked = true;
                 cambiaEstadoModal(".modalUSUARIOS", true); //true =activaer     
                 //actualizaDialogoModal(".modalUSUARIOS-content", "12%", "1%", "60%", "50%"); //top 12%                
             } else {
@@ -481,11 +506,15 @@ function CrudUSR(e){
             }           
 
             break;
-        case "btnDelUsrtbl":
-                alert("Por Implementar borrado de usuario");
-            break;
-            
+        
         case "cancelarUSUARIO":
+            document.getElementById("usrId").value="";
+            document.getElementById("uname").value = "";
+            document.getElementById("apaterno").value = "";
+            document.getElementById("amaterno").value = "";
+            document.getElementById("correo").value="";
+            document.getElementById("numEmpleado").value="";
+            document.getElementById("correo").value = "";
             //boton del dialogo modal cancelar dialogo
             cambiaEstadoModal(".modalUSUARIOS", false); //true =activaer     
             break;
@@ -494,42 +523,34 @@ function CrudUSR(e){
             if (r === true) {
                 var tablavista = "tblusuarios";               
                 var tableref = document.getElementById(tablavista);
-                var numregistro = tableref.rows.length;
-                var usid = numregistro;
+                var usrId = document.getElementById("usrId").value;
                 var nombre = document.getElementById("uname").value;
                 var apaterno = document.getElementById("apaterno").value;
                 var amaterno = document.getElementById("amaterno").value;
-                var curp1 = document.getElementById("curp").value; 
+                var curp = document.getElementById("curp").value; 
+                var correo= document.getElementById("correo").value;
+                var numEmpleado=parseInt(document.getElementById("numEmpleado").value);
                 var selAPPS = getSelectedCheckboxValues("perfilapp");//perfilapp es el nombre de los checkboxes    
                 let valuesRow = "[";
                 let valuesCLV = [];
                 for (var i = 0; i < selAPPS.length; i++) {
                     var PERFILES = getRowCells(selAPPS[i] + 1, "showDataRol"); //reglon 1 de perfiles
                     valuesRow += '"' + PERFILES[1].innerHTML + '"' + ",";
-                    valuesCLV.push(PERFILES[0].innerHTML);
+                    valuesCLV.push(Number(PERFILES[0].innerHTML));
                 }
+                console.log(valuesCLV);
                 var perfil = valuesRow.substring(0, valuesRow.length - 1) + "]";//elimina la coma al final de la cadena
                 var refregx = getRadioVal("estado");
+                console.log(refregx);
                 var lixboxsel = document.getElementById("perf2");
                 var areaasignada = lixboxsel[lixboxsel.selectedIndex].innerText; //perfil
                 var areaser = lixboxsel[lixboxsel.selectedIndex].value; //pkey table perfil      
+                areaser=Number(areaser)
+                var Data = {"usuarioID": usrId, "nombre": nombre, "apellidoPaterno": apaterno, "apellidoMaterno": amaterno, 
+                                        "correoElectronico":correo, "curp": curp, "numEmpleado":numEmpleado, "area": areaser, "roles": valuesCLV, "estado":refregx};
+                console.log(Data);
                 
-                var jsonData = {"usrId": numregistro, "nombreUsr": nombre, "aPaterno": apaterno, "aMaterno": amaterno, "curp": curp1, "areaAsignada": areaser, "usrPerf": valuesCLV};
-                console.log(jsonData);
-                
-                var llavesrsa = KEYUTIL.generateKeypair("RSA", 2048);// Se crean el par de llaves
-                var llaveprivada = KEYUTIL.getPEM(llavesrsa.prvKeyObj,"PKCS8PRV");// Se obtiene la llave privada
-                var llavepublica = KEYUTIL.getPEM(llavesrsa.pubKeyObj);
-                var header ={ alg: "RS256", typ: "JWT"};// Se declara la cabecera del JWT
-                var JSONToken = KJUR.jws.JWS.sign("RS256", JSON.stringify(header), JSON.stringify(jsonData), llaveprivada);// Se crea el JWT
-                console.log(JSONToken);
-                var nuevoJson = {"llavepublica" : llavepublica,"token" : JSONToken};//Se guarda la llave pública y el JWT en un objeto JavaScript
-                
-                postRestService(uriserv + "/USREntity/CREATE", nuevoJson);  
-                //se agrega el renglon a la tabla de referencia
-                //var cuerpoedo1 = '<tr><td>' + numregistro + '</td><td>' + nombre + '</td><td>' + apaterno + '</td><td>' + amaterno + '</td><td>' + areaasignada + '</td><td>' + curp1 + '</td><td>' + perfil + '</td><td>' + "Editar " + edit + '</td><td>' + "Borrar " + del + '</td></tr>';                
-                //$("#" + tablavista).append(cuerpoedo1);
-                //tableRowColorCellSelection(tablavista, columnaedit, columnadel); //columna de edic´on y borrado
+                postRestService(uriserv + "/user/create", Data);  
                 cambiaEstadoModal(".modalUSUARIOS", false); //false =ocultar 
             }               
             break;
@@ -542,42 +563,34 @@ function CrudUSR(e){
                 if ((valorRadioPK) > 0) {
                     var cellsOfRow = getRowCells(valorRadioPK, tabla);
                     //var usid = document.querySelector("#USRrowid").value; 
-                    var usid = cellsOfRow[0].innerHTML;
-                    var nombre = cellsOfRow[1].innerHTML = document.getElementById("uname").value;
-                    var apaterno = cellsOfRow[2].innerHTML = document.getElementById("apaterno").value;
-                    var amaterno = cellsOfRow[3].innerHTML = document.getElementById("amaterno").value;
-                    var curp1 = cellsOfRow[5].innerHTML = document.getElementById("curp").value;
+                    var nombre = document.getElementById("uname").value;
+                    var apaterno = document.getElementById("apaterno").value;
+                    var amaterno = document.getElementById("amaterno").value;
+                    var correo=document.getElementById("correo").value;
+                    var curp = cellsOfRow[6].innerHTML;
+                    var numEmpleado=parseInt(cellsOfRow[0].innerHTML);
                     var selAPPS = getSelectedCheckboxValues("perfilapp");//perfilapp es el nombre de los checkboxes
                     let valuesRow = "[";
                     let valuesCLV = [];
                     for (var i = 0; i < selAPPS.length; i++) {
                         var PERFILES = getRowCells(selAPPS[i] + 1, "showDataRol"); //reglon 1 de perfiles
                         valuesRow += '"' + PERFILES[1].innerHTML + '"' + ",";
-                        valuesCLV.push(PERFILES[0].innerHTML);
+                        valuesCLV.push(parseInt(PERFILES[0].innerHTML));
                     }
                     var roles = valuesRow.substring(0, valuesRow.length - 1) + "]";//elimina la coma al final de la cadena
-                    cellsOfRow[6].innerHTML = roles; //columna del perfil es la 7
                     var tiposel = getRadioVal("estado");
                     console.log("Selección de estado: "+tiposel);
                     var lixboxsel = document.getElementById("perf2");
-                    cellsOfRow[4].innerHTML = lixboxsel[lixboxsel.selectedIndex].innerText; //perfil
-                    var areaser = lixboxsel[lixboxsel.selectedIndex].value; //pkey table perfil                                
-                    console.log("pkey de area: " + areaser + " desc: " + cellsOfRow[4].innerHTML);
+                    var areaser = parseInt(lixboxsel[lixboxsel.selectedIndex].value); //pkey table perfil              
+                    var refregx = getRadioVal("estado");      
+                    console.log(refregx);
                     //guardar en BD.
                     // Se guardan los datos adquiridos de la vista en la variable jsonData
-                    var jsonData = {"usrId": usid, "nombreUsr": nombre, "aPaterno": apaterno, "aMaterno": amaterno, "curp": curp1, "areaAsignada": areaser, "usrPerf": valuesCLV};
+                    var jsonData = {"curp": curp, "numEmpleado": numEmpleado, "nombre": nombre, "apellidoPaterno": apaterno, "apellidoMaterno": amaterno, "correoElectronico":correo, "area": areaser, "roles": valuesCLV, "estado":refregx};
                     console.log(jsonData); 
-                    var rsaKeyPair = KEYUTIL.generateKeypair("RSA", 2048);// Se crean el par de llaves
-                    var privateKey = KEYUTIL.getPEM(rsaKeyPair.prvKeyObj,"PKCS8PRV");// Se obtiene la llave privada
-                    var publicKey = KEYUTIL.getPEM(rsaKeyPair.pubKeyObj);//Se obtiene la llave pública
-                    var header ={ alg: "RS256", typ: "JWT"};// Se declara la cabecera del JWT
-                    var JSONToken = KJUR.jws.JWS.sign("RS256", JSON.stringify(header), JSON.stringify(jsonData), privateKey);// Se crea el JWT
-                    console.log('El Token creado es:'+ JSONToken);
-                    var nuevoJson = {"llavepublica" : publicKey,"token" : JSONToken};//Se guarda la llave pública y el JWT en un objeto JavaScript
-                    //console.log(nuevoJson);
-
-                    postRestService(uriserv + "/USREntity/UPDATE", nuevoJson);//Se manda el JWT y la llave pública hacia el Backend
                     
+
+                    postRestService(uriserv + "/user/update", jsonData);//Se manda el JWT y la llave pública hacia el Backend
                     cambiaEstadoModal(".modalUSUARIOS", false); //false =ocultar 
                 } else {
                     alert("Seleccione un registro de la tabla");
@@ -591,10 +604,10 @@ function CrudUSR(e){
 function getUsrs() {
 
     var colsArea = ["Referencia", "Área", "Descripción"];
-    var llamadaAREA = getTBL(uriserv + "/getAll/areaManager", "showDataArea", "tblareas", colsArea);
+    var llamadaAREA = getTBL(uriserv + "/initial/getAreas", "showDataArea", "tblareas", colsArea);
 
     var colsRol = ["Referencia", "Perfil", "Descripción"];
-    var llamadaPRO = getTBL(uriserv + "/getAll/rolManager", "showDataProfile", "tblroles", colsRol);
+    var llamadaPRO = getTBL(uriserv + "/initial/getRoles", "showDataProfile", "tblroles", colsRol);
 
     $.when( llamadaPRO, llamadaAREA).done(function (ajaxPROResults, ajaxAREAResults) {
         //console.log("Generando listbox");
