@@ -38,14 +38,14 @@ public class EquipoImagenologiaServiceImpl implements EquipoImagenologiaService{
     private final ObjectMapper objMapper;
     
     // Aplicaciones
-    private static final int APLICACION_CONSULTA = 2;
-    private static final int APLICACION_EDITAR = 3;
-    private static final int APLICACION_CREAR = 4;
+    private static final int APLICACION_CONSULTA = 1;
+    private static final int APLICACION_EDITAR = 2;
+    private static final int APLICACION_CREAR = 3;
     
     //Eventos
-    private static final int EQUIPO_AGREGADO_EXITOSAMENTE = 5;
-    private static final int EQUIPO_EDITADO_EXITOSAMENTE = 6  ;
-    private static final int CATALOGO_CONSULTADO_EXITOSAMENTE = 7;
+    private static final int EQUIPO_AGREGADO_EXITOSAMENTE = 3;
+    private static final int EQUIPO_EDITADO_EXITOSAMENTE = 4 ;
+    private static final int CATALOGO_CONSULTADO_EXITOSAMENTE = 5;
     private static final int NUM_SERIE_EXISTENTE = 1004;
     private static final int NUM_SERIE_NO_EXISTE = 1005;
     
