@@ -18,10 +18,7 @@ public class Evento implements Serializable {
     @Column(name = "idEvento", nullable = false)
     private Integer idEvento;
 
-    @Basic(optional = false)
-    @Column(name = "TipoEv", nullable = false)
-    private Integer tipoEv;
-
+ 
     @Basic(optional = false)
     @Column(name = "Descripcion", length = 45, nullable = false)
     private String descripcion;
@@ -32,9 +29,8 @@ public class Evento implements Serializable {
 
     public Evento() {}
 
-    public Evento(Integer idEvento, Integer tipoEv, String descripcion) {
+    public Evento(Integer idEvento, String descripcion) {
         this.idEvento = idEvento;
-        this.tipoEv = tipoEv;
         this.descripcion = descripcion;
     }
 
@@ -42,8 +38,6 @@ public class Evento implements Serializable {
     public Integer getIdEvento() { return idEvento; }
     public void setIdEvento(Integer idEvento) { this.idEvento = idEvento; }
 
-    public Integer getTipoEv() { return tipoEv; }
-    public void setTipoEv(Integer tipoEv) { this.tipoEv = tipoEv; }
 
     public String getDescripcion() { return descripcion; }
     public void setDescripcion(String descripcion) { this.descripcion = descripcion; }

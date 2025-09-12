@@ -4,6 +4,8 @@
  */
 package com.UAM.RISINR.exceptions;
 
+import com.UAM.RISINR.model.Evento;
+import com.UAM.RISINR.repository.EventoRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -17,14 +19,25 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
     
+    private final EventoRepository eventoRepository;
+
+    public GlobalExceptionHandler(EventoRepository eventoRepository) {
+        this.eventoRepository = eventoRepository;
+    }
+    
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<String> handleEquipoNotFound(ResourceNotFoundException ex) {
+        
+        
         return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
     }
     
     @ExceptionHandler(ResourceFoundException.class)
     public ResponseEntity<String> handleResourceFoundException(ResourceFoundException ex) {
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
+        
+        String message = eventoRepository.findByIdEvento(ex.getidEvento()).getDescripcion();
+        System.out.println(message);
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(message);
     }
   
 }

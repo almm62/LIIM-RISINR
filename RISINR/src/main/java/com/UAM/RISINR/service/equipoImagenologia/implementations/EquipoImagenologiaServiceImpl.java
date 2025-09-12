@@ -89,7 +89,7 @@ public class EquipoImagenologiaServiceImpl implements EquipoImagenologiaService{
         
         if(validarEquipo(nSerie) != null){
             registroEvento.log(NUM_SERIE_EXISTENTE, APLICACION_CREAR, hora, datos);
-            throw new ResourceFoundException("El equipo con numero de serie "+ nSerie +  " ya ha sido registrado");
+            throw new ResourceFoundException(1004);
            
         }else{
             
