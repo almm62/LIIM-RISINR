@@ -155,8 +155,10 @@ function listenermodalEQPRIS(e) {
             break;
         case 'updateEQPRIS':
             var formData = getFormData("UpdateEqp", "formEquipoRIS");
+            
+            var datosJson = getDatos("formEquipoRIS");
             //var getEquipoimg =POSTForDataFiles(formData, uriserv + "/FormularioEqpImg/UpdateEqp");
-            var getEquipoimg = POSTForDataFiles(formData, uriserv + "/EquipoImagenologia/editEquipo");
+            var getEquipoimg = POSTForDataFiles(datosJson, uriserv + "/EquipoImagenologia/editEquipo");
             $.when(getEquipoimg.done(function (data) {
                 console.log(data);
                 //var resp = JSON.parse(data);
@@ -179,11 +181,15 @@ function listenermodalEQPRIS(e) {
             var formData = getFormData("CreateEqp", "formEquipoRIS");
             console.log("Datos antes de la peticion" + formData);
             console.log(formData);
+            
+            var datosJson = getDatos("formEquipoRIS");
+            
+           
             //var getEquipoimg =POSTForDataFiles(formData, uriserv + "/FormularioEqpImg/CreateEqp");
-            var getEquipoimg = POSTForDataFiles(formData, uriserv + "/EquipoImagenologia/addEquipo");
+            var getEquipoimg = POSTForDataFiles(datosJson, uriserv + "/EquipoImagenologia/addEquipo");
             $.when(getEquipoimg.done(function (data) {
                 console.log(data);
-                var resp = JSON.parse(data);
+                //var resp = JSON.parse(data);
             }));
             cambiaEstadoModal(".modalEquipoRIS", false); //true =activaer                 
             break;
@@ -197,6 +203,35 @@ function getFormData(crud, formname) {
     //formData.append('Operation', 'Create'); //agregar campo para CRUD, webservce contra parte
     formData.append('Operation', crud); //agregar campo para CRUD, webservce contra parte
     return formData;
+    
+    
+}
+
+function getDatos(formname){
+    
+    var formulario = document.forms.namedItem(formname);
+    
+    var datosJson = {
+        
+        nSerie : formulario.elements["nserEQP"].value,
+        nombreEquipo: formulario.elements["nomEQP"].value,
+        marca:formulario.elements["marcaEQP"].value,
+        modelo: formulario.elements["modeloEQP"].value,
+        modalidad: formulario.elements["modalEQP"].value,
+        idArea: formulario.elements["areEqp"].value,
+        estado: formulario.elements["edoEqp"].value,
+        fechaInstalacion: null
+    };
+    
+    console.log(datosJson);
+    
+    var datosJsonCadena = JSON.stringify(datosJson);
+    
+    console.log("Después de hacerlo cadena");
+    console.log(datosJsonCadena);
+    
+    return datosJsonCadena; 
+    
 }
 
 window.onload = function () {

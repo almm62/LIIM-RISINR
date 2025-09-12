@@ -9,6 +9,7 @@ import com.UAM.RISINR.exceptions.ResourceFoundException;
 import com.UAM.RISINR.model.AreaDeServicio;
 import com.UAM.RISINR.model.EquipoImagenologia;
 import com.UAM.RISINR.model.dto.EquipoImagenologiaDTO;
+import com.UAM.RISINR.model.dto.EquipoImagenologiaRequest;
 import com.UAM.RISINR.repository.EquipoImagenologiaRepository;
 import com.UAM.RISINR.service.areaDeServicio.AreaDeServicioService;
 import com.UAM.RISINR.service.equipoImagenologia.EquipoImagenologiaService;
@@ -78,12 +79,13 @@ public class EquipoImagenologiaServiceImpl implements EquipoImagenologiaService{
     }   
     
     @Override
-    public EquipoImagenologiaDTO add(EquipoImagenologiaDTO equipoDTO){  
+    public EquipoImagenologiaDTO add(EquipoImagenologiaRequest equipoRequest){  
         hora =  System.currentTimeMillis();
         EquipoImagenologia equipo;
+        EquipoImagenologiaDTO equipoDTO;
         AreaDeServicio area;
         String datos = "{}";
-        String nSerie = equipoDTO.getnSerie();
+        String nSerie = equipoRequest.getnSerie();
         
         if(validarEquipo(nSerie) != null){
             registroEvento.log(NUM_SERIE_EXISTENTE, APLICACION_CREAR, hora, datos);
@@ -91,15 +93,16 @@ public class EquipoImagenologiaServiceImpl implements EquipoImagenologiaService{
            
         }else{
             
-            area = validarArea(equipoDTO.getIdArea());
+            area = validarArea(equipoRequest.getIdArea());
             if(area == null){
                 registroEvento.log(NUM_SERIE_EXISTENTE, APLICACION_CREAR, hora, datos);
                 throw new ResourceNotFoundException("El area ingresada no existe"); 
             }
-            equipo = extraerDatos(equipoDTO, area);
+            equipo = extraerDatos(equipoRequest, area);
             repository.save(equipo);
+            equipoDTO = convertirDTO(equipo);
             try {
-                 datos = objMapper.writeValueAsString(equipoDTO); // JSON correcto
+                 datos = objMapper.writeValueAsString(equipoRequest); // JSON correcto
                  System.out.println(datos);
             } catch (JsonProcessingException e) {
                 e.printStackTrace();  // valor por defecto para no romper la app
@@ -111,18 +114,19 @@ public class EquipoImagenologiaServiceImpl implements EquipoImagenologiaService{
     
     
     @Override
-    public EquipoImagenologiaDTO  edit(@RequestBody EquipoImagenologiaDTO equipoDTO){ 
+    public EquipoImagenologiaDTO  edit(@RequestBody EquipoImagenologiaRequest equipoRequest){ 
        hora =  System.currentTimeMillis();
         EquipoImagenologia equipo;
+        EquipoImagenologiaDTO equipoDTO;
         AreaDeServicio area;
         String datos = "{}";
-        String nSerie = equipoDTO.getnSerie();
+        String nSerie = equipoRequest.getnSerie();
         
         if(validarEquipo(nSerie) == null){
             registroEvento.log(NUM_SERIE_NO_EXISTE, APLICACION_EDITAR, hora, datos);
             throw new ResourceNotFoundException("El equipo con numero de serie "+ nSerie +  " ya ha sido registrado");
         }else{
-            area = validarArea(equipoDTO.getIdArea());
+            area = validarArea(equipoRequest.getIdArea());
             if(area == null){
                 
                 registroEvento.log(NUM_SERIE_NO_EXISTE, APLICACION_CREAR, hora, datos);
@@ -130,23 +134,23 @@ public class EquipoImagenologiaServiceImpl implements EquipoImagenologiaService{
             }
             
             equipo = repository.findBynSerie(nSerie);
-            equipo.setNombre(equipoDTO.getNombreEquipo());
-            equipo.setMarca(equipoDTO.getMarca());
-            equipo.setModalidad(equipoDTO.getModalidad());
-            equipo.setModelo(equipoDTO.getModelo());
-            equipo.setEstado(equipoDTO.getEstado());
+            equipo.setNombre(equipoRequest.getNombreEquipo());
+            equipo.setMarca(equipoRequest.getMarca());
+            equipo.setModalidad(equipoRequest.getModalidad());
+            equipo.setModelo(equipoRequest.getModelo());
+            equipo.setEstado(equipoRequest.getEstado());
             equipo.setAreaDeServicioidArea(area);
-            equipo.setFechaInstalacion(equipoDTO.getFechaInstalacion());
             repository.save(equipo);
+            equipoDTO = convertirDTO(equipo);
             
             try {
-                 datos = objMapper.writeValueAsString(equipoDTO); // JSON correcto
+                 datos = objMapper.writeValueAsString(equipoRequest); // JSON correcto
                  System.out.println(datos);
             } catch (JsonProcessingException e) {
                 e.printStackTrace();  // valor por defecto para no romper la app
             }
             
-            registroEvento.log(EQUIPO_EDITADO_EXITOSAMENTE, APLICACION_CREAR, hora, datos);
+            registroEvento.log(EQUIPO_EDITADO_EXITOSAMENTE, APLICACION_EDITAR, hora, datos);
             return equipoDTO;
         }
     }
@@ -164,7 +168,7 @@ public class EquipoImagenologiaServiceImpl implements EquipoImagenologiaService{
         String estado = eqp.getEstado();
         Date fechaInstalacion = eqp.getFechaInstalacion();
 
-        EquipoImagenologiaDTO equipoDTO = new EquipoImagenologiaDTO(nSerie, nombreEquipo, marca, modelo, modalidad, idArea, estado,fechaInstalacion);
+        EquipoImagenologiaDTO equipoDTO = new EquipoImagenologiaDTO(nSerie, nombreEquipo, marca, modelo, modalidad,idArea,nombreArea , estado,fechaInstalacion);
 
         return equipoDTO;  
     }
@@ -180,17 +184,18 @@ public class EquipoImagenologiaServiceImpl implements EquipoImagenologiaService{
         return area;
    }
    
-   public EquipoImagenologia extraerDatos(EquipoImagenologiaDTO equipoDTO, AreaDeServicio area){
+   public EquipoImagenologia extraerDatos(EquipoImagenologiaRequest equipoRequest, AreaDeServicio area){
        EquipoImagenologia equipo = new EquipoImagenologia();
+       Date fecha = new Date();
        
-       equipo.setnSerie(equipoDTO.getnSerie());
-       equipo.setNombre(equipoDTO.getNombreEquipo());
-       equipo.setMarca(equipoDTO.getMarca());
-       equipo.setModalidad(equipoDTO.getModalidad());
-       equipo.setModelo(equipoDTO.getModelo());
-       equipo.setEstado(equipoDTO.getEstado());
+       equipo.setnSerie(equipoRequest.getnSerie());
+       equipo.setNombre(equipoRequest.getNombreEquipo());
+       equipo.setMarca(equipoRequest.getMarca());
+       equipo.setModalidad(equipoRequest.getModalidad());
+       equipo.setModelo(equipoRequest.getModelo());
+       equipo.setEstado(equipoRequest.getEstado());
        equipo.setAreaDeServicioidArea(area);
-       equipo.setFechaInstalacion(equipoDTO.getFechaInstalacion());
+       equipo.setFechaInstalacion(fecha);
 
        return equipo;
    }

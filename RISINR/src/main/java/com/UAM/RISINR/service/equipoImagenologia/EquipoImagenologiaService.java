@@ -6,6 +6,7 @@ package com.UAM.RISINR.service.equipoImagenologia;
 
 import com.UAM.RISINR.model.EquipoImagenologia;
 import com.UAM.RISINR.model.dto.EquipoImagenologiaDTO;
+import com.UAM.RISINR.model.dto.EquipoImagenologiaRequest;
 import java.util.List;
 import java.util.Map;
 
@@ -16,8 +17,8 @@ import java.util.Map;
 public interface EquipoImagenologiaService {
     
     List<EquipoImagenologiaDTO> consultarTodos();
-    EquipoImagenologiaDTO add(EquipoImagenologiaDTO equipoDTO);
-    EquipoImagenologiaDTO  edit(EquipoImagenologiaDTO equipoDTO);
+    EquipoImagenologiaDTO add(EquipoImagenologiaRequest equipoRequest);
+    EquipoImagenologiaDTO  edit(EquipoImagenologiaRequest equipoRequest);
     EquipoImagenologiaDTO convertirDTO(EquipoImagenologia eqp);
     
 }

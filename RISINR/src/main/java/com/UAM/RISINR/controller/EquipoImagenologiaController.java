@@ -6,6 +6,7 @@ package com.UAM.RISINR.controller;
 
 import com.UAM.RISINR.model.EquipoImagenologia;
 import com.UAM.RISINR.model.dto.EquipoImagenologiaDTO;
+import com.UAM.RISINR.model.dto.EquipoImagenologiaRequest;
 import com.UAM.RISINR.service.equipoImagenologia.EquipoImagenologiaService;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import jakarta.servlet.http.HttpServletRequest;
@@ -50,9 +51,9 @@ public class EquipoImagenologiaController {
     }
     
     @PostMapping("/addEquipo")
-    public ResponseEntity<Object> addEquipo(@RequestBody EquipoImagenologiaDTO equipoDTO) {
+    public ResponseEntity<Object> addEquipo(@RequestBody EquipoImagenologiaRequest equipoRequest) {
         System.out.println("Entró al controlador para agreagar");
-        EquipoImagenologiaDTO equipoImgDTO = service.add(equipoDTO); 
+        EquipoImagenologiaDTO equipoImgDTO = service.add(equipoRequest); 
         System.out.println("Salio del service");
         return ResponseEntity.ok(equipoImgDTO);
            
@@ -60,8 +61,8 @@ public class EquipoImagenologiaController {
     
     
     @PostMapping("/editEquipo")
-    public ResponseEntity<Object> editEquipo(@RequestBody EquipoImagenologiaDTO equipoDTO) {
-            EquipoImagenologiaDTO equipo = service.edit(equipoDTO);
+    public ResponseEntity<Object> editEquipo(@RequestBody EquipoImagenologiaRequest equipoRequest) {
+            EquipoImagenologiaDTO equipo = service.edit(equipoRequest);
             List<Object> equipos = new ArrayList();
             
             if (equipo == null) {

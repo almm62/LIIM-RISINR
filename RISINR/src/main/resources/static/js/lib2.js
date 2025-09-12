@@ -711,8 +711,7 @@ function POSTForDataFiles(formData, servicio) {
         type: 'post',
         data: formData,
         processData: false, // tell jQuery not to process the data
-        enctype: 'multipart/form-data',
-        contentType: false  // tell jQuery not to set contentType        
+        contentType: 'application/json'  // tell jQuery not to set contentType        
     }).done(function (data) {
         //console.log("OBJETO NUEVOOOO");
         console.log(data);
