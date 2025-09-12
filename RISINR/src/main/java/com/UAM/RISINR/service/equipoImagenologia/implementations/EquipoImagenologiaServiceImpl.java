@@ -4,7 +4,7 @@
  */
 package com.UAM.RISINR.service.equipoImagenologia.implementations;
 
-import com.UAM.RISINR.exceptions.EquipoImagenologia.ResourceNotFoundException;
+import com.UAM.RISINR.exceptions.ResourceNotFoundException;
 import com.UAM.RISINR.exceptions.ResourceFoundException;
 import com.UAM.RISINR.model.AreaDeServicio;
 import com.UAM.RISINR.model.EquipoImagenologia;
