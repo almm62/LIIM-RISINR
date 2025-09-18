@@ -96,7 +96,7 @@ public class EquipoImagenologiaServiceImpl implements EquipoImagenologiaService{
             area = validarArea(equipoRequest.getIdArea());
             if(area == null){
                 registroEvento.log(NUM_SERIE_EXISTENTE, APLICACION_CREAR, hora, datos);
-                throw new ResourceNotFoundException("El area ingresada no existe"); 
+                throw new ResourceNotFoundException(1005); 
             }
             equipo = extraerDatos(equipoRequest, area);
             repository.save(equipo);
@@ -124,13 +124,13 @@ public class EquipoImagenologiaServiceImpl implements EquipoImagenologiaService{
         
         if(validarEquipo(nSerie) == null){
             registroEvento.log(NUM_SERIE_NO_EXISTE, APLICACION_EDITAR, hora, datos);
-            throw new ResourceNotFoundException("El equipo con numero de serie "+ nSerie +  " ya ha sido registrado");
+            throw new ResourceNotFoundException(1005);
         }else{
             area = validarArea(equipoRequest.getIdArea());
             if(area == null){
                 
                 registroEvento.log(NUM_SERIE_NO_EXISTE, APLICACION_CREAR, hora, datos);
-                throw new ResourceNotFoundException("El area ingresada no existe"); 
+                throw new ResourceNotFoundException(1005); 
             }
             
             equipo = repository.findBynSerie(nSerie);

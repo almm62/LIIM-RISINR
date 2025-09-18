@@ -11,7 +11,15 @@ package com.UAM.RISINR.exceptions;
  */
 
 public class ResourceNotFoundException extends RuntimeException{
-  public ResourceNotFoundException(String message) {
-      super(message);
-  }
+    private final Integer idEvento;
+    
+    public ResourceNotFoundException(Integer idEvento) {
+        super("Error con id: " + idEvento);
+          this.idEvento = idEvento;
+    }
+
+    public Integer getidEvento() {
+          return idEvento;
+    }
+
 }

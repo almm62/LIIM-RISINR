@@ -26,15 +26,14 @@ public class GlobalExceptionHandler {
     }
     
     @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<String> handleEquipoNotFound(ResourceNotFoundException ex) {
-        
-        
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
+    public ResponseEntity<String> handleResourceNotFoundException(ResourceNotFoundException ex) {   
+        String message = eventoRepository.findByIdEvento(ex.getidEvento()).getDescripcion();
+        System.out.println(message);
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(message);
     }
     
     @ExceptionHandler(ResourceFoundException.class)
     public ResponseEntity<String> handleResourceFoundException(ResourceFoundException ex) {
-        
         String message = eventoRepository.findByIdEvento(ex.getidEvento()).getDescripcion();
         System.out.println(message);
         return ResponseEntity.status(HttpStatus.CONFLICT).body(message);

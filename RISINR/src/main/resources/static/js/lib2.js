@@ -732,7 +732,7 @@ function POSTForDataFiles(formData, servicio) {
         //console.log(jqXHROrData);
         console.log(jqXHROrErrorThrown);
         console.log(mensaje);
-        alert("Error: " + mensaje);
+        alert(mensaje);
 
     }).always(function (jqXHROrData, textStatus, jqXHROrErrorThrown) {
     });
