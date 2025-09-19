@@ -71,7 +71,12 @@ LOCK TABLES `Aplicacion` WRITE;
 /*!40000 ALTER TABLE `Aplicacion` DISABLE KEYS */;
 INSERT INTO `Aplicacion` VALUES
 (0,'Login','Login al sistema'),
-(1,'Alta Usuarios','Alta de un nuevo usuario');
+(1,'Consulta de Equipos','Listar equipos existentes en BD'),
+(2,'Edicion de Equipo','Editar equipos existentes en BD'),
+(3,'Alta de Equipo','Agregar equipo nuevo'),
+(4,'Consulta de usuarios','Listar usuarios existentes en BD'),
+(5,'Edicion de Usuarios','Editar usuarios existentes en BD'),
+(6,'Alta de Usuarios','Alta de usuario nuevo');
 /*!40000 ALTER TABLE `Aplicacion` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -289,8 +294,12 @@ CREATE TABLE `DatosAcceso` (
 LOCK TABLES `DatosAcceso` WRITE;
 /*!40000 ALTER TABLE `DatosAcceso` DISABLE KEYS */;
 INSERT INTO `DatosAcceso` VALUES
-('abc123','carlos',0,'PEPC000000','Activo'),
-('holaMundo','LIIM',1,'LIIM0000','Activo');
+('abc123','carlos',0,'PEPC000000','Inicial'),
+('holaMundo','LIIM',1,'LIIM0000','Activo'),
+('REBM111111','MaddieRB',100,'REBM111111','Activo'),
+('ROJP000000','MisaRJ',10,'ROJP000000','Activo'),
+('PRUEBA0000','PruebaID',5,'PRUEBA0000','Activo'),
+('ELCP0000','SoyPacoElChato',22,'ELCP0000','Activo');
 /*!40000 ALTER TABLE `DatosAcceso` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -561,7 +570,7 @@ DROP TABLE IF EXISTS `Evento`;
 /*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Evento` (
   `idEvento` int(11) NOT NULL,
-  `Descripcion` varchar(45) NOT NULL,
+  `Descripcion` varchar(100) NOT NULL,
   PRIMARY KEY (`idEvento`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -573,13 +582,27 @@ CREATE TABLE `Evento` (
 LOCK TABLES `Evento` WRITE;
 /*!40000 ALTER TABLE `Evento` DISABLE KEYS */;
 INSERT INTO `Evento` VALUES
-(1,'Usuario dado de alta previamente'),
-(2,'Login Exitoso'),
-(3,'Bloqueo automatico de usuario'),
-(4,'Desbloqueo de Usuario'),
-(1001,'Login con Contraseña incorrecta'),
-(1002,'Login con Usuario no existente'),
-(1003,'Login con Estado=Bloqueado');
+(1,'Login Exitoso'),
+(2,'Bloqueo automatico de usuario'),
+(3,'Nuevo equipo agregado exitosamente '),
+(4,'Equipo editado exitosamente'),
+(5,'Consulta de equipos exitosa'),
+(6,'Usuario dado de alta'),
+(7,'Usuario actualizado'),
+(8,'Usuario dado de baja'),
+(9,'Usuario desbloqueado'),
+(10,'Usuario bloqueado manualmente'),
+(1001,'Login fallido por Contraseña incorrecta'),
+(1002,'Login fallido por Usuario no existente'),
+(1003,'Login fallido por Estado != Activo o Inicial'),
+(1004,'Intento de registrar un nuevo equipo con numero de serie existente '),
+(1005,'Edicion de equipo fallida porque el número de serie no existe'),
+(1006,'Alta de Usuario fallida, llaves primarias dado de alta previamente'),
+(1007,'Alta de Usuario fallida, UsuarioID vinculado a otro Usuario'),
+(1008,'Alta o Actualizacion de Usuario fallida, CorreoElectronico vinculado a otro Usuario'),
+(1009,'Alta o Actualizacion de Usuario fallida, Asignacion de Roles inexistentes'),
+(1010,'Alta o Actualizacion de Usuario fallida, Asignacion de AreaDeServicio inexistente'),
+(1011,'Actualizacion de Usuario fallida, UsuarioPK inexistente');
 /*!40000 ALTER TABLE `Evento` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -704,13 +727,22 @@ LOCK TABLES `Perfil` WRITE;
 /*!40000 ALTER TABLE `Perfil` DISABLE KEYS */;
 INSERT INTO `Perfil` VALUES
 (0,'PEPC000000',1,0),
+(0,'PEPC000000',2,0),
+(0,'PEPC000000',3,0),
+(0,'PEPC000000',4,0),
+(0,'PEPC000000',5,0),
 (0,'PEPC000000',6,0),
 (1,'LIIM0000',1,0),
 (1,'LIIM0000',2,0),
 (1,'LIIM0000',3,0),
 (1,'LIIM0000',4,0),
 (1,'LIIM0000',5,0),
-(1,'LIIM0000',6,0);
+(5,'PRUEBA0000',2,0),
+(10,'ROJP000000',1,0),
+(22,'ELCP0000',1,0),
+(22,'ELCP0000',2,0),
+(22,'ELCP0000',3,0),
+(100,'REBM111111',1,0);
 /*!40000 ALTER TABLE `Perfil` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -768,56 +800,45 @@ CREATE TABLE `RegistroEvento` (
 LOCK TABLES `RegistroEvento` WRITE;
 /*!40000 ALTER TABLE `RegistroEvento` DISABLE KEYS */;
 INSERT INTO `RegistroEvento` VALUES
-(2,0,1755501805896,'{\"usuarioId\":\"carlos\",\"contrasena\":\"abc123\",\"ipAddress\":\"192.168.1.98\"}'),
-(2,0,1755501825368,'{\"usuarioId\":\"MisaelRJ\",\"contrasena\":\"holaMundo\",\"ipAddress\":\"192.168.1.98\"}'),
-(2,0,1755546409012,'{\"usuarioId\":\"carlos\",\"contrasena\":\"abc123\",\"ipAddress\":\"192.168.1.98\"}'),
-(2,0,1756073298580,'{\"usuarioId\":\"MisaelRJ\",\"contrasena\":\"holaMundo\",\"ipAddress\":\"127.0.0.1\"}'),
-(2,0,1756077908002,'{\"usuarioId\":\"carlos\",\"contrasena\":\"abc123\",\"ipAddress\":\"127.0.0.1\"}'),
-(2,0,1756283869503,'{\"usuarioId\":\"carlos\",\"contrasena\":\"abc123\",\"ipAddress\":\"0:0:0:0:0:0:0:1\"}'),
-(2,0,1756285425681,'{\"usuarioId\":\"MisaelRJ\",\"contrasena\":\"holaMundo\",\"ipAddress\":\"127.0.0.1\"}'),
-(2,0,1756323055247,'{\"usuarioId\":\"carlos\",\"contrasena\":\"abc123\",\"ipAddress\":\"0:0:0:0:0:0:0:1\"}'),
-(2,0,1756411213023,'{\"usuarioId\":\"carlos\",\"contrasena\":\"abc123\",\"ipAddress\":\"127.0.0.1\"}'),
-(2,0,1756749593726,'{\"usuarioId\":\"carlos\",\"contrasena\":\"abc123\",\"ipAddress\":\"127.0.0.1\"}'),
-(2,0,1756750435816,'{\"usuarioId\":\"LIIM\",\"contrasena\":\"holaMundo\",\"ipAddress\":\"127.0.0.1\"}'),
-(2,0,1756750955671,'{\"usuarioId\":\"LIIM\",\"contrasena\":\"holaMundo\",\"ipAddress\":\"127.0.0.1\"}'),
-(2,0,1756754170648,'{\"usuarioId\":\"LIIM\",\"contrasena\":\"holaMundo\",\"ipAddress\":\"127.0.0.1\"}'),
-(2,0,1756754291167,'{\"usuarioId\":\"carlos\",\"contrasena\":\"abc123\",\"ipAddress\":\"127.0.0.1\"}'),
-(2,0,1756755556914,'{\"usuarioId\":\"carlos\",\"contrasena\":\"abc123\",\"ipAddress\":\"127.0.0.1\"}'),
-(2,0,1756756865348,'{\"usuarioId\":\"carlos\",\"contrasena\":\"abc123\",\"ipAddress\":\"0:0:0:0:0:0:0:1\"}'),
-(3,0,1755501919971,'{\"usuarioId\":\"carlos\",\"contrasena\":\"112\",\"ipAddress\":\"192.168.1.98\"}'),
-(3,0,1755502065798,'{\"usuarioId\":\"MisaelRJ\",\"contrasena\":\"dlsjkhadjksad\",\"ipAddress\":\"192.168.1.98\"}'),
-(3,0,1755546565301,'{\"usuarioId\":\"carlos\",\"contrasena\":\"kjhsdakjagsdas\",\"ipAddress\":\"192.168.1.98\"}'),
-(3,0,1755582920387,'{\"usuarioId\":\"MisaelRJ\",\"contrasena\":\"jkdsladask\",\"ipAddress\":\"127.0.0.1\"}'),
-(1001,0,1755501773305,'{\"usuarioId\":\"carlos\",\"contrasena\":\"kjhasbjkhasbas\",\"ipAddress\":\"192.168.1.98\"}'),
-(1001,0,1755501781082,'{\"usuarioId\":\"MisaelRJ\",\"contrasena\":\"odhslakjhasjk\",\"ipAddress\":\"192.168.1.98\"}'),
-(1001,0,1755501793356,'{\"usuarioId\":\"carlos\",\"contrasena\":\"abc1233\",\"ipAddress\":\"192.168.1.98\"}'),
-(1001,0,1755501849956,'{\"usuarioId\":\"MisaelRJ\",\"contrasena\":\"lkjwqhelkjqwelkj\",\"ipAddress\":\"192.168.1.98\"}'),
-(1001,0,1755501860526,'{\"usuarioId\":\"MisaelRJ\",\"contrasena\":\"qwkieuqwkuieqwik\",\"ipAddress\":\"192.168.1.98\"}'),
-(1001,0,1755501882469,'{\"usuarioId\":\"carlos\",\"contrasena\":\"abc1234565\",\"ipAddress\":\"192.168.1.98\"}'),
-(1001,0,1755501895400,'{\"usuarioId\":\"carlos\",\"contrasena\":\"sadkhjsgad\",\"ipAddress\":\"192.168.1.98\"}'),
-(1001,0,1755501919970,'{\"usuarioId\":\"carlos\",\"contrasena\":\"112\",\"ipAddress\":\"192.168.1.98\"}'),
-(1001,0,1755501971894,'{\"usuarioId\":\"MisaelRJ\",\"contrasena\":\"oiuwqyouiqwe\",\"ipAddress\":\"192.168.1.98\"}'),
-(1001,0,1755502065797,'{\"usuarioId\":\"MisaelRJ\",\"contrasena\":\"dlsjkhadjksad\",\"ipAddress\":\"192.168.1.98\"}'),
-(1001,0,1755546505020,'{\"usuarioId\":\"carlos\",\"contrasena\":\"qwertyui\",\"ipAddress\":\"192.168.1.98\"}'),
-(1001,0,1755546541321,'{\"usuarioId\":\"carlos\",\"contrasena\":\"juhkhgdskajhgda\",\"ipAddress\":\"192.168.1.98\"}'),
-(1001,0,1755546550280,'{\"usuarioId\":\"carlos\",\"contrasena\":\"hkjgdkjhasgd\",\"ipAddress\":\"192.168.1.98\"}'),
-(1001,0,1755546555296,'{\"usuarioId\":\"carlos\",\"contrasena\":\"kjhdsgdkjas\",\"ipAddress\":\"192.168.1.98\"}'),
-(1001,0,1755546565300,'{\"usuarioId\":\"carlos\",\"contrasena\":\"kjhsdakjagsdas\",\"ipAddress\":\"192.168.1.98\"}'),
-(1001,0,1755582503289,'{\"usuarioId\":\"MisaelRJ\",\"contrasena\":\"lkjdsakldjas\",\"ipAddress\":\"127.0.0.1\"}'),
-(1001,0,1755582523340,'{\"usuarioId\":\"MisaelRJ\",\"contrasena\":\"dkjshaldkjah\",\"ipAddress\":\"127.0.0.1\"}'),
-(1001,0,1755582534153,'{\"usuarioId\":\"MisaelRJ\",\"contrasena\":\"dkjshaljdkhaslkj\",\"ipAddress\":\"127.0.0.1\"}'),
-(1001,0,1755582545174,'{\"usuarioId\":\"MisaelRJ\",\"contrasena\":\"dl.ksajd.lkasdjas\",\"ipAddress\":\"127.0.0.1\"}'),
-(1001,0,1755582920386,'{\"usuarioId\":\"MisaelRJ\",\"contrasena\":\"jkdsladask\",\"ipAddress\":\"127.0.0.1\"}'),
-(1002,0,1755582553779,'{\"usuarioId\":\"kljdshlkjas\",\"contrasena\":\"lkdsajldkas\",\"ipAddress\":\"127.0.0.1\"}'),
-(1002,0,1755582585485,'{\"usuarioId\":\"dsadasfwasdf\",\"contrasena\":\"sdfsdafdas\",\"ipAddress\":\"127.0.0.1\"}'),
-(1002,0,1755582847581,'{\"usuarioId\":\"ewqeqweqw\",\"contrasena\":\"ewqeqweqw\",\"ipAddress\":\"127.0.0.1\"}'),
-(1002,0,1755582905960,'{\"usuarioId\":\"dsgfsdarsdf\",\"contrasena\":\"fadsfasdads\",\"ipAddress\":\"127.0.0.1\"}'),
-(1002,0,1755582911662,'{\"usuarioId\":\"dfgerger\",\"contrasena\":\"reterter\",\"ipAddress\":\"127.0.0.1\"}'),
-(1003,0,1755501960841,'{\"usuarioId\":\"carlos\",\"contrasena\":\"dkhjsadjhas\",\"ipAddress\":\"192.168.1.98\"}'),
-(1003,0,1755546150266,'{\"usuarioId\":\"carlos\",\"contrasena\":\"qwertyui\",\"ipAddress\":\"192.168.1.98\"}'),
-(1003,0,1755546228021,'{\"usuarioId\":\"carlos\",\"contrasena\":\"oiuewoiequ\",\"ipAddress\":\"192.168.1.98\"}'),
-(1003,0,1755582927108,'{\"usuarioId\":\"MisaelRJ\",\"contrasena\":\"djklshdlkjas\",\"ipAddress\":\"127.0.0.1\"}'),
-(1003,0,1755843209066,'{\"usuarioId\":\"MisaelRJ\",\"contrasena\":\"holaMundo\",\"ipAddress\":\"127.0.0.1\"}');
+(1,0,1757557469747,'{\"usuarioId\":\"LIIM\",\"contrasena\":\"holaMundo\",\"ipAddress\":\"127.0.0.1\"}'),
+(1,0,1757557568659,'{\"usuarioId\":\"MisaRJ\",\"contrasena\":\"ROJP000000\",\"ipAddress\":\"127.0.0.1\"}'),
+(1,0,1757557865408,'{\"usuarioId\":\"LIIM\",\"contrasena\":\"holaMundo\",\"ipAddress\":\"127.0.0.1\"}'),
+(1,0,1757558015278,'{\"usuarioId\":\"MisaRJ\",\"contrasena\":\"ROJP000000\",\"ipAddress\":\"127.0.0.1\"}'),
+(1,0,1757559643869,'{\"usuarioId\":\"LIIM\",\"contrasena\":\"holaMundo\",\"ipAddress\":\"127.0.0.1\"}'),
+(1,0,1757619234411,'{\"usuarioId\":\"MisaRJ\",\"contrasena\":\"ROJP000000\",\"ipAddress\":\"127.0.0.1\"}'),
+(2,0,1757556218008,'{\"usuarioId\":\"LIIM\",\"contrasena\":\"holaMundo\",\"ipAddress\":\"127.0.0.1\"}'),
+(2,0,1757556656818,'{\"usuarioId\":\"MisaRJ\",\"contrasena\":\"ROJP000000\",\"ipAddress\":\"127.0.0.1\"}'),
+(3,0,1757556068972,'{\"usuarioId\":\"MisaRJ\",\"contrasena\":\"jsoajsa\",\"ipAddress\":\"127.0.0.1\"}'),
+(7,5,1757556252234,'{\"Actualizacion\":{\"curp\":\"ROJP000000\",\"numEmpleado\":10,\"nombre\":\"Pedro Misael\",\"apellidoPaterno\":\"Rodríguez\",\"apellidoMaterno\":\"Jiménez\",\"estado\":\"Inicial\",\"area\":5,\"roles\":[1],\"correoElectronico\":\"p.misaelrj@gmail.com\"},\"SesionActiva\":{\"horaInicio\":1757556218008,\"usuarioCURP\":\"LIIM0000\",\"usuarioNumEmpleado\":1,\"aplicacionID\":0}}'),
+(7,5,1757556683245,'{\"Actualizacion\":{\"curp\":\"ROJP000000\",\"numEmpleado\":10,\"nombre\":\"Pedro Misael\",\"apellidoPaterno\":\"Rodríguez\",\"apellidoMaterno\":\"Jiménez\",\"estado\":\"Bloqueado\",\"area\":5,\"roles\":[1],\"correoElectronico\":\"p.misaelrj@gmail.com\"},\"SesionActiva\":{\"horaInicio\":1757556656818,\"usuarioCURP\":\"ROJP000000\",\"usuarioNumEmpleado\":10,\"aplicacionID\":0}}'),
+(7,5,1757557489660,'{\"Actualizacion\":{\"curp\":\"ROJP000000\",\"numEmpleado\":10,\"nombre\":\"Pedro Misael\",\"apellidoPaterno\":\"Rodríguez\",\"apellidoMaterno\":\"Jiménez\",\"estado\":\"Activo\",\"area\":5,\"roles\":[1],\"correoElectronico\":\"p.misaelrj@gmail.com\"},\"SesionActiva\":{\"horaInicio\":1757557469747,\"usuarioCURP\":\"LIIM0000\",\"usuarioNumEmpleado\":1,\"aplicacionID\":0}}'),
+(7,5,1757557589058,'{\"Actualizacion\":{\"curp\":\"ROJP000000\",\"numEmpleado\":10,\"nombre\":\"Pedro Misael\",\"apellidoPaterno\":\"Rodríguez\",\"apellidoMaterno\":\"Jiménez\",\"estado\":\"Bloqueado\",\"area\":5,\"roles\":[1],\"correoElectronico\":\"p.misaelrj@gmail.com\"},\"SesionActiva\":{\"horaInicio\":1757557568659,\"usuarioCURP\":\"ROJP000000\",\"usuarioNumEmpleado\":10,\"aplicacionID\":0}}'),
+(7,5,1757557883458,'{\"Actualizacion\":{\"curp\":\"ROJP000000\",\"numEmpleado\":10,\"nombre\":\"Pedro Misael\",\"apellidoPaterno\":\"Rodríguez\",\"apellidoMaterno\":\"Jiménez\",\"estado\":\"Activo\",\"area\":5,\"roles\":[1],\"correoElectronico\":\"p.misaelrj@gmail.com\"},\"SesionActiva\":{\"horaInicio\":1757557865408,\"usuarioCURP\":\"LIIM0000\",\"usuarioNumEmpleado\":1,\"aplicacionID\":0}}'),
+(7,5,1757558032123,'{\"Actualizacion\":{\"curp\":\"ROJP000000\",\"numEmpleado\":10,\"nombre\":\"Pedro Misael\",\"apellidoPaterno\":\"Rodríguez\",\"apellidoMaterno\":\"Jiménez\",\"estado\":\"Bloqueado\",\"area\":5,\"roles\":[1],\"correoElectronico\":\"p.misaelrj@gmail.com\"},\"SesionActiva\":{\"horaInicio\":1757558015278,\"usuarioCURP\":\"ROJP000000\",\"usuarioNumEmpleado\":10,\"aplicacionID\":0}}'),
+(7,5,1757559666823,'{\"Actualizacion\":{\"curp\":\"ROJP000000\",\"numEmpleado\":10,\"nombre\":\"Pedro Misael\",\"apellidoPaterno\":\"Rodríguez\",\"apellidoMaterno\":\"Jiménez\",\"estado\":\"Activo\",\"area\":5,\"roles\":[1],\"correoElectronico\":\"p.misaelrj@gmail.com\"},\"SesionActiva\":{\"horaInicio\":1757559643869,\"usuarioCURP\":\"LIIM0000\",\"usuarioNumEmpleado\":1,\"aplicacionID\":0}}'),
+(7,5,1757559680421,'{\"Actualizacion\":{\"curp\":\"ROJP000000\",\"numEmpleado\":10,\"nombre\":\"Pedro Misael\",\"apellidoPaterno\":\"Rodríguez\",\"apellidoMaterno\":\"Jiménez\",\"estado\":\"Inicial\",\"area\":5,\"roles\":[1],\"correoElectronico\":\"p.misaelrj@gmail.com\"},\"SesionActiva\":{\"horaInicio\":1757559643869,\"usuarioCURP\":\"LIIM0000\",\"usuarioNumEmpleado\":1,\"aplicacionID\":0}}'),
+(7,5,1757559700757,'{\"Actualizacion\":{\"curp\":\"ROJP000000\",\"numEmpleado\":10,\"nombre\":\"Pedro Misael\",\"apellidoPaterno\":\"Rodríguez\",\"apellidoMaterno\":\"Jiménez\",\"estado\":\"Bloqueado\",\"area\":5,\"roles\":[1],\"correoElectronico\":\"p.misaelrj@gmail.com\"},\"SesionActiva\":{\"horaInicio\":1757559643869,\"usuarioCURP\":\"LIIM0000\",\"usuarioNumEmpleado\":1,\"aplicacionID\":0}}'),
+(7,5,1757559727190,'{\"Actualizacion\":{\"curp\":\"ROJP000000\",\"numEmpleado\":10,\"nombre\":\"Pedro Misael\",\"apellidoPaterno\":\"Rodríguez\",\"apellidoMaterno\":\"Jiménez\",\"estado\":\"Dado de baja\",\"area\":5,\"roles\":[1],\"correoElectronico\":\"p.misaelrj@gmail.com\"},\"SesionActiva\":{\"horaInicio\":1757559643869,\"usuarioCURP\":\"LIIM0000\",\"usuarioNumEmpleado\":1,\"aplicacionID\":0}}'),
+(7,5,1757559770745,'{\"Actualizacion\":{\"curp\":\"ROJP000000\",\"numEmpleado\":10,\"nombre\":\"Pedro Misael\",\"apellidoPaterno\":\"Rodríguez\",\"apellidoMaterno\":\"Jiménez\",\"estado\":\"Activo\",\"area\":5,\"roles\":[1],\"correoElectronico\":\"p.misaelrj@gmail.com\"},\"SesionActiva\":{\"horaInicio\":1757559643869,\"usuarioCURP\":\"LIIM0000\",\"usuarioNumEmpleado\":1,\"aplicacionID\":0}}'),
+(8,5,1757559727191,'{\"Actualizacion\":{\"curp\":\"ROJP000000\",\"numEmpleado\":10,\"nombre\":\"Pedro Misael\",\"apellidoPaterno\":\"Rodríguez\",\"apellidoMaterno\":\"Jiménez\",\"estado\":\"Dado de baja\",\"area\":5,\"roles\":[1],\"correoElectronico\":\"p.misaelrj@gmail.com\"},\"SesionActiva\":{\"horaInicio\":1757559643869,\"usuarioCURP\":\"LIIM0000\",\"usuarioNumEmpleado\":1,\"aplicacionID\":0}}'),
+(9,5,1757559666824,'{\"Actualizacion\":{\"curp\":\"ROJP000000\",\"numEmpleado\":10,\"nombre\":\"Pedro Misael\",\"apellidoPaterno\":\"Rodríguez\",\"apellidoMaterno\":\"Jiménez\",\"estado\":\"Activo\",\"area\":5,\"roles\":[1],\"correoElectronico\":\"p.misaelrj@gmail.com\"},\"SesionActiva\":{\"horaInicio\":1757559643869,\"usuarioCURP\":\"LIIM0000\",\"usuarioNumEmpleado\":1,\"aplicacionID\":0}}'),
+(10,5,1757559700758,'{\"Actualizacion\":{\"curp\":\"ROJP000000\",\"numEmpleado\":10,\"nombre\":\"Pedro Misael\",\"apellidoPaterno\":\"Rodríguez\",\"apellidoMaterno\":\"Jiménez\",\"estado\":\"Bloqueado\",\"area\":5,\"roles\":[1],\"correoElectronico\":\"p.misaelrj@gmail.com\"},\"SesionActiva\":{\"horaInicio\":1757559643869,\"usuarioCURP\":\"LIIM0000\",\"usuarioNumEmpleado\":1,\"aplicacionID\":0}}'),
+(1001,0,1757555983427,'{\"usuarioId\":\"MisaRJ\",\"contrasena\":\"jdlskañd\",\"ipAddress\":\"127.0.0.1\"}'),
+(1001,0,1757555989415,'{\"usuarioId\":\"MisaRJ\",\"contrasena\":\"holaaaa\",\"ipAddress\":\"127.0.0.1\"}'),
+(1001,0,1757555995022,'{\"usuarioId\":\"LIIM\",\"contrasena\":\"mlkdsamda\",\"ipAddress\":\"127.0.0.1\"}'),
+(1001,0,1757556002320,'{\"usuarioId\":\"MaddieRB\",\"contrasena\":\"holaa\",\"ipAddress\":\"127.0.0.1\"}'),
+(1001,0,1757556018242,'{\"usuarioId\":\"MisaRJ\",\"contrasena\":\"ROJP21331\",\"ipAddress\":\"127.0.0.1\"}'),
+(1001,0,1757556040498,'{\"usuarioId\":\"MisaRJ\",\"contrasena\":\"sasa\",\"ipAddress\":\"127.0.0.1\"}'),
+(1001,0,1757556068971,'{\"usuarioId\":\"MisaRJ\",\"contrasena\":\"jsoajsa\",\"ipAddress\":\"127.0.0.1\"}'),
+(1001,0,1757558007955,'{\"usuarioId\":\"MisaRJ\",\"contrasena\":\"ROJP00000\",\"ipAddress\":\"127.0.0.1\"}'),
+(1001,0,1757559633618,'{\"usuarioId\":\"LIIM\",\"contrasena\":\"ROJP000000\",\"ipAddress\":\"127.0.0.1\"}'),
+(1002,0,1757556060621,'{\"usuarioId\":\"MisaRJww\",\"contrasena\":\"dksld\",\"ipAddress\":\"127.0.0.1\"}'),
+(1003,0,1757556173525,'{\"usuarioId\":\"MisaRJ\",\"contrasena\":\"ROJP00qqq\",\"ipAddress\":\"127.0.0.1\"}'),
+(1003,0,1757556182597,'{\"usuarioId\":\"MisaRJ\",\"contrasena\":\"ROJP\",\"ipAddress\":\"127.0.0.1\"}'),
+(1003,0,1757557421736,'{\"usuarioId\":\"MisaRJ\",\"contrasena\":\"ROJP0000\",\"ipAddress\":\"127.0.0.1\"}'),
+(1003,0,1757557847173,'{\"usuarioId\":\"MisaRJ\",\"contrasena\":\"ROJP000000\",\"ipAddress\":\"127.0.0.1\"}'),
+(1003,0,1757559622332,'{\"usuarioId\":\"MisaRJ\",\"contrasena\":\"ROJP000000\",\"ipAddress\":\"127.0.0.1\"}'),
+(1008,5,1757559800250,'{\"Actualizacion\":{\"curp\":\"ROJP000000\",\"numEmpleado\":10,\"nombre\":\"Pedro Misael\",\"apellidoPaterno\":\"Rodríguez\",\"apellidoMaterno\":\"Jiménez\",\"estado\":\"Activo\",\"area\":5,\"roles\":[1],\"correoElectronico\":\"prueba@gmail.com\"},\"SesionActiva\":{\"horaInicio\":1757559643869,\"usuarioCURP\":\"LIIM0000\",\"usuarioNumEmpleado\":1,\"aplicacionID\":0}}');
 /*!40000 ALTER TABLE `RegistroEvento` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -910,11 +931,126 @@ CREATE TABLE `Sesion` (
 LOCK TABLES `Sesion` WRITE;
 /*!40000 ALTER TABLE `Sesion` DISABLE KEYS */;
 INSERT INTO `Sesion` VALUES
-(1756750955671,1756750957920,'127.0.0.1','Normal',1,'LIIM0000',0,'Admin','LIIM'),
-(1756754170648,1756754233583,'127.0.0.1','Normal',1,'LIIM0000',0,'Admin','LIIM'),
-(1756754291167,1756754338779,'127.0.0.1','Normal',0,'PEPC000000',0,'Admin','carlos'),
-(1756755556914,1756758284270,'127.0.0.1','Inactividad',0,'PEPC000000',0,'Admin','carlos'),
-(1756756865348,NULL,'0:0:0:0:0:0:0:1',NULL,0,'PEPC000000',0,'Admin','carlos');
+(1757048667398,1757048681434,'127.0.0.1','Normal',0,'PEPC000000',0,'Admin','carlos'),
+(1757048711385,1757048811284,'0:0:0:0:0:0:0:1','NormalPostman',0,'PEPC000000',0,'Admin','carlos'),
+(1757049489936,1757049640480,'0:0:0:0:0:0:0:1','NormalPostman',1,'LIIM0000',0,'Admin','LIIM'),
+(1757049645564,1757049650728,'0:0:0:0:0:0:0:1','NormalPostman',1,'LIIM0000',0,'Admin','LIIM'),
+(1757050610693,1757050677409,'0:0:0:0:0:0:0:1','NaturalPostman',1,'LIIM0000',0,'Admin','LIIM'),
+(1757051129662,1757051181049,'0:0:0:0:0:0:0:1','NaturalPostman',10,'ROJP000000',0,'Admin','MisaRJ'),
+(1757052638467,1757053098774,'0:0:0:0:0:0:0:1','NormalPostman',1,'LIIM0000',0,'Admin','LIIM'),
+(1757100152723,NULL,'0:0:0:0:0:0:0:1',NULL,1,'LIIM0000',0,'Admin','LIIM'),
+(1757134520478,1757134562712,'127.0.0.1','Normal',10,'ROJP000000',0,'Admin','MisaRJ'),
+(1757134571741,NULL,'127.0.0.1',NULL,10,'ROJP000000',0,'Admin','MisaRJ'),
+(1757135670347,NULL,'127.0.0.1',NULL,1,'LIIM0000',0,'Admin','LIIM'),
+(1757136062051,NULL,'127.0.0.1',NULL,1,'LIIM0000',0,'Admin','LIIM'),
+(1757136287868,1757136617820,'127.0.0.1','Normal',10,'ROJP000000',0,'Admin','MisaRJ'),
+(1757136638821,1757136727368,'127.0.0.1','Normal',10,'ROJP000000',0,'Admin','MisaRJ'),
+(1757137089735,1757137153963,'127.0.0.1','Normal',10,'ROJP000000',0,'Admin','MisaRJ'),
+(1757137229847,1757137361060,'127.0.0.1','Normal',0,'PEPC000000',0,'Admin','carlos'),
+(1757137383068,NULL,'127.0.0.1',NULL,10,'ROJP000000',0,'Admin','MisaRJ'),
+(1757138619945,1757138866990,'127.0.0.1','Normal',0,'PEPC000000',0,'Admin','carlos'),
+(1757138901173,NULL,'127.0.0.1',NULL,10,'ROJP000000',0,'Admin','MisaRJ'),
+(1757140157294,NULL,'127.0.0.1',NULL,10,'ROJP000000',0,'Admin','MisaRJ'),
+(1757140368747,NULL,'0:0:0:0:0:0:0:1',NULL,0,'PEPC000000',0,'Admin','carlos'),
+(1757360057529,1757369072689,'127.0.0.1','Inactividad',0,'PEPC000000',0,'Admin','carlos'),
+(1757374545171,NULL,'127.0.0.1',NULL,10,'ROJP000000',0,'Admin','MisaRJ'),
+(1757376267231,NULL,'127.0.0.1',NULL,10,'ROJP000000',0,'Admin','MisaRJ'),
+(1757381236126,NULL,'127.0.0.1',NULL,10,'ROJP000000',0,'Admin','MisaRJ'),
+(1757381411311,NULL,'127.0.0.1',NULL,10,'ROJP000000',0,'Admin','MisaRJ'),
+(1757381750014,NULL,'127.0.0.1',NULL,10,'ROJP000000',0,'Admin','MisaRJ'),
+(1757382705342,NULL,'127.0.0.1',NULL,10,'ROJP000000',0,'Admin','MisaRJ'),
+(1757383804465,NULL,'127.0.0.1',NULL,10,'ROJP000000',0,'Admin','MisaRJ'),
+(1757384106238,NULL,'127.0.0.1',NULL,10,'ROJP000000',0,'Admin','MisaRJ'),
+(1757385273169,NULL,'127.0.0.1',NULL,10,'ROJP000000',0,'Admin','MisaRJ'),
+(1757385478688,NULL,'127.0.0.1',NULL,10,'ROJP000000',0,'Admin','MisaRJ'),
+(1757386989419,NULL,'127.0.0.1',NULL,10,'ROJP000000',0,'Admin','MisaRJ'),
+(1757387343300,NULL,'127.0.0.1',NULL,10,'ROJP000000',0,'Admin','MisaRJ'),
+(1757387701505,NULL,'127.0.0.1',NULL,10,'ROJP000000',0,'Admin','MisaRJ'),
+(1757387971989,NULL,'127.0.0.1',NULL,10,'ROJP000000',0,'Admin','MisaRJ'),
+(1757388116467,NULL,'127.0.0.1',NULL,10,'ROJP000000',0,'Admin','MisaRJ'),
+(1757388256957,NULL,'127.0.0.1',NULL,10,'ROJP000000',0,'Admin','MisaRJ'),
+(1757388307159,1757388386940,'127.0.0.1','Normal',10,'ROJP000000',0,'Admin','MisaRJ'),
+(1757388619669,NULL,'127.0.0.1',NULL,10,'ROJP000000',0,'Admin','MisaRJ'),
+(1757389045253,NULL,'127.0.0.1',NULL,10,'ROJP000000',0,'Admin','MisaRJ'),
+(1757389271304,NULL,'127.0.0.1',NULL,10,'ROJP000000',0,'Admin','MisaRJ'),
+(1757389414248,1757389471391,'127.0.0.1','Normal',10,'ROJP000000',0,'Admin','MisaRJ'),
+(1757389561183,1757389714607,'127.0.0.1','Normal',10,'ROJP000000',0,'Admin','MisaRJ'),
+(1757389755772,NULL,'127.0.0.1',NULL,10,'ROJP000000',0,'Admin','MisaRJ'),
+(1757389917381,NULL,'127.0.0.1',NULL,10,'ROJP000000',0,'Admin','MisaRJ'),
+(1757390111991,NULL,'127.0.0.1',NULL,10,'ROJP000000',0,'Admin','MisaRJ'),
+(1757390231608,NULL,'127.0.0.1',NULL,10,'ROJP000000',0,'Admin','MisaRJ'),
+(1757390356405,NULL,'127.0.0.1',NULL,10,'ROJP000000',0,'Admin','MisaRJ'),
+(1757390697936,NULL,'127.0.0.1',NULL,10,'ROJP000000',0,'Admin','MisaRJ'),
+(1757390785249,NULL,'127.0.0.1',NULL,10,'ROJP000000',0,'Admin','MisaRJ'),
+(1757390886311,NULL,'127.0.0.1',NULL,10,'ROJP000000',0,'Admin','MisaRJ'),
+(1757391198224,NULL,'127.0.0.1',NULL,10,'ROJP000000',0,'Admin','MisaRJ'),
+(1757391280767,NULL,'127.0.0.1',NULL,10,'ROJP000000',0,'Admin','MisaRJ'),
+(1757391392612,NULL,'127.0.0.1',NULL,10,'ROJP000000',0,'Admin','MisaRJ'),
+(1757391645980,NULL,'127.0.0.1',NULL,10,'ROJP000000',0,'Admin','MisaRJ'),
+(1757391723024,NULL,'127.0.0.1',NULL,10,'ROJP000000',0,'Admin','MisaRJ'),
+(1757392844193,NULL,'127.0.0.1',NULL,10,'ROJP000000',0,'Admin','MisaRJ'),
+(1757393028864,NULL,'127.0.0.1',NULL,10,'ROJP000000',0,'Admin','MisaRJ'),
+(1757393341158,1757393468542,'127.0.0.1','Normal',10,'ROJP000000',0,'Admin','MisaRJ'),
+(1757393491990,NULL,'127.0.0.1',NULL,10,'ROJP000000',0,'Admin','MisaRJ'),
+(1757393657879,NULL,'0:0:0:0:0:0:0:1',NULL,1,'LIIM0000',0,'Admin','LIIM'),
+(1757393747035,1757393829563,'127.0.0.1','Normal',1,'LIIM0000',0,'Admin','LIIM'),
+(1757445902670,1757446323774,'127.0.0.1','Normal',1,'LIIM0000',0,'Admin','LIIM'),
+(1757466492298,NULL,'127.0.0.1',NULL,10,'ROJP000000',0,'Admin','MisaRJ'),
+(1757466685803,NULL,'127.0.0.1',NULL,10,'ROJP000000',0,'Admin','MisaRJ'),
+(1757467790070,NULL,'127.0.0.1',NULL,10,'ROJP000000',0,'Admin','MisaRJ'),
+(1757468527750,NULL,'127.0.0.1',NULL,10,'ROJP000000',0,'Admin','MisaRJ'),
+(1757469551431,NULL,'127.0.0.1',NULL,0,'PEPC000000',0,'Admin','carlos'),
+(1757472926918,1757474177674,'127.0.0.1','Inactividad',10,'ROJP000000',0,'Admin','MisaRJ'),
+(1757474744363,1757475168459,'127.0.0.1','Normal',10,'ROJP000000',0,'Admin','MisaRJ'),
+(1757475236732,1757475965017,'127.0.0.1','Inactividad',10,'ROJP000000',0,'Admin','MisaRJ'),
+(1757476060232,NULL,'127.0.0.1',NULL,10,'ROJP000000',0,'Admin','MisaRJ'),
+(1757476214293,NULL,'127.0.0.1',NULL,10,'ROJP000000',0,'Admin','MisaRJ'),
+(1757476424590,1757476455552,'127.0.0.1','Normal',10,'ROJP000000',0,'Admin','MisaRJ'),
+(1757476518560,NULL,'127.0.0.1',NULL,10,'ROJP000000',0,'Admin','MisaRJ'),
+(1757476772629,NULL,'127.0.0.1',NULL,10,'ROJP000000',0,'Admin','MisaRJ'),
+(1757476903323,NULL,'127.0.0.1',NULL,10,'ROJP000000',0,'Admin','MisaRJ'),
+(1757477323545,NULL,'127.0.0.1',NULL,10,'ROJP000000',0,'Admin','MisaRJ'),
+(1757477594426,NULL,'127.0.0.1',NULL,10,'ROJP000000',0,'Admin','MisaRJ'),
+(1757477906317,1757478507024,'127.0.0.1','Inactividad',10,'ROJP000000',0,'Admin','MisaRJ'),
+(1757478608946,1757478648542,'127.0.0.1','Normal',10,'ROJP000000',0,'Admin','MisaRJ'),
+(1757478772959,NULL,'127.0.0.1',NULL,10,'ROJP000000',0,'Admin','MisaRJ'),
+(1757478827471,NULL,'127.0.0.1',NULL,10,'ROJP000000',0,'Admin','MisaRJ'),
+(1757478873725,NULL,'127.0.0.1',NULL,10,'ROJP000000',0,'Admin','MisaRJ'),
+(1757479625171,NULL,'127.0.0.1',NULL,10,'ROJP000000',0,'Admin','MisaRJ'),
+(1757479652657,NULL,'0:0:0:0:0:0:0:1',NULL,1,'LIIM0000',0,'Admin','LIIM'),
+(1757479828429,NULL,'127.0.0.1',NULL,10,'ROJP000000',0,'Admin','MisaRJ'),
+(1757479903542,NULL,'127.0.0.1',NULL,10,'ROJP000000',0,'Admin','MisaRJ'),
+(1757480441080,NULL,'127.0.0.1',NULL,10,'ROJP000000',0,'Admin','MisaRJ'),
+(1757480635525,1757480768902,'127.0.0.1','Normal',10,'ROJP000000',0,'Admin','MisaRJ'),
+(1757480819674,1757480859193,'127.0.0.1','Normal',10,'ROJP000000',0,'Admin','MisaRJ'),
+(1757481058296,NULL,'127.0.0.1',NULL,10,'ROJP000000',0,'Admin','MisaRJ'),
+(1757481434935,NULL,'127.0.0.1',NULL,10,'ROJP000000',0,'Admin','MisaRJ'),
+(1757481702902,1757482066059,'127.0.0.1','Normal',10,'ROJP000000',0,'Admin','MisaRJ'),
+(1757482207589,NULL,'127.0.0.1',NULL,10,'ROJP000000',0,'Admin','MisaRJ'),
+(1757482357327,NULL,'127.0.0.1',NULL,10,'ROJP000000',0,'Admin','MisaRJ'),
+(1757482477477,NULL,'127.0.0.1',NULL,10,'ROJP000000',0,'Admin','MisaRJ'),
+(1757531275853,1757532012005,'127.0.0.1','Inactividad',10,'ROJP000000',0,'Admin','MisaRJ'),
+(1757532038968,1757532149042,'127.0.0.1','Normal',10,'ROJP000000',0,'Admin','MisaRJ'),
+(1757545242480,1757545672086,'127.0.0.1','Normal',10,'ROJP000000',0,'Admin','MisaRJ'),
+(1757545818833,NULL,'127.0.0.1',NULL,10,'ROJP000000',0,'Admin','MisaRJ'),
+(1757546737228,1757546944620,'127.0.0.1','Normal',10,'ROJP000000',0,'Admin','MisaRJ'),
+(1757546994501,1757547599016,'127.0.0.1','Inactividad',10,'ROJP000000',0,'Admin','MisaRJ'),
+(1757547818564,1757548420013,'127.0.0.1','Inactividad',10,'ROJP000000',0,'Admin','MisaRJ'),
+(1757548779737,1757549431008,'127.0.0.1','Inactividad',10,'ROJP000000',0,'Admin','MisaRJ'),
+(1757549758617,NULL,'127.0.0.1',NULL,10,'ROJP000000',0,'Admin','MisaRJ'),
+(1757549816630,NULL,'127.0.0.1',NULL,10,'ROJP000000',0,'Admin','MisaRJ'),
+(1757550003580,NULL,'127.0.0.1',NULL,10,'ROJP000000',0,'Admin','MisaRJ'),
+(1757550110997,1757550118694,'127.0.0.1','Normal',10,'ROJP000000',0,'Admin','MisaRJ'),
+(1757550128426,1757550139833,'127.0.0.1','Normal',10,'ROJP000000',0,'Admin','MisaRJ'),
+(1757550273378,1757550874098,'127.0.0.1','Inactividad',10,'ROJP000000',0,'Admin','MisaRJ'),
+(1757556218008,NULL,'127.0.0.1',NULL,1,'LIIM0000',0,'Admin','LIIM'),
+(1757556656818,NULL,'127.0.0.1',NULL,10,'ROJP000000',0,'Admin','MisaRJ'),
+(1757557469747,NULL,'127.0.0.1',NULL,1,'LIIM0000',0,'Admin','LIIM'),
+(1757557568659,NULL,'127.0.0.1',NULL,10,'ROJP000000',0,'Admin','MisaRJ'),
+(1757557865408,NULL,'127.0.0.1',NULL,1,'LIIM0000',0,'Admin','LIIM'),
+(1757558015278,1757558046473,'127.0.0.1','Normal',10,'ROJP000000',0,'Admin','MisaRJ'),
+(1757559643869,1757560400208,'127.0.0.1','Inactividad',1,'LIIM0000',0,'Admin','LIIM'),
+(1757619234411,1757619836010,'127.0.0.1','Inactividad',10,'ROJP000000',0,'Admin','MisaRJ');
 /*!40000 ALTER TABLE `Sesion` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -1034,7 +1170,11 @@ LOCK TABLES `Usuario` WRITE;
 /*!40000 ALTER TABLE `Usuario` DISABLE KEYS */;
 INSERT INTO `Usuario` VALUES
 (0,'PEPC000000',5,'Carlos Alberto','Pérez','Pérez','carlos@gmail.com'),
-(1,'LIIM0000',1,'Laboratorio de Investigacion','Informatica','Medica','LIIM.UAMI@gmail.com');
+(1,'LIIM0000',5,'Laboratorio de Investigacion','Informatica','Medica','LIIM.UAMI@gmail.com'),
+(5,'PRUEBA0000',4,'Prueba Edicion','pruebaaaaa','pruebaaaaa','prueba@gmail.com'),
+(10,'ROJP000000',5,'Pedro Misael','Rodríguez','Jiménez','p.misaelrj@gmail.com'),
+(22,'ELCP0000',4,'Paco','El','Chato','pacoelchato@gmail.com'),
+(100,'REBM111111',5,'Maddie','Rebolledo','Bustillo','maddie.rb@gmail.com');
 /*!40000 ALTER TABLE `Usuario` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -1047,4 +1187,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-09-02 13:22:06
+-- Dump completed on 2025-09-11 14:11:25

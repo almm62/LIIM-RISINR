@@ -28,12 +28,15 @@ function barraBotonesEQP(e) {
             html_ShowElement("agregarEQPRIS");
             html_ShowElement("secSerie"); //seccion de numero de serie
             //document.getElementById("nserEQP").disabled = false; //número de serie (activo al geenrar uno nuevo)
-
+            limpiarCampos();
+            
+            /*
             document.getElementById("nomEQP").value = "";
             document.getElementById("marcaEQP").value = "";
-
+             */
             cambiaEstadoModal(".modalEquipoRIS", true); //true =activaer
             actualizaDialogoModal(".modalEquipoRIS-content", "12%", "1%", "60%", "50%"); //top 12%
+            
 
             break;
         case 'btnEdtEqptbl':
@@ -60,7 +63,7 @@ function barraBotonesEQP(e) {
 
                 document.getElementById("modalEQP").value = columnasrow[4].innerText;
                 //listbox modalidad
-                document.getElementById("idmod").value = columnasrow[4].innerText;
+                //document.getElementById("idmod").value = columnasrow[4].innerText;
                 //listbox modalidad                
 
                 document.getElementById("areEqp").value = columnasrow[5].innerText;
@@ -68,7 +71,7 @@ function barraBotonesEQP(e) {
                 document.getElementById("idarea").value = columnasrow[6].innerText; //campo de area actual
 
                 document.getElementById("edoEqp").value = columnasrow[7].innerText; //listbox estado
-                document.getElementById("idedo").value = columnasrow[7].innerText; //campo de estado actual
+                //document.getElementById("idedo").value = columnasrow[7].innerText; //campo de estado actual
 
 
                 cambiaEstadoModal(".modalEquipoRIS", true); //true =activaer 
@@ -155,8 +158,10 @@ function listenermodalEQPRIS(e) {
             break;
         case 'updateEQPRIS':
             var formData = getFormData("UpdateEqp", "formEquipoRIS");
+            
+            var datosJson = getDatos("formEquipoRIS");
             //var getEquipoimg =POSTForDataFiles(formData, uriserv + "/FormularioEqpImg/UpdateEqp");
-            var getEquipoimg = POSTForDataFiles(formData, uriserv + "/EquipoImagenologia/editEquipo");
+            var getEquipoimg = POSTForDataFiles(datosJson, uriserv + "/EquipoImagenologia/editEquipo");
             $.when(getEquipoimg.done(function (data) {
                 console.log(data);
                 //var resp = JSON.parse(data);
@@ -179,11 +184,17 @@ function listenermodalEQPRIS(e) {
             var formData = getFormData("CreateEqp", "formEquipoRIS");
             console.log("Datos antes de la peticion" + formData);
             console.log(formData);
+            
+            var datosJson = getDatos("formEquipoRIS");
+            
+           
             //var getEquipoimg =POSTForDataFiles(formData, uriserv + "/FormularioEqpImg/CreateEqp");
-            var getEquipoimg = POSTForDataFiles(formData, uriserv + "/EquipoImagenologia/addEquipo");
+            var getEquipoimg = POSTForDataFiles(datosJson, uriserv + "/EquipoImagenologia/addEquipo");
             $.when(getEquipoimg.done(function (data) {
                 console.log(data);
-                var resp = JSON.parse(data);
+                alert("Se agregó el registro con exito");
+                readTblsEQP();
+                //var resp = JSON.parse(data);
             }));
             cambiaEstadoModal(".modalEquipoRIS", false); //true =activaer                 
             break;
@@ -197,7 +208,48 @@ function getFormData(crud, formname) {
     //formData.append('Operation', 'Create'); //agregar campo para CRUD, webservce contra parte
     formData.append('Operation', crud); //agregar campo para CRUD, webservce contra parte
     return formData;
+    
+    
 }
+
+function getDatos(formname){
+    
+    var formulario = document.forms.namedItem(formname);
+    
+    var datosJson = {
+        
+        nSerie : formulario.elements["nserEQP"].value,
+        nombreEquipo: formulario.elements["nomEQP"].value,
+        marca:formulario.elements["marcaEQP"].value,
+        modelo: formulario.elements["modeloEQP"].value,
+        modalidad: formulario.elements["modalEQP"].value,
+        idArea: formulario.elements["areEqp"].value,
+        estado: formulario.elements["edoEqp"].value,
+        fechaInstalacion: null
+    };
+    
+    console.log(datosJson);
+    
+    var datosJsonCadena = JSON.stringify(datosJson);
+    
+    console.log("Después de hacerlo cadena");
+    console.log(datosJsonCadena);
+    
+    return datosJsonCadena; 
+    
+}
+
+function limpiarCampos() {
+    document.getElementById("nserEQP").value = "";
+    document.getElementById("nomEQP").value = "";
+    document.getElementById("marcaEQP").value = "";
+    document.getElementById("modeloEQP").value = "";
+    document.getElementById("modalEQP").value = "";
+    document.getElementById("areEqp").value = "";
+    document.getElementById("idarea").value = "";
+    document.getElementById("edoEqp").value = "";
+}
+
 
 window.onload = function () {
     //$().ready(function () {   

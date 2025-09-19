@@ -7,6 +7,6 @@ import java.util.List;
 
 public interface UserService {
     List<UsuarioResumenDTO> getAll();
-    UsuarioResumenDTO create(CrearUsuarioDTO dto, String ipDispositivo);
-    void update(ActualizarUsuarioDTO dto, String ipDispositivo);
+    UsuarioResumenDTO create(CrearUsuarioDTO dto, String token);
+    UsuarioResumenDTO update(ActualizarUsuarioDTO dto, String token);
 }

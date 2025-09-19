@@ -2,41 +2,40 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package com.UAM.RISINR.model.dto;
+package com.UAM.RISINR.model.dto.equipoImagenologia;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import java.util.Date;
 
 /**
- *
- * @author vsfs2
+ * Clase DTO (Data Transfer Object) utilizada para recibir datos de un equipo de imagenología
+ * desde las solicitudes del cliente. Permite transportar la información necesaria para
+ * agregar o editar un equipo sin exponer la entidad de base de datos directamente.
+ * 
+ * Contiene información básica del equipo, su área de servicio y estado.
+ * 
+ * Autor: María de Jesús Rebolledo Bustillo
  */
-public class EquipoImagenologiaDTO {
-    
-        private String nSerie;
+public class EquipoImagenologiaRequest {
+    private String nSerie;
         private String nombreEquipo;
         private String marca;
         private String modelo;
         private String modalidad;
         private Integer idArea;
-        private String nombreArea; 
         private String estado; 
-        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-        private Date fechaInstalacion;
+       
 
-    public EquipoImagenologiaDTO(String nSerie, String nombreEquipo, String marca, String modelo, String modalidad, Integer idArea, String nombreArea, String estado, Date fechaInstalacion) {
+    public EquipoImagenologiaRequest(String nSerie, String nombreEquipo, String marca, String modelo, String modalidad, Integer idArea,String estado) {
         this.nSerie = nSerie;
         this.nombreEquipo = nombreEquipo;
         this.marca = marca;
         this.modelo = modelo;
         this.modalidad = modalidad;
         this.idArea = idArea;
-        this.nombreArea = nombreArea;
         this.estado = estado;
-        this.fechaInstalacion = fechaInstalacion;
+        
     }
     
-    public EquipoImagenologiaDTO(){
+    public EquipoImagenologiaRequest(){
     }
 
     public String getEstado() {
@@ -95,28 +94,5 @@ public class EquipoImagenologiaDTO {
     public void setIdArea(Integer idArea) {
         this.idArea = idArea;
     }
-
-    public String getNombreArea() {
-        return nombreArea;
-    }
-
-    public void setNombreArea(String nombreArea) {
-        this.nombreArea = nombreArea;
-    }
-
-    public Date getFechaInstalacion() {
-        return fechaInstalacion;
-    }
-
-    public void setFechaInstalacion(Date fechaInstalacion) {
-        this.fechaInstalacion = fechaInstalacion;
-    }
-        
-        
-       
-   
-  
-  
-    
     
 }
