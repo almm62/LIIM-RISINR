@@ -11,8 +11,13 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 /**
- *
- * @author vsfs2
+ * Repositorio para la entidad EquipoImagenologia.
+ * 
+ * Esta interfaz hereda JpaRepository, proporcionando métodos CRUD y consultas
+ * personalizadas sobre la entidad EquipoImagenologia. Permite acceder a los datos
+ * de equipos de imagenología almacenados en la base de datos.
+ * 
+ * Autor: María de Jesús Rebolledo Bustillo
  */
 @Repository
 public interface EquipoImagenologiaRepository extends JpaRepository<EquipoImagenologia, String> {

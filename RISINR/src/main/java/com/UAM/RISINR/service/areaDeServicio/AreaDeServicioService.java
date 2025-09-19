@@ -7,8 +7,15 @@ package com.UAM.RISINR.service.areaDeServicio;
 import com.UAM.RISINR.model.AreaDeServicio;
 
 /**
- *
- * @author vsfs2
+ * Interfaz del servicio de áreas de servicio.
+ * 
+ * Define las operaciones disponibles para la gestión de áreas de servicio,
+ * principalmente la consulta de un área a partir de su identificador.
+ * 
+ * Esta interfaz permite abstraer la implementación concreta, facilitando
+ * la inyección de dependencias y pruebas unitarias.
+ * 
+ * Autor: Maria de Jesus Rebolledo Bustillo
  */
 public interface AreaDeServicioService {
         AreaDeServicio consultarPorID(Integer id); 
