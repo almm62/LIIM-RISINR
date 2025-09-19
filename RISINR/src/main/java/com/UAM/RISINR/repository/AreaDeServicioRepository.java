@@ -5,13 +5,17 @@
 package com.UAM.RISINR.repository;
 
 import com.UAM.RISINR.model.AreaDeServicio;
-import com.UAM.RISINR.model.EquipoImagenologia;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 /**
- *
- * @author vsfs2
+ * Repositorio para la entidad AreaDeServicio.
+ * 
+ * Esta interfaz extiende JpaRepository, proporcionando métodos CRUD y consultas
+ * personalizadas sobre la entidad AreaDeServicio. Permite acceder a los datos
+ * de las áreas de servicio almacenadas en la base de datos.
+ * 
+ * Autor: María de Jesús Rebolledo Bustillo
  */
 
 @Repository
