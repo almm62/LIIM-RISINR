@@ -2,27 +2,33 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package com.UAM.RISINR.model.dto;
+package com.UAM.RISINR.model.dto.equipoImagenologia;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import java.util.Date;
 
 /**
- *
- * @author vsfs2
+ * Clase DTO (Data Transfer Object) que representa un equipo de imagenología.
+ * Se utiliza para transferir datos entre capas de la aplicación sin exponer
+ * directamente la entidad de la base de datos.
+ * 
+ * Contiene información básica del equipo, su área de servicio, estado
+ * y la fecha de instalación. Se utiliza para enviar la información hacia el cliente. 
+ * 
+ * Autor: María de Jesús Rebolleddo Bustillo
  */
 public class EquipoImagenologiaDTO {
     
-        private String nSerie;
-        private String nombreEquipo;
-        private String marca;
-        private String modelo;
-        private String modalidad;
-        private Integer idArea;
-        private String nombreArea; 
-        private String estado; 
-        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-        private Date fechaInstalacion;
+    private String nSerie;
+    private String nombreEquipo;
+    private String marca;
+    private String modelo;
+    private String modalidad;
+    private Integer idArea;
+    private String nombreArea; 
+    private String estado; 
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    private Date fechaInstalacion;
 
     public EquipoImagenologiaDTO(String nSerie, String nombreEquipo, String marca, String modelo, String modalidad, Integer idArea,String nombreArea,String estado, Date fechaInstalacion) {
         this.nSerie = nSerie;
@@ -113,11 +119,5 @@ public class EquipoImagenologiaDTO {
         this.nombreArea = nombreArea;
     }
         
-        
-       
    
-  
-  
-    
-    
 }

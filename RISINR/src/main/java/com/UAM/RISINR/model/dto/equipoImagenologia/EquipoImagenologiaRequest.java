@@ -2,14 +2,17 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package com.UAM.RISINR.model.dto;
+package com.UAM.RISINR.model.dto.equipoImagenologia;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import java.util.Date;
 
 /**
- *
- * @author vsfs2
+ * Clase DTO (Data Transfer Object) utilizada para recibir datos de un equipo de imagenología
+ * desde las solicitudes del cliente. Permite transportar la información necesaria para
+ * agregar o editar un equipo sin exponer la entidad de base de datos directamente.
+ * 
+ * Contiene información básica del equipo, su área de servicio y estado.
+ * 
+ * Autor: María de Jesús Rebolledo Bustillo
  */
 public class EquipoImagenologiaRequest {
     private String nSerie;
