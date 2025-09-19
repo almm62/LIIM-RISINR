@@ -38,5 +38,12 @@ public class GlobalExceptionHandler {
         System.out.println(message);
         return ResponseEntity.status(HttpStatus.CONFLICT).body(message);
     }
+    
+    @ExceptionHandler(IncompleteFormException.class)
+    public ResponseEntity<String> handleIncompleteFormException(IncompleteFormException ex) {
+        String message = eventoRepository.findByIdEvento(ex.getidEvento()).getDescripcion();
+        System.out.println(message);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(message);
+    }
   
 }

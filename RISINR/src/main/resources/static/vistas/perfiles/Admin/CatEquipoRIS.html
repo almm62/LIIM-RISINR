@@ -14,7 +14,7 @@
             <button id="btnCatEqptbl" onclick="barraBotonesEQP(event)" class="button button1 fa fa-plus" style="display:block"> Consulta catálogo</button>
             <button id="btnAddEqptbl" onclick="barraBotonesEQP(event)" class="button button1 fa fa-plus" style="display:block"> Nuevo</button>
             <button id="btnEdtEqptbl" onclick="barraBotonesEQP(event)" class="button button1 fa fa-pencil" style="display:none"> Editar</button>
-            <button id="btnDelEqptbl" onclick="barraBotonesEQP(event)" class="button button1 fa fa-trash" style="display:none"> Borrar</button>                         
+                                
         </div>  
         <br>
         <div id="showDataEQP" class="scrollcell"></div> 
@@ -61,7 +61,7 @@
                                 <option id="mod5" value="US">US</option>
                                 <option id="mod6" value="OT">OT</option>
                             </select>                    
-                            <input type="text" style="margin: 0px 0px 0px 0.5%; width:26%; height: 30px;" id="idmod" name="idmod"  autocomplete="off">
+                            <!--<input type="text" style="margin: 0px 0px 0px 0.5%; width:26%; height: 30px;" id="idmod" name="idmod"  autocomplete="off"> -->
                             <b>Área: </b> 
                             <!--Corresponden a la tabla de áreas, llenarlo con el contenido de la tabla -->
                             <select name="areEqp" id="areEqp" style='color:black; font-size: 14px; padding: 6px; width:21%;' onchange="updatePKSEqp(event)">
@@ -75,7 +75,7 @@
                                 <option id="area7" value="7">Densitometria</option>
                                 <option id="area8" value="8">Subdirección de Rehabilitación</option>
                             </select>
-                            <input type="text" id="idarea" name="idarea" style="margin: 0px 0px 0px 0.5%; width:21%; height: 30px;" autocomplete="off">
+                            <input type="text" id="idarea" name="idarea" style="margin: 0px 0px 0px 0.5%; width:21%; height: 30px;" autocomplete="off"  readonly>
                         </p>  
                         <p style='color:black; text-align: left; padding: 10px 0 0 20px; font-size: 14px;'>
                             <b>Estado: </b> 
@@ -86,7 +86,7 @@
                                 <option id="edo3" value="Mantenimiento preventivo">Mantenimiento preventivo</option>
                                 <option id="edo4" value="Mantenimiento Correctivo">Mantenimiento Correctivo</option>
                             </select>
-                            <input type="text" id="idedo" name="idedo" style="margin: 0px 0px 0px 0.5%; width:26%; height: 30px;"  autocomplete="off" >                            
+                            <!--<input type="text" id="idedo" name="idedo" style="margin: 0px 0px 0px 0.5%; width:26%; height: 30px;"  autocomplete="off" >      -->                      
                         </p>  
                         <!--p style='color:black; text-align: left; padding: 10px 0 0 20px; font-size: 14px;'>
                             <b>Fecha de instalación: </b> 

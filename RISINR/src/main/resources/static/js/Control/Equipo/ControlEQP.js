@@ -28,12 +28,15 @@ function barraBotonesEQP(e) {
             html_ShowElement("agregarEQPRIS");
             html_ShowElement("secSerie"); //seccion de numero de serie
             //document.getElementById("nserEQP").disabled = false; //número de serie (activo al geenrar uno nuevo)
-
+            limpiarCampos();
+            
+            /*
             document.getElementById("nomEQP").value = "";
             document.getElementById("marcaEQP").value = "";
-
+             */
             cambiaEstadoModal(".modalEquipoRIS", true); //true =activaer
             actualizaDialogoModal(".modalEquipoRIS-content", "12%", "1%", "60%", "50%"); //top 12%
+            
 
             break;
         case 'btnEdtEqptbl':
@@ -60,7 +63,7 @@ function barraBotonesEQP(e) {
 
                 document.getElementById("modalEQP").value = columnasrow[4].innerText;
                 //listbox modalidad
-                document.getElementById("idmod").value = columnasrow[4].innerText;
+                //document.getElementById("idmod").value = columnasrow[4].innerText;
                 //listbox modalidad                
 
                 document.getElementById("areEqp").value = columnasrow[5].innerText;
@@ -68,7 +71,7 @@ function barraBotonesEQP(e) {
                 document.getElementById("idarea").value = columnasrow[6].innerText; //campo de area actual
 
                 document.getElementById("edoEqp").value = columnasrow[7].innerText; //listbox estado
-                document.getElementById("idedo").value = columnasrow[7].innerText; //campo de estado actual
+                //document.getElementById("idedo").value = columnasrow[7].innerText; //campo de estado actual
 
 
                 cambiaEstadoModal(".modalEquipoRIS", true); //true =activaer 
@@ -189,6 +192,8 @@ function listenermodalEQPRIS(e) {
             var getEquipoimg = POSTForDataFiles(datosJson, uriserv + "/EquipoImagenologia/addEquipo");
             $.when(getEquipoimg.done(function (data) {
                 console.log(data);
+                alert("Se agregó el registro con exito");
+                readTblsEQP();
                 //var resp = JSON.parse(data);
             }));
             cambiaEstadoModal(".modalEquipoRIS", false); //true =activaer                 
@@ -233,6 +238,18 @@ function getDatos(formname){
     return datosJsonCadena; 
     
 }
+
+function limpiarCampos() {
+    document.getElementById("nserEQP").value = "";
+    document.getElementById("nomEQP").value = "";
+    document.getElementById("marcaEQP").value = "";
+    document.getElementById("modeloEQP").value = "";
+    document.getElementById("modalEQP").value = "";
+    document.getElementById("areEqp").value = "";
+    document.getElementById("idarea").value = "";
+    document.getElementById("edoEqp").value = "";
+}
+
 
 window.onload = function () {
     //$().ready(function () {   

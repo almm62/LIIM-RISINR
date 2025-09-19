@@ -4,6 +4,7 @@
  */
 package com.UAM.RISINR.service.equipoImagenologia.implementations;
 
+import com.UAM.RISINR.exceptions.IncompleteFormException;
 import com.UAM.RISINR.exceptions.ResourceNotFoundException;
 import com.UAM.RISINR.exceptions.ResourceFoundException;
 import com.UAM.RISINR.model.AreaDeServicio;
@@ -48,6 +49,8 @@ public class EquipoImagenologiaServiceImpl implements EquipoImagenologiaService{
     private static final int CATALOGO_CONSULTADO_EXITOSAMENTE = 5;
     private static final int NUM_SERIE_EXISTENTE = 1004;
     private static final int NUM_SERIE_NO_EXISTE = 1005;
+    private static final int INFORMACION_INCOMPLETA_AGREGAR= 1012;
+    private static final int INFORMACION_INCOMPLETA_EDITAR = 1013;
     
     
     private long hora = 0;
@@ -83,22 +86,20 @@ public class EquipoImagenologiaServiceImpl implements EquipoImagenologiaService{
         hora =  System.currentTimeMillis();
         EquipoImagenologia equipo;
         EquipoImagenologiaDTO equipoDTO;
-        AreaDeServicio area;
         String datos = "{}";
         String nSerie = equipoRequest.getnSerie();
         
         if(validarEquipo(nSerie) != null){
             registroEvento.log(NUM_SERIE_EXISTENTE, APLICACION_CREAR, hora, datos);
-            throw new ResourceFoundException(1004);
-           
-        }else{
-            
-            area = validarArea(equipoRequest.getIdArea());
-            if(area == null){
-                registroEvento.log(NUM_SERIE_EXISTENTE, APLICACION_CREAR, hora, datos);
-                throw new ResourceNotFoundException(1005); 
+            throw new ResourceFoundException(1004); 
+        }else{     
+            boolean valido = validacionDatos(equipoRequest);
+            if(valido == false){
+                registroEvento.log(INFORMACION_INCOMPLETA_AGREGAR, APLICACION_CREAR, hora, datos);
+                throw new IncompleteFormException(1012); 
             }
-            equipo = extraerDatos(equipoRequest, area);
+            
+            equipo = extraerDatos(equipoRequest);
             repository.save(equipo);
             equipoDTO = convertirDTO(equipo);
             try {
@@ -118,7 +119,6 @@ public class EquipoImagenologiaServiceImpl implements EquipoImagenologiaService{
        hora =  System.currentTimeMillis();
         EquipoImagenologia equipo;
         EquipoImagenologiaDTO equipoDTO;
-        AreaDeServicio area;
         String datos = "{}";
         String nSerie = equipoRequest.getnSerie();
         
@@ -126,12 +126,12 @@ public class EquipoImagenologiaServiceImpl implements EquipoImagenologiaService{
             registroEvento.log(NUM_SERIE_NO_EXISTE, APLICACION_EDITAR, hora, datos);
             throw new ResourceNotFoundException(1005);
         }else{
-            area = validarArea(equipoRequest.getIdArea());
-            if(area == null){
-                
-                registroEvento.log(NUM_SERIE_NO_EXISTE, APLICACION_CREAR, hora, datos);
-                throw new ResourceNotFoundException(1005); 
+            boolean valido = validacionDatos(equipoRequest);
+            if(valido == false){
+                registroEvento.log(INFORMACION_INCOMPLETA_EDITAR, APLICACION_EDITAR, hora, datos);
+                throw new IncompleteFormException(1013); 
             }
+            
             
             equipo = repository.findBynSerie(nSerie);
             equipo.setNombre(equipoRequest.getNombreEquipo());
@@ -139,7 +139,7 @@ public class EquipoImagenologiaServiceImpl implements EquipoImagenologiaService{
             equipo.setModalidad(equipoRequest.getModalidad());
             equipo.setModelo(equipoRequest.getModelo());
             equipo.setEstado(equipoRequest.getEstado());
-            equipo.setAreaDeServicioidArea(area);
+            equipo.setAreaDeServicioidArea(areaService.consultarPorID(equipoRequest.getIdArea()));
             repository.save(equipo);
             equipoDTO = convertirDTO(equipo);
             
@@ -184,7 +184,9 @@ public class EquipoImagenologiaServiceImpl implements EquipoImagenologiaService{
         return area;
    }
    
-   public EquipoImagenologia extraerDatos(EquipoImagenologiaRequest equipoRequest, AreaDeServicio area){
+   
+   
+   public EquipoImagenologia extraerDatos(EquipoImagenologiaRequest equipoRequest){
        EquipoImagenologia equipo = new EquipoImagenologia();
        Date fecha = new Date();
        
@@ -194,10 +196,50 @@ public class EquipoImagenologiaServiceImpl implements EquipoImagenologiaService{
        equipo.setModalidad(equipoRequest.getModalidad());
        equipo.setModelo(equipoRequest.getModelo());
        equipo.setEstado(equipoRequest.getEstado());
-       equipo.setAreaDeServicioidArea(area);
+       equipo.setAreaDeServicioidArea(areaService.consultarPorID(equipoRequest.getIdArea()));
        equipo.setFechaInstalacion(fecha);
 
        return equipo;
    }
     
+   public boolean validacionDatos(EquipoImagenologiaRequest request) {
+    if (request == null) {
+        return false;
+    }
+
+    if (request.getnSerie() == null || request.getnSerie().trim().isEmpty()) {
+        return false;
+    }
+    if (request.getNombreEquipo() == null || request.getNombreEquipo().trim().isEmpty()) {
+        return false;
+    }
+    if (request.getMarca() == null || request.getMarca().trim().isEmpty()) {
+        return false;
+    }
+    if (request.getModelo() == null || request.getModelo().trim().isEmpty()) {
+        return false;
+    }
+
+    // Modalidad: no nula, no vacía, no "0"
+    if (request.getModalidad() == null || request.getModalidad().trim().isEmpty() || request.getModalidad().trim().equals("0")) {
+        return false;
+    }
+
+    // idArea: no nulo y no 0
+    if (validarArea(request.getIdArea()) == null) {
+        return false;
+    }
+
+    // Estado: no nulo, no vacío, no "0"
+    if (request.getEstado() == null || request.getEstado().trim().isEmpty() || request.getEstado().trim().equals("0")) {
+        return false;
+    }
+
+    // Si pasó todas las validaciones
+    return true;
 }
+
+
+   
+   
+   }
