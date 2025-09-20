@@ -19,7 +19,12 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.json.JSONObject;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -58,6 +63,7 @@ public class EquipoImagenologiaServiceImpl implements EquipoImagenologiaService{
     private static final int EQUIPO_AGREGADO_EXITOSAMENTE = 3;
     private static final int EQUIPO_EDITADO_EXITOSAMENTE = 4 ;
     private static final int CATALOGO_CONSULTADO_EXITOSAMENTE = 5;
+     private static final int ESTADO_DE_EQUIPO_CAMBIADO = 11;
     private static final int NUM_SERIE_EXISTENTE = 1004;
     private static final int NUM_SERIE_NO_EXISTE = 1005;
     private static final int INFORMACION_INCOMPLETA_AGREGAR= 1012;
@@ -189,7 +195,8 @@ public class EquipoImagenologiaServiceImpl implements EquipoImagenologiaService{
             equipo.setNombre(equipoRequest.getNombreEquipo());
             equipo.setMarca(equipoRequest.getMarca());
             equipo.setModalidad(equipoRequest.getModalidad());
-            equipo.setModelo(equipoRequest.getModelo());
+            equipo.setModelo(equipoRequest.getModelo());      
+            registrarEstado(equipo.getEstado(),equipoRequest.getEstado());
             equipo.setEstado(equipoRequest.getEstado());
             equipo.setAreaDeServicioidArea(areaService.consultarPorID(equipoRequest.getIdArea()));
             repository.save(equipo);
@@ -321,5 +328,23 @@ public class EquipoImagenologiaServiceImpl implements EquipoImagenologiaService{
     // Si pasó todas las validaciones
     return true;
     }
+   
+   
+    public void registrarEstado(String estadoActual, String estadoNuevo){        
+        if(!estadoActual.equals(estadoNuevo)){
+            Map<String, String> datos = new HashMap<>();
+            datos.put("estadoActual", estadoNuevo);
+            datos.put("estadoAnterior", estadoActual);
+            String d;
+            try {
+                d = objMapper.writeValueAsString(datos);
+                registroEvento.log(ESTADO_DE_EQUIPO_CAMBIADO, APLICACION_EDITAR, hora, d);
+            } catch (JsonProcessingException ex) {
+                Logger.getLogger(EquipoImagenologiaServiceImpl.class.getName()).log(Level.SEVERE, null, ex);
+            }   
+        }  
+    }
   
-}
+   
+   
+ }
