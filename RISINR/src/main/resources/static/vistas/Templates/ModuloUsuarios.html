@@ -15,7 +15,6 @@
             <button id="btnCatUSRtbl" onclick="CrudUSR(event)" class="button button1 fa fa-plus" style="display:block">Consulta catálogo</button>            
             <button id="btnAdtUsrtbl" onclick="CrudUSR(event)" class="button button1 fa fa-plus" style="display:block">Nuevo</button>    
             <button id="btnEdtUsrtbl" onclick="CrudUSR(event)" class="button button1 fa fa-pencil" style="display:none">Editar</button>
-            <button id="btnDelUsrtbl" onclick="CrudUSR(event)" class="button button1 fa fa-trash" style="display:none">Borrar</button>  
         </div>  
         <br>
         <div id="showDataUser" class="scrollcell"></div>  
@@ -27,23 +26,32 @@
                     <input type="hidden" id="USRrowid" name="USRrowid" value="-1">
                     <h1 style="color:black; text-align: center">***Usuarios****</h1>
                     <hr>
+                    <p id="_usrId" style='color:black; text-align: left; padding: 10px 0 0 20px;'><b>UsuarioID</b></p>
+                    <input placeholder="INGRESE USUARIO_ID" name="usrId" type="text" id="usrId" autocomplete="off">
                     <p style='color:black; text-align: left; padding: 10px 0 0 20px;'><b>Nombre</b></p>
                     <input placeholder="INGRESE NOMBRE DE USUARIO" name="uname" type="text" id="uname" autocomplete="off">
                     <p style='color:black; text-align: left; padding: 0 0 0 20px;'><b>A. Paterno</b></p>
                     <input placeholder="INGRESE APELLIDO PATERNO" name="apaterno" type="text" id="apaterno" autocomplete="off">
                     <p style='color:black; text-align: left; padding: 0 0 0 20px;'><b>A. Materno</b></p>                        
                     <input placeholder="INGRESE APELLIDO MATERNO" name="amaterno" type="text" id="amaterno" autocomplete="off">
-                    <p style='color:black; text-align: left; padding: 0 0 0 20px;'><b>CURP</b></p>
-                    <input placeholder="INGRESE CURP" name="curp" type="text" id="curp" autocomplete="off">                        
+                    <p id="_curp" style='color:black; text-align: left; padding: 0 0 0 20px;'><b>CURP</b></p>
+                    <input placeholder="INGRESE CURP" name="curp" type="text" id="curp" autocomplete="off">                       
+                    <p id="_numEmpleado" style='color:black; text-align: left; padding: 0 0 0 20px;'><b>Numero de Empleado</b></p>
+                    <input placeholder="INGRESE NUMERO DE EMPLEADO" name="numEmpleado" type="text" id="numEmpleado" autocomplete="off">                        
+                    <p style='color:black; text-align: left; padding: 0 0 0 20px;'><b>Correo Electrónico</b></p>
+                    <input placeholder="INGRESE CORREO ELECTRONICO" name="correo" type="text" id="correo" autocomplete="off">                        
                     <div id="perfilcreate" style='color:black; text-align: left; padding: 10px 0 0 20px;'>
                         <b>Area de adscripción: </b> 
                         <select style='color:black; font-size: 14px; padding: 6px' name="perf2" id="perf2">
                             <option value="0">Seleccione Área</option>
                         </select> 
                         <b>Estado</b>            
-                        <label><input type="radio" name="estado" value="1" checked>Activo</label>            
-                        <label><input type="radio" name="estado" value="2">Bloqueado</label>
-                        <label><input type="radio" name="estado" value="3">Suspendido</label>
+                        <label id="_Activo" ><input type="radio" id="Activo" name="estado" value="Activo" checked>Activo</label>          
+                        <label id="_Inicial"><input type="radio" id="Inicial" name="estado" value="Inicial" checked>Inicial</label>            
+                        <label id="_Bloqueado" ><input type="radio" id="Bloqueado" name="estado" value="Bloqueado">Bloqueado</label>
+                        <label id="_Suspendido" ><input type="radio" id="Suspendido" name="estado" value="Suspendido">Suspendido</label>
+                        <label id="_Dado_de_baja" ><input type="radio" id="Dado_de_baja" name="estado" value="Dado de baja">Dado de baja</label>
+                        
                     </div>
 
                     <div id="perfilupdate" style='color:black; text-align: left; padding: 0 0 0 10px;'>

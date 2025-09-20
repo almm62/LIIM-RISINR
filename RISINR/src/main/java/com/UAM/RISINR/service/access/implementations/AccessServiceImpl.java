@@ -14,7 +14,6 @@ import com.UAM.RISINR.repository.PerfilRepository;
 import com.UAM.RISINR.repository.RegistroEventoRepository;
 import com.UAM.RISINR.repository.RolRepository;
 import com.UAM.RISINR.repository.SesionRepository;
-import com.UAM.RISINR.repository.projection.PerfilRolView;
 import com.UAM.RISINR.repository.projection.RolView;
 import com.UAM.RISINR.service.access.AccessService;
 import com.UAM.RISINR.service.access.AccountLockedService;
@@ -33,7 +32,6 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Service
 public class AccessServiceImpl implements AccessService {
@@ -49,11 +47,11 @@ public class AccessServiceImpl implements AccessService {
     private final ObjectMapper objectMapper;
     private String datos;
 
-    private static final int EVENTO_LOGIN_EXITOSO = 2;     // "Login Exitoso"
+    private static final int EVENTO_LOGIN_EXITOSO = 1;     // "Login Exitoso"
+    private static final int EVENTO_BLOQUEO_DE_USUARIO = 2;//"Cambio de Estado='Activo' -> Estado='Bloqueado'
     private static final int EVENTO_PWD_INCORRECTA = 1001; // "Contraseña Incorrecta en Login"
     private static final int EVENTO_USUARIO_INVALIDO = 1002; // "Usuario invalido"
     private static final int EVENTO_USUARIO_BLOQUEADO = 1003;//"Usuario con estado!=Activo"
-    private static final int EVENTO_BLOQUEO_DE_USUARIO = 3;//"Cambio de Estado='Activo' -> Estado='Bloqueado'
     // Aplicación que registra el evento
     private static final int APLICACION_ID = 0;
 
@@ -107,7 +105,7 @@ public class AccessServiceImpl implements AccessService {
             System.out.println("Usuario invalido");
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "USER_INVALID");
         }
-        if (!"Activo".equals(match.get().getEstado())){
+        if (!"Activo".equals(match.get().getEstado()) && !"Inicial".equals(match.get().getEstado())){
             registroEvento.log(EVENTO_USUARIO_BLOQUEADO, APLICACION_ID, hora, datos);
             System.out.println("Usuario Bloqueado");
             throw new ResponseStatusException(HttpStatus.LOCKED, "USER_LOCKED");
@@ -158,15 +156,13 @@ public class AccessServiceImpl implements AccessService {
                 );
 
         // 4) Roles: ids/estado (Perfil) → detalle (Rol)
-        var perfiles = perfilRepo.findByPerfilPKUsuarioNumEmpleadoAndPerfilPKUsuarioCURP(usuario.getnumEmpleado(), usuario.getcurp()); //List con Roles del usuario
+        var perfiles = perfilRepo.findByPerfilPKUsuarioNumEmpleadoAndPerfilPKUsuarioCURP(usuario.getnumEmpleado(), usuario.getcurp()); //List con Perfiles del usuario
         if (perfiles.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "El usuario no tiene roles asignados");
         }
         List<Integer> rolIds = perfiles.stream()
-                .map(PerfilRolView::getPerfilPKRolidRol)
-                .distinct()
-                .collect(Collectors.toList());
-
+        .map(p -> p.getPerfilPK().getRolidRol())
+        .toList();
         var rolRows = rolRepo.findByIdRolIn(rolIds);
         Map<Integer, RolView> byId = new LinkedHashMap<>();
         rolRows.forEach(r -> byId.put(r.getIdRol(), r));

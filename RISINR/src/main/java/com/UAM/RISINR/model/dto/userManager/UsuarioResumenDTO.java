@@ -12,6 +12,7 @@ public class UsuarioResumenDTO {
     private String AreaHospitalaria;
     private String CURP;
     private List<String> Perfiles;
+    private String estado;
     
     
     public UsuarioResumenDTO() {
@@ -19,7 +20,7 @@ public class UsuarioResumenDTO {
 
     public UsuarioResumenDTO(int numEmpleado, String nombre, String apellidoPaterno,
                              String apellidoMaterno, String CorreoElectronico, String areaHospitalaria,
-                             String curp, List<String> perfiles) {
+                             String curp, List<String> perfiles, String estado) {
         this.NumEmpleado = numEmpleado;
         this.Nombre = nombre;
         this.ApellidoPaterno = apellidoPaterno;
@@ -28,6 +29,7 @@ public class UsuarioResumenDTO {
         this.AreaHospitalaria = areaHospitalaria;
         this.CURP = curp;
         this.Perfiles = perfiles;
+        this.estado=estado;
     }
 
     
@@ -93,5 +95,13 @@ public class UsuarioResumenDTO {
 
     public void setPerfiles(List<String> perfiles) {
         this.Perfiles = perfiles;
+    }
+    
+    public String getEstado(){
+        return estado;
+    }
+    
+    public void setEstado(String estado){
+        this.estado=estado;
     }
 }
