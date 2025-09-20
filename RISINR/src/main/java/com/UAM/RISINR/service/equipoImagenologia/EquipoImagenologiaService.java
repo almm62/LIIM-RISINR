@@ -5,14 +5,16 @@
 package com.UAM.RISINR.service.equipoImagenologia;
 
 import com.UAM.RISINR.model.EquipoImagenologia;
-import com.UAM.RISINR.model.dto.EquipoImagenologiaDTO;
-import com.UAM.RISINR.model.dto.EquipoImagenologiaRequest;
+import com.UAM.RISINR.model.dto.equipoImagenologia.EquipoImagenologiaDTO;
+import com.UAM.RISINR.model.dto.equipoImagenologia.EquipoImagenologiaRequest;
 import java.util.List;
-import java.util.Map;
 
 /**
  *
- * @author vsfs2
+ * Interfaz que permite aislar la implementación de la lógica de negocio
+ * del servicio de equipos. Declara los métodos CRUD para el servicio.
+ * 
+ * Spring se encarga de encontrar la clase que implemente la interfaz. 
  */
 public interface EquipoImagenologiaService {
     

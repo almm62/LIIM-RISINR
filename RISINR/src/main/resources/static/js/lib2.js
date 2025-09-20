@@ -726,10 +726,14 @@ function POSTForDataFiles(formData, servicio) {
     }).done(function (data) {
         //console.log("OBJETO NUEVOOOO");
         console.log(data);
-    }).fail(function (jqXHROrData, textStatus, jqXHROrErrorThrown) {
+    }).fail(function (jqXHR, textStatus, jqXHROrErrorThrown) {
+        let mensaje = jqXHR.responseText;
         console.log(textStatus);
-        console.log(jqXHROrData);
+        //console.log(jqXHROrData);
         console.log(jqXHROrErrorThrown);
+        console.log(mensaje);
+        alert(mensaje);
+
     }).always(function (jqXHROrData, textStatus, jqXHROrErrorThrown) {
     });
 }

@@ -2,7 +2,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package com.UAM.RISINR.exceptions.EquipoImagenologia;
+package com.UAM.RISINR.exceptions;
 
 
 /**
@@ -11,7 +11,15 @@ package com.UAM.RISINR.exceptions.EquipoImagenologia;
  */
 
 public class ResourceNotFoundException extends RuntimeException{
-  public ResourceNotFoundException(String message) {
-      super(message);
-  }
+    private final Integer idEvento;
+    
+    public ResourceNotFoundException(Integer idEvento) {
+        super("Error con id: " + idEvento);
+          this.idEvento = idEvento;
+    }
+
+    public Integer getidEvento() {
+          return idEvento;
+    }
+
 }

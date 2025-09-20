@@ -8,11 +8,11 @@ package com.UAM.RISINR.exceptions;
  *
  * @author vsfs2
  */
-public class ResourceFoundException extends RuntimeException{
+public class IncompleteFormException extends RuntimeException{
     
     private final Integer idEvento;
 
-    public ResourceFoundException(Integer idEvento){
+    public IncompleteFormException(Integer idEvento){
         super("Error con id: " + idEvento);
         this.idEvento = idEvento;
     }
@@ -20,6 +20,9 @@ public class ResourceFoundException extends RuntimeException{
     public Integer getidEvento() {
         return idEvento;
     }
+    
+    
+    
     
     
 }
