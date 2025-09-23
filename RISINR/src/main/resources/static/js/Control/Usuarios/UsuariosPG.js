@@ -2,6 +2,52 @@ var uriserv = "/RISSERVER";
 var host = "http://" + location.host + "/RISSERVER/";
 
 
+
+async function getTBL(uriServ, nameDivContainer, tablName, columnas) {
+    console.log("Hola desde async");
+  // (1) Estado de carga opcional (si tienes un spinner)
+  showLoading(nameDivContainer, true);
+
+  try {
+    const res = await fetch(uriServ, { method: 'GET', headers: { 'Accept': 'application/json' } });
+    if (!res.ok) {
+      // Lanza error con detalles HTTP
+      const msg = `HTTP ${res.status} ${res.statusText}`;
+      throw new Error(msg);
+    }
+
+    // (2) Parseo
+    let data;
+    try {
+      data = await res.json();
+    } catch {
+      throw new Error('Respuesta no es JSON válido');
+    }
+
+    // (3) Normalización en caso de ser necesario
+    const resultSet = Array.isArray(data) ? data : convertTojsonArray(data);
+    console.log("Array is Array?"+Array.isArray(data));
+
+    // (4) Creacion de tabla
+    CreateTableFromJSON(nameDivContainer, tablName, columnas);
+    UpdateTableRows(tablName, resultSet);
+
+    return { rows: resultSet, count: resultSet.length };
+
+  } catch (err) {
+    console.error('getTBL error:', err);
+    alert(`Error al recuperar información: ${err.message}`);
+    // Puedes re-lanzar si quieres que el caller maneje el error:
+    // throw err;
+    return { rows: [], count: 0 };
+  } finally {
+    showLoading(nameDivContainer, false);
+  }
+}
+
+
+
+/*
 function getTBL(uriServ, nameDivContainer, tablName, columnas) {
     console.log("Llamando a tablaHOLAAA: "+tablName);
     console.log("servicio: "+uriServ);
@@ -26,7 +72,7 @@ function getTBL(uriServ, nameDivContainer, tablName, columnas) {
         //removerPreloader(servicio); 
     });
 }
-
+*/
 function getRestService(uriServ, tipohttp) {
     return $.ajax({
         url: uriServ,
@@ -390,7 +436,7 @@ function CrudUSR(e){
         case "btnCatUSRtbl":
         //alert("Por implementar");
             html_HideElement("btnEdtUsrtbl")
-            var columnaPKUSR = 6; //se toma como llave primaria para busquedas la columna 5 curp
+            var columnaPKUSR = 6; //se toma como llave primaria para busquedas la columna 6 curp
             var coleditarUSR = "Ref";
             var roweditarUSR = "Sel ";
             var tabladatosUSR="tblusuarios";
@@ -406,13 +452,12 @@ function CrudUSR(e){
                 //Bloque de código para integrar la funcionalidad de JSON Webt Token
                 var datosjson = data; // Se guarda la información en la variable datosjson
                 //A continuación se realiza un condicional para saber si es correcta la validación
-                  console.log('La data es:   ' + data);
                   
                   CreateTableFromJSON("showDataUser", "tblusuarios", colsUSR); //parametros referencia div, nombre tabla , arreglo json, cabecera
-                  console.log('La data es:   ' + data);
                   UpdateTableRows("tblusuarios", data);//Se colocan los resultados en la Tabla
                   tableHeaderSelection(tabladatosUSR, [1, 2, 3, 4, 5, 6]);
                   addRadioButtonColumnPKTBL(tabladatosUSR, 9, roweditarUSR, coleditarUSR, actionListenerUSR, columnaPKUSR); //columna 5 PK RFC
+                  tableRowColorCellSelectionKlib(tabladatosUSR);
                 //console.log(data); //los datos llegan como un arreglo de cadenas ordenadas como se presentaran en la tabla
                 
             }).fail(function (jqXHR, textStatus, errorThrown) {
@@ -508,14 +553,8 @@ function CrudUSR(e){
             break;
         
         case "cancelarUSUARIO":
-            document.getElementById("usrId").value="";
-            document.getElementById("uname").value = "";
-            document.getElementById("apaterno").value = "";
-            document.getElementById("amaterno").value = "";
-            document.getElementById("correo").value="";
-            document.getElementById("numEmpleado").value="";
-            document.getElementById("correo").value = "";
             //boton del dialogo modal cancelar dialogo
+            document.getElementById("USUARIOS").reset(); //Borra datos del formulario
             cambiaEstadoModal(".modalUSUARIOS", false); //true =activaer     
             break;
         case "nuevoUSUARIO": //Boton del dialogo modal de nuevo usuario
@@ -543,16 +582,23 @@ function CrudUSR(e){
                 var refregx = getRadioVal("estado");
                 console.log(refregx);
                 var lixboxsel = document.getElementById("perf2");
-                var areaasignada = lixboxsel[lixboxsel.selectedIndex].innerText; //perfil
                 var areaser = lixboxsel[lixboxsel.selectedIndex].value; //pkey table perfil      
                 areaser=Number(areaser)
                 var Data = {"usuarioID": usrId, "nombre": nombre, "apellidoPaterno": apaterno, "apellidoMaterno": amaterno, 
                                         "correoElectronico":correo, "curp": curp, "numEmpleado":numEmpleado, "area": areaser, "roles": valuesCLV, "estado":refregx};
                 console.log(Data);
                 
-                postRestService(uriserv + "/user/create", Data);  
-                cambiaEstadoModal(".modalUSUARIOS", false); //false =ocultar 
-            }               
+                postRestService(uriserv + "/user/create", Data)
+                .done(function () {
+                    // Esto se ejecuta cuando terminó bien
+                    cambiaEstadoModal(".modalUSUARIOS", false);
+                    document.getElementById("USUARIOS").reset(); //Borra datos del formulario
+                    CrudUSR('btnCatUSRtbl');
+                })
+                .fail(function () {
+                    alert("No se pudo crear el usuario");
+                });
+            } 
             break;
         case "actualizaUSUARIO":
             var r = confirm("Desea Actualizar el registro ");
@@ -590,16 +636,23 @@ function CrudUSR(e){
                     console.log(jsonData); 
                     
 
-                    postRestService(uriserv + "/user/update", jsonData);//Se manda el JWT y la llave pública hacia el Backend
-                    cambiaEstadoModal(".modalUSUARIOS", false); //false =ocultar 
+                    postRestService(uriserv + "/user/create", Data)
+                .done(function () {
+                    // Esto se ejecuta cuando terminó bien
+                    cambiaEstadoModal(".modalUSUARIOS", false);
+                    document.getElementById("USUARIOS").reset(); //Borra datos del formulario
+                    CrudUSR('btnCatUSRtbl');
+                })
+                .fail(function () {
+                    alert("No se pudo crear el usuario");
+                });
                 } else {
                     alert("Seleccione un registro de la tabla");
                 }
-            }                        
+            }             
             break;
     }
 }
-
 
 function getUsrs() {
 
@@ -645,8 +698,8 @@ function getUsrs() {
 
 $(document).ready(function () {
     $("#includedCatEquipo").load("CatEquipoRIS.html"); // página externa
-    $("#includedAgendaADM").load("../../Templates/AgendaRIS.html"); // página externa
-    $("#includedUSRADM").load("../../Templates/ModuloUsuarios.html"); // página externa
+    //$("#includedAgendaADM").load("../../Templates/AgendaRIS.html"); // página externa
+    //$("#includedUSRADM").load("../../Templates/ModuloUsuarios.html"); // página externa
    getUsrs(); //roles y areas
  
 });

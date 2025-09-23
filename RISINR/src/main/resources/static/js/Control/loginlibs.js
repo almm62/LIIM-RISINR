@@ -23,7 +23,26 @@ function nobackbutton() {
     };
 }
 
-//mover a clase de servicios ajax (paquete controlador)
+
+async function getServicio(url, tipohttp = 'GET', body = null) {
+  const headers = { 'Accept': 'application/json' };
+  if (body) headers['Content-Type'] = 'application/json';
+
+  const res = await fetch(url, {
+    method: tipohttp,
+    headers,
+    body: body ? JSON.stringify(body) : undefined,
+    credentials: 'include' // quita si no usas cookies
+  });
+
+  if (!res.ok) {
+    throw new Error(`HTTP ${res.status}`);
+  }
+
+  return res.json();
+}
+
+/*mover a clase de servicios ajax (paquete controlador)
 function getServicio(uriServ,tipohttp) {
     return $.ajax({
         url: uriServ,
@@ -35,24 +54,26 @@ function getServicio(uriServ,tipohttp) {
     }).always(function (jqXHROrData, textStatus, jqXHROrErrorThrown) {
         //console.log(jqXHROrData);
     });
-}  
+}  */
 
 //MISAAAA
-function onModalIngresarClick(e) {
-  e.preventDefault();
+async function onModalIngresarClick(e) {
+  if (e && e.preventDefault) e.preventDefault();
 
-  var rolNombre = $('#perf2').val();
+  const rolNombre = $('#perf2').val();
   if (!rolNombre || rolNombre === '0') {
     alert('Selecciona un rol');
     return;
   }
-  if (!window._loginCache || !window._loginCache.usuarioId || !Array.isArray(window._loginCache.roles)) {
+
+  const cache = window._loginCache;
+  if (!cache || !cache.usuarioId || !Array.isArray(cache.roles)) {
     alert('No hay datos de login en memoria. Intenta iniciar sesión de nuevo.');
     return;
   }
 
   // Buscar idRol por nombre
-  var elegido = window._loginCache.roles.find(function (r) { return r && r.nombre === rolNombre; });
+  const elegido = cache.roles.find(r => r && r.nombre === rolNombre);
   if (!elegido) {
     alert('Rol inválido');
     return;
@@ -60,55 +81,46 @@ function onModalIngresarClick(e) {
 
   agregarPreloader('login');
 
-  $.ajax({
-    url: '/RISSERVER/access/seleccionar-rol',
-    type: 'POST',
-    contentType: 'application/json',
-    dataType: 'json',
-    data: JSON.stringify({
-      usuarioId: window._loginCache.usuarioId,
+  try {
+    // 1) Notificar rol seleccionado (cookie de sesión ya se envía sola por credentials: 'include')
+    await getServicio('/RISSERVER/access/seleccionar-rol', 'POST', {
+      usuarioId: cache.usuarioId,
       idRol: elegido.idRol
-    }),
-    success: function (data) {
-      // Guardar token
-      if (data && data.tokenJWT) {
-        sessionStorage.setItem('token', data.tokenJWT);
-      } else {
-        alert('No se recibió token al seleccionar rol.');
-        return;
-      }
+    });
 
-      // Cerrar modal
-      $('.modalUSUARIOS').hide();
+    // 2) Cerrar modal
+    $('.modalUSUARIOS').hide();
 
-      // Cargar FSM del rol elegido y redirigir
-      var llamadaFSM = getServicio("/RISSERVER/RISFSM/fsm2/" + encodeURIComponent(rolNombre), "GET");
-      $.when(llamadaFSM.done(function (ajaxFSMResults) {
-        FSM2 = new FSM(ajaxFSMResults);
-        var estado = FSM2.getFSMStateById('INGRESAR'); // ajusta si tu estado inicial es otro
-        if (!estado || !estado.estado || !estado.estado.length) {
-          alert('FSM sin estado de entrada válido.');
-          return;
-        }
-        var vista = estado.estado[0].vista;
-        var host = "http://" + location.host + "/RISSERVER/";
-        window.location = host + "vistas/perfiles/" + encodeURIComponent(rolNombre) + "/" + vista;
-      })).fail(function () {
-        alert("No se pudo cargar la FSM del rol");
-      });
-    },
-    statusCode: {
-      403: function () { alert('El usuario no tiene ese rol'); },
-      409: function () { alert('Conflicto al seleccionar rol'); }
-    },
-    error: function (xhr) {
-      console.error('Error seleccionar-rol', xhr);
-      alert('Error al seleccionar rol (' + xhr.status + ').');
-    },
-    complete: function () {
-      removerPreloader('login');
+    // 3) Cargar FSM del rol y redirigir
+    const fsmJson = await getServicio(`/RISSERVER/RISFSM/fsm2/${encodeURIComponent(rolNombre)}`, 'GET');
+    const FSM2 = new FSM(fsmJson);
+
+    const estado = FSM2.getFSMStateById('INGRESAR'); // ajusta el id si tu estado inicial es otro
+    const vista = estado?.estado?.[0]?.vista;
+
+    if (!vista) {
+      alert('FSM sin estado de entrada válido.');
+      return;
     }
-  });
+
+    window.location.href = `${location.origin}/RISSERVER/vistas/perfiles/${encodeURIComponent(rolNombre)}/${vista}`;
+
+  } catch (err) {
+    console.error('Error seleccionar-rol:', err);
+
+    // Mapear códigos sin helper (el mensaje viene como "HTTP 403", etc.)
+    const msg = String(err?.message || '');
+    if (msg.includes('403')) {
+      alert('El usuario no tiene ese rol');
+    } else if (msg.includes('409')) {
+      alert('Conflicto al seleccionar rol');
+    } else {
+      alert('Error al seleccionar rol');
+    }
+
+  } finally {
+    removerPreloader('login');
+  }
 }
 
 //MISAA
@@ -116,8 +128,6 @@ function onModalCancelarClick(e) {
   e.preventDefault();
   $('.modalUSUARIOS').hide();
   $('#formulario')[0].reset();
-  // Si quieres forzar regresar a login limpio:
-  // window.location = "http://" + location.host + "/RISSERVER/login.html";
 }
 
 //funcion para insertar opciones de selección en un listbox
@@ -143,7 +153,71 @@ function getSelectedIndex(refselid) {
 }
 
 //metodo para controlar la opción de ingreso al sistema (boton Ingresar)
-function logIn(estado, e) {
+async function logIn(e) {
+    if (e && e.preventDefault) e.preventDefault();
+    agregarPreloader("login");
+    try {
+        var usuarioId = $('#uname').val().trim();
+        var passwd    = $('#psw').val(); // no hagas trim a passwd
+
+        if (!usuarioId || !passwd) {
+          removerPreloader("login");
+          alert("Ingresa usuario y contraseña");
+          return;
+        }
+        // LOGIN
+        const data = await getServicio('/RISSERVER/access/login', 'POST', { usuarioId, passwd });
+        if (data?.requiereSeleccionRol) {
+          // MULTI-ROL
+          const $select = $('#perf2');
+          $select.find('option:not([value="0"])').remove();
+          (data.roles || []).forEach(r => {
+            $('<option>').val(r.nombre).text(r.nombre).appendTo($select);
+          });
+
+          const u = data.usuario || {};
+          $('#usuarioactivo').text(`Bienvenido: ${u.nombre || ''} ${u.apellidoPaterno || ''} ${u.apellidoMaterno || ''}`);
+
+          window._loginCache = { usuarioId, roles: data.roles || [] };
+          $('.modalUSUARIOS').show();
+          return;
+        }
+        const rolUnico = data?.roles?.[0]?.nombre ?? null;
+        const fsmJson = await getServicio(`/RISSERVER/RISFSM/fsm2/${encodeURIComponent(rolUnico)}`, 'GET');
+        const FSM2 = new FSM(fsmJson);
+        const estadoIngresar = FSM2.getFSMStateById('INGRESAR');
+        const vista = estadoIngresar?.estado?.[0]?.vista;
+        if (!vista) {
+          alert("No se encontró la vista para el estado 'INGRESAR'. Revisa la FSM.");
+          return;
+        }
+        window.location.href =
+          `${location.origin}/RISSERVER/vistas/perfiles/${encodeURIComponent(rolUnico)}/${vista}`;
+
+  } catch (err) {
+    console.error('Error login:', err.message);
+    // Manejo básico de errores por código
+    if (err.message.includes('401')) {
+      alert('Credenciales inválidas');
+    } else if (err.message.includes('403')) {
+      alert('Acceso denegado: usuario sin roles');
+    } else if (err.message.includes('423')) {
+      alert('Cuenta bloqueada. Acude a administración');
+    } else {
+      alert('Error al autenticar');
+    }
+
+  } finally {
+    removerPreloader("login");
+    const form = $('#formulario')[0];
+    if (form) form.reset();
+  }
+}
+
+
+
+/*
+function logIn(e) {
   if (e && e.preventDefault) e.preventDefault();
   agregarPreloader("login");
 
@@ -223,14 +297,16 @@ function logIn(estado, e) {
       $('#formulario')[0].reset();
     }
   });
-}
+}*/
 
-$(document).ready(function () {
-    var llamadaFSM=getServicio("/RISSERVER/RISFSM/fsm2/General","GET");// cargar FSM general..
-    $.when(llamadaFSM.done(function (ajaxFSMResults) {
-        FSM2= new  FSM(ajaxFSMResults);//creación de objeto FSM con el json proveniente del back-end
-        //console.log(FSM2);
-    })); 
+$(async function () {
+  try {
+    const ajaxFSMResults = await getServicio("/RISSERVER/RISFSM/fsm2/General", "GET");
+    if (!ajaxFSMResults) return; // manejo suave si getServicio devolvió null tras alert
+    FSM2 = new FSM(ajaxFSMResults);
+  } catch (err) {
+    console.error("Error cargando FSM:", err);
+  }
 });
 
 
@@ -246,7 +322,7 @@ $(document).off('click', '#cancelarUSUARIOS');
 $(document).on('click', '#btnLogin', function (e) {
   e.preventDefault();
   // Llama a tu función existente de login
-  logIn('login', e);
+  logIn(e);
 });
 
 // (Opcional) Permitir Enter en el formulario para disparar el mismo flujo

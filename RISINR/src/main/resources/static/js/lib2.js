@@ -242,6 +242,7 @@ function dateYYYYmmdd() {
 
 //construye una tabla html utilizando la informacion de un arreglo en json
 function CreateTableFromJSON(divnameref, tablename, refhed) {
+    console.log("Creando Tabla desde JSON")
     //console.log(refhed);
     // CREATE DYNAMIC TABLE.
     var table = document.createElement("table");
