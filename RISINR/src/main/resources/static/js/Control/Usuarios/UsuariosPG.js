@@ -153,6 +153,36 @@ function postRestService(urlser, jsonData) {
     });
 }
 
+async function postRestServiceFetch(jsonString, servicio) {
+    try {
+        console.log("entró al fetch");
+        const response = await fetch(servicio, {
+            method: 'POST',
+            body: jsonString,               // Ya es JSON, no hacer stringify
+            credentials: 'include',         // 🔑 envía cookies automáticamente
+            headers: {
+                'Content-Type': 'application/json'  // Indicamos que enviamos JSON
+            }
+        });
+
+        if (!response.ok) {
+            const mensaje = await response.text();
+            console.error('Error:', response.status, mensaje);
+            alert(mensaje);
+            return null;
+        }
+
+        const data = await response.json();   // Parsear respuesta JSON
+        console.log(data);
+        return data;
+
+    } catch (error) {
+        console.error('Fetch falló:', error);
+        alert('Ocurrió un error al enviar los datos');
+        return null;
+    }
+}
+
 function activamodal(str, form) {
     console.log("Forma: "+form.id);
     console.log("Forma: "+str);

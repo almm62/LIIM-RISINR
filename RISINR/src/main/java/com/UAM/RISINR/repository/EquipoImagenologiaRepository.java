@@ -4,6 +4,7 @@
  */
 package com.UAM.RISINR.repository;
 
+import com.UAM.RISINR.model.AreaDeServicio;
 import com.UAM.RISINR.model.EquipoImagenologia;
 import java.util.Date;
 import java.util.List;
@@ -30,6 +31,8 @@ public interface EquipoImagenologiaRepository extends JpaRepository<EquipoImagen
     List<EquipoImagenologia> findByFechaInstalacion(Date fechaInstalacion); 
     List<EquipoImagenologia> findByEstado(String estado);
     EquipoImagenologia findBynSerie(String nSerie);
+    List<EquipoImagenologia> findByareaDeServicioidArea(AreaDeServicio area);
+    
 
     
 }

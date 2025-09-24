@@ -126,16 +126,23 @@ function readTblsEQP() {
     var cabecerapac = ["Serie", "Nombre", "Marca", "Modelo", "Modalidad", "Id_area", "Área", "Estado","Fecha Instalación"];
     CreateTableFromJSON(divtable, tabladatos, cabecerapac); //parametros referencia div, nombre tabla , cabecera
     var jsonData = {"nombre": "*"};
-    var getEquipoimg = postRestService(uriserv + "/EquipoImagenologia/requestALL", jsonData);
-    $.when(getEquipoimg.done(function (data) {
-        console.log(data);
-        //var array = convertTojsonArray(data[0]);
-        //UpdateTableRows(tabladatos, array);
-        UpdateTableRows(tabladatos, data);
-        tableRowColorCellSelectionKlib(tabladatos);
-        hideTableColumns(tabladatos, colocultas); //ocultar columnas (medico, idpac) 
-        addRadioButtonColumnPKTBL(tabladatos, columnaedicion, coleditar, roweditar, actionListener, columnaPK); //columna k con radiobutton y acctionlistne                     
-    }));
+    //var getEquipoimg = postRestService(uriserv + "/EquipoImagenologia/requestALL", jsonData);
+     var getEquipoimg = postRestServiceFetch(jsonData, uriserv + "/EquipoImagenologia/requestALL");
+    getEquipoimg.then(function(data) {
+      console.log(data);
+      // Actualizar la tabla con los datos recibidos
+      UpdateTableRows(tabladatos, data);
+      tableRowColorCellSelectionKlib(tabladatos);
+      hideTableColumns(tabladatos, colocultas); // Ocultar columnas
+      addRadioButtonColumnPKTBL(
+          tabladatos, columnaedicion, coleditar, roweditar,
+          actionListener, columnaPK
+      );
+  })
+  .catch(function(error) {
+      console.error("Error al obtener datos:", error);
+      alert("Ocurrió un error al obtener los datos del servidor");
+  });
 }
 
 function convertTojsonArray(arreglocadena) {
@@ -184,10 +191,6 @@ function listenermodalEQPRIS(e) {
             var formData = getFormData("CreateEqp", "formEquipoRIS");
             console.log("Datos antes de la peticion" + formData);
             console.log(formData);
-            
-            var datosJson = getDatos("formEquipoRIS");
-            
-           
             //var getEquipoimg =POSTForDataFiles(formData, uriserv + "/FormularioEqpImg/CreateEqp");
             var getEquipoimg = POSTForDataFiles(datosJson, uriserv + "/EquipoImagenologia/addEquipo");
             $.when(getEquipoimg.done(function (data) {
@@ -249,6 +252,15 @@ function limpiarCampos() {
     document.getElementById("idarea").value = "";
     document.getElementById("edoEqp").value = "";
 }
+
+
+
+function getCookie(name) {
+  return document.cookie.split('; ')
+    .find(row => row.startsWith(name + '='))
+    ?.split('=')[1];
+}
+
 
 
 window.onload = function () {

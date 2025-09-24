@@ -7,10 +7,14 @@ package com.UAM.RISINR.controller;
 import com.UAM.RISINR.model.dto.equipoImagenologia.EquipoImagenologiaDTO;
 import com.UAM.RISINR.model.dto.equipoImagenologia.EquipoImagenologiaRequest;
 import com.UAM.RISINR.service.equipoImagenologia.EquipoImagenologiaService;
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CookieValue;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -50,15 +54,15 @@ public class EquipoImagenologiaController {
     
     
     /**
-     * Endpoint para consultar todos los equipos de imagenología.
-     * Realiza una llamada al servicio {@link EquipoImagenologiaService#consultarTodos()}
-     * y retorna la lista de DTOs de equipos.
-     * 
+     * Endpoint para consultar todos los equipos de imagenología.Realiza una llamada al servicio {@link EquipoImagenologiaService#consultarTodos()}
+ y retorna la lista de DTOs de equipos.
+     *
+     * @param token 
      * @return ResponseEntity con la lista de {@link EquipoImagenologiaDTO} (que Spring convierte a JSON)y código HTTP 200.
      */
     @PostMapping("/requestALL")
-    public ResponseEntity<List<EquipoImagenologiaDTO>> consultarTodos(){
-        List<EquipoImagenologiaDTO> datos = service.consultarTodos();
+    public ResponseEntity<List<EquipoImagenologiaDTO>> consultarTodos(@CookieValue(value = "token", required = false) String token){
+        List<EquipoImagenologiaDTO> datos = service.consultarTodos(token);
         return ResponseEntity.ok(datos);
     }
     
@@ -108,5 +112,13 @@ public class EquipoImagenologiaController {
                 return ResponseEntity.ok(equipos); 
             }
         }
+    
+    @GetMapping("/consultaEquiposArea")
+    public ResponseEntity<Object> consultaJefeServicio(@CookieValue(value = "token", required = false) String token){
+        List<EquipoImagenologiaDTO> equiposDTO = service.consultarEquipoArea(token);
+        System.out.println("los equipos son: " + equiposDTO);
+       return ResponseEntity.ok(equiposDTO);
+  
+    }
   
 }
