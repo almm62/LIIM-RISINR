@@ -19,7 +19,11 @@ function barraBotonesEQP(e) {
     console.log("selección: " + opc);
     switch (opc) {
         case 'btnCatEqptbl':
-            readTblsEQP();
+            readTblsEQP(1);
+            break;
+            
+        case 'btnCatEqpAreatbl':
+            readTblsEQP(2);
             break;
         case 'btnAddEqptbl':
             var tablaref = "Eqptbl";
@@ -108,7 +112,7 @@ function updatePKSEqp(e) {
     }
 }
 
-function readTblsEQP() {
+function readTblsEQP(opc) {
     var divtable = "showDataEQP";
     var tabladatos = "Eqptbl";
     var columnaedicion = 9;
@@ -127,7 +131,21 @@ function readTblsEQP() {
     CreateTableFromJSON(divtable, tabladatos, cabecerapac); //parametros referencia div, nombre tabla , cabecera
     var jsonData = {"nombre": "*"};
     //var getEquipoimg = postRestService(uriserv + "/EquipoImagenologia/requestALL", jsonData);
-     var getEquipoimg = postRestServiceFetch(jsonData, uriserv + "/EquipoImagenologia/requestALL");
+     //var getEquipoimg = postRestServiceFetch(jsonData, uriserv + "/EquipoImagenologia/requestALL");
+     var getEquipoimg;
+     switch (opc) {
+        case 1:
+            console.log("entró al caso 1");
+            getEquipoimg = postRestServiceFetch(jsonData, uriserv + "/EquipoImagenologia/requestALL",'POST');
+            break;
+            
+        case 2:
+            console.log("entró al caso 2");
+            getEquipoimg = getRestServiceFetch(uriserv + "/EquipoImagenologia/consultaEquiposArea",'GET');
+            break;
+    }
+     
+     
     getEquipoimg.then(function(data) {
       console.log(data);
       // Actualizar la tabla con los datos recibidos

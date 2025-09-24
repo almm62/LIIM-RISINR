@@ -1,15 +1,45 @@
 <!DOCTYPE html>
-<!--
-Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
-Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this template
--->
 <html>
-    <head>
-        <title>TODO supply a title</title>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    </head>
-    <body>
-        <div>Menu Jefe de Servicio</div>
-    </body>
+<head>
+    <title>Gestión de Equipo - RIS</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="../../../css/SuMainPages.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="http://code.jquery.com/jquery-2.2.0.min.js"></script>  
+    <script src="../../../js/lib2.js"></script>
+     <script src="../../../js/Control/Usuarios/UsuariosPG.js"></script>
+    <script src="../../../js/Control/Equipo/ControlEQP.js"></script>
+    <script src="../../../js/sessionWatch.js"></script>
+</head>
+
+<body>
+    <section> 
+        <h2 style="text-align:center">APP RIS</h2>       
+        <header>
+            <div class="contenedor-logout">
+                <button id="salir" value="salir" onclick="salir()">Salir del sistema</button>
+            </div>            
+        </header>          
+
+        <nav>
+            <div class="tab">
+                <button class="tablinks active">Gestión de Equipo</button>
+            </div>
+        </nav> 
+
+        <article>
+            <div id="EQUIPOTAB" class="tabcontent" style="display:block;">
+                <h2 style="text-align:center">Administración de Equipo</h2>
+                <div class="flex-container">
+                    <button id="btnCatEqpAreatbl" onclick="barraBotonesEQP(event)" class="button button1 fa fa-list"> Consultar Equipo</button>
+                    <button id="btnEdtEqptbl" onclick="barraBotonesEQP(event)" class="button button1 fa fa-pencil"> Editar</button>
+                </div>  
+                <br>
+                <div id="showDataEQP" class="scrollcell"></div> 
+            </div>
+        </article> 
+        
+    </section>
+</body>
 </html>
