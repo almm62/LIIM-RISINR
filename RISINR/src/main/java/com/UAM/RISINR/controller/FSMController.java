@@ -16,6 +16,7 @@ public class FSMController {
             case "General"       -> "FSM/General.json";
             case "Admin"         -> "FSM/Admin.json";
             case "Recepcionista" -> "FSM/Admin.json";
+            case "JefedelServicio" -> "FSM/JefeDeServicio.json";
             default              -> "FSM/General.json";
         };
         Resource resource = new ClassPathResource(path);
