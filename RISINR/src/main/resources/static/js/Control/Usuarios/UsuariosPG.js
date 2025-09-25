@@ -2,6 +2,49 @@ var uriserv = "/RISSERVER";
 var host = "http://" + location.host + "/RISSERVER/";
 
 
+
+async function getTBL(uriServ, nameDivContainer, tablName, columnas) {
+    console.log("Hola desde async");
+  // (1) Estado de carga opcional (si tienes un spinner)
+
+  try {
+    const res = await fetch(uriServ, { method: 'GET', headers: { 'Accept': 'application/json' } });
+    if (!res.ok) {
+      // Lanza error con detalles HTTP
+      const msg = `HTTP ${res.status} ${res.statusText}`;
+      throw new Error(msg);
+    }
+
+    // (2) Parseo
+    let data;
+    try {
+      data = await res.json();
+    } catch {
+      throw new Error('Respuesta no es JSON válido');
+    }
+
+    // (3) Normalización en caso de ser necesario (En este caso ya lo es
+    const resultSet = Array.isArray(data) ? data : convertTojsonArray(data);
+    console.log("Array is Array?"+Array.isArray(data));
+
+    // (4) Creacion de tabla
+    CreateTableFromJSON(nameDivContainer, tablName, columnas);
+    UpdateTableRows(tablName, resultSet);
+
+    return { rows: resultSet, count: resultSet.length };
+
+  } catch (err) {
+    console.error('getTBL error:', err);
+    alert(`Error al recuperar información: ${err.message}`);
+    // Puedes re-lanzar si quieres que el caller maneje el error:
+    // throw err;
+    return { rows: [], count: 0 };
+  }
+}
+
+
+
+/*
 function getTBL(uriServ, nameDivContainer, tablName, columnas) {
     console.log("Llamando a tablaHOLAAA: "+tablName);
     console.log("servicio: "+uriServ);
@@ -26,18 +69,23 @@ function getTBL(uriServ, nameDivContainer, tablName, columnas) {
         //removerPreloader(servicio); 
     });
 }
+*/
+async function getServicio(url, tipohttp = 'GET', body = null) {
+    const headers = { 'Accept': 'application/json' };
+    if (body) headers['Content-Type'] = 'application/json';
 
-function getRestService(uriServ, tipohttp) {
-    return $.ajax({
-        url: uriServ,
-        type: tipohttp, // 'get', // Tipo de envio 
-        dataType: 'json' //Tipo de Respuesta
-    }).fail(function (jqXHR, textStatus, errorThrown) {
-        console.log("Sesion");
-        alert("No hay datos" + errorThrown);
-    }).always(function (jqXHROrData, textStatus, jqXHROrErrorThrown) {
-        //console.log(jqXHROrData);
+    const res = await fetch(url, {
+        method: tipohttp,
+        headers,
+        body: body ? JSON.stringify(body) : undefined,
+        credentials: 'include' // quita si no usas cookies
     });
+
+    if (!res.ok) {
+        throw new Error(`HTTP ${res.status}`);
+    }
+
+    return res.json();
 }
 
 
@@ -383,7 +431,6 @@ function salir() {
   $.ajax({
     url: '/RISSERVER/access/logout?tipoCierre=' + encodeURIComponent(tc),
     type: 'POST',
-    xhrFields: { withCredentials: true }, // enviará la cookie 'token'
     // No body ni headers necesarios
     success: function () {
       // ok, el backend marcó horaFin/tipoCierre y borró cookie
@@ -425,13 +472,23 @@ function actualizaPerfilSeleccionado(e) {
     //perfilupdate.value=lixboxseltxt; //opcion default;
 }
 
-window.onload = function () {
-    //console.log("ID medico: "+document.getElementById("medID").value);          
-    var actualizarol = getRestService("/RISSERVER/rest/USRSesionRST/rol/Admin", "GET");//se actualiza la tabla de sesion
-    $.when(actualizarol.done(function (data) {
-        document.getElementById("usuartioactivonombre").innerHTML = data.nombre + " , " + data.area + " , " + data.rolActivo;
-    }));
-    nobackbutton();
+window.onload = async function () {
+    try {
+    // Llama a tu helper basado en fetch
+    const data = await getServicio('/RISSERVER/rest/USRSesionRST/rol/Admin', 'GET');
+
+    // Actualiza el DOM si el elemento existe
+    const el = document.getElementById('usuartioactivonombre');
+    if (el && data) {
+        el.textContent = `${data.nombre} , ${data.area} , ${data.rolActivo}`;
+    }
+    } catch (err) {
+        console.error('Error obteniendo rol activo:', err);
+        alert('No hay datos: ' + err.message);
+    } finally {
+    // Lo que hacías al final de onload
+        nobackbutton();
+    }
 };
 
 
@@ -440,7 +497,7 @@ function SelRadioButtonTablaUSR(){
     html_VisibleElement("btnEdtUsrtbl");
 }
 
-function CrudUSR(e){
+async function CrudUSR(e){
     if(typeof e === "string"){
         accion=e;
     }else{
@@ -450,7 +507,7 @@ function CrudUSR(e){
         case "btnCatUSRtbl":
         //alert("Por implementar");
             html_HideElement("btnEdtUsrtbl")
-            var columnaPKUSR = 6; //se toma como llave primaria para busquedas la columna 5 curp
+            var columnaPKUSR = 6; //se toma como llave primaria para busquedas la columna 6 curp
             var coleditarUSR = "Ref";
             var roweditarUSR = "Sel ";
             var tabladatosUSR="tblusuarios";
@@ -466,13 +523,12 @@ function CrudUSR(e){
                 //Bloque de código para integrar la funcionalidad de JSON Webt Token
                 var datosjson = data; // Se guarda la información en la variable datosjson
                 //A continuación se realiza un condicional para saber si es correcta la validación
-                  console.log('La data es:   ' + data);
                   
                   CreateTableFromJSON("showDataUser", "tblusuarios", colsUSR); //parametros referencia div, nombre tabla , arreglo json, cabecera
-                  console.log('La data es:   ' + data);
                   UpdateTableRows("tblusuarios", data);//Se colocan los resultados en la Tabla
                   tableHeaderSelection(tabladatosUSR, [1, 2, 3, 4, 5, 6]);
                   addRadioButtonColumnPKTBL(tabladatosUSR, 9, roweditarUSR, coleditarUSR, actionListenerUSR, columnaPKUSR); //columna 5 PK RFC
+                  tableRowColorCellSelectionKlib(tabladatosUSR);
                 //console.log(data); //los datos llegan como un arreglo de cadenas ordenadas como se presentaran en la tabla
                 
             }).fail(function (jqXHR, textStatus, errorThrown) {
@@ -537,16 +593,13 @@ function CrudUSR(e){
                 cleanCheckboxValues("perfilapp"); //limpia todas las casilla para evitar previa seleccion 
                 var cadperfil = columnasrow[7].innerHTML; //columna del perfil es la 6
                 //codigo para activar los push buttons de los perfiles del usuario en la tabla del dialogo modal.
-                console.log(cadperfil);
                 var arregloroles = cadperfil.split(",");
-                console.log(arregloroles)
                 let renglones = [];//arreglo de seleccion
                 for (var i = 0; i < arregloroles.length; i++) {
                     var rolk = arregloroles[i];
                     var renglonk = compareTableColumns("roles", 1, rolk) - 1; //columna 1 de tabla roles = perfil 
                     renglones.push(renglonk);
                 }
-                console.log(renglones);
                 if(renglones[0]!==-1)
                   setSelectedCheckboxValues("perfilapp", renglones); //activar checkboxes de acuerdo al contenido de la tabla, si no tiene perfil no hay selección   
                 document.querySelector("#USRrowid").value = valorRadioPK;
@@ -568,14 +621,8 @@ function CrudUSR(e){
             break;
         
         case "cancelarUSUARIO":
-            document.getElementById("usrId").value="";
-            document.getElementById("uname").value = "";
-            document.getElementById("apaterno").value = "";
-            document.getElementById("amaterno").value = "";
-            document.getElementById("correo").value="";
-            document.getElementById("numEmpleado").value="";
-            document.getElementById("correo").value = "";
             //boton del dialogo modal cancelar dialogo
+            document.getElementById("USUARIOS").reset(); //Borra datos del formulario
             cambiaEstadoModal(".modalUSUARIOS", false); //true =activaer     
             break;
         case "nuevoUSUARIO": //Boton del dialogo modal de nuevo usuario
@@ -603,23 +650,28 @@ function CrudUSR(e){
                 var refregx = getRadioVal("estado");
                 console.log(refregx);
                 var lixboxsel = document.getElementById("perf2");
-                var areaasignada = lixboxsel[lixboxsel.selectedIndex].innerText; //perfil
                 var areaser = lixboxsel[lixboxsel.selectedIndex].value; //pkey table perfil      
                 areaser=Number(areaser)
                 var Data = {"usuarioID": usrId, "nombre": nombre, "apellidoPaterno": apaterno, "apellidoMaterno": amaterno, 
                                         "correoElectronico":correo, "curp": curp, "numEmpleado":numEmpleado, "area": areaser, "roles": valuesCLV, "estado":refregx};
-                console.log(Data);
+                try{
+                  const data= await getServicio(uriserv + "/user/create","POST", Data) 
+                  console.log("Todo funciono increible");
+                }catch (err){
+                    alert("Error al procesar la respuesta " + err.message);
+                } finally{
+                    cambiaEstadoModal(".modalUSUARIOS", false);
+                    document.getElementById("USUARIOS").reset(); //Borra datos del formulario
+                    CrudUSR('btnCatUSRtbl');
+                }
                 
-                postRestService(uriserv + "/user/create", Data);  
-                cambiaEstadoModal(".modalUSUARIOS", false); //false =ocultar 
-            }               
+            } 
             break;
         case "actualizaUSUARIO":
             var r = confirm("Desea Actualizar el registro ");
             if (r === true){
                 var tabla = "tblusuarios";
                 var valorRadioPK = getRadioValIndice("radio" + tabla) + 1;//valor de 0 a k-1, sumarle 1
-                console.log(valorRadioPK);
                 if ((valorRadioPK) > 0) {
                     var cellsOfRow = getRowCells(valorRadioPK, tabla);
                     //var usid = document.querySelector("#USRrowid").value; 
@@ -637,67 +689,79 @@ function CrudUSR(e){
                         valuesRow += '"' + PERFILES[1].innerHTML + '"' + ",";
                         valuesCLV.push(parseInt(PERFILES[0].innerHTML));
                     }
-                    var roles = valuesRow.substring(0, valuesRow.length - 1) + "]";//elimina la coma al final de la cadena
-                    var tiposel = getRadioVal("estado");
-                    console.log("Selección de estado: "+tiposel);
                     var lixboxsel = document.getElementById("perf2");
                     var areaser = parseInt(lixboxsel[lixboxsel.selectedIndex].value); //pkey table perfil              
                     var refregx = getRadioVal("estado");      
-                    console.log(refregx);
-                    //guardar en BD.
-                    // Se guardan los datos adquiridos de la vista en la variable jsonData
+                    // Se guardan los datos adquiridos del form en jsonData
                     var jsonData = {"curp": curp, "numEmpleado": numEmpleado, "nombre": nombre, "apellidoPaterno": apaterno, "apellidoMaterno": amaterno, "correoElectronico":correo, "area": areaser, "roles": valuesCLV, "estado":refregx};
-                    console.log(jsonData); 
                     
-
-                    postRestService(uriserv + "/user/update", jsonData);//Se manda el JWT y la llave pública hacia el Backend
-                    cambiaEstadoModal(".modalUSUARIOS", false); //false =ocultar 
+                    try{
+                        const data = getServicio(uriserv + "/user/update","POST",jsonData)
+                        console.log("Todo funciono increible")
+                    } catch(err){
+                        alert("Error al procesar la respuesta " + err.message);                        
+                    } finally{
+                        cambiaEstadoModal(".modalUSUARIOS", false);
+                        document.getElementById("USUARIOS").reset(); //Borra datos del formulario
+                        CrudUSR('btnCatUSRtbl');
+                    }
                 } else {
                     alert("Seleccione un registro de la tabla");
                 }
-            }                        
+            }             
             break;
     }
 }
 
-
-function getUsrs() {
-
+async function getUsrs() {
+    console.log("Primer paso getUsrs")
     var colsArea = ["Referencia", "Área", "Descripción"];
-    var llamadaAREA = getTBL(uriserv + "/initial/getAreas", "showDataArea", "tblareas", colsArea);
+    var pArea = getTBL(uriserv + "/initial/getAreas", "showDataArea", "tblareas", colsArea);
 
+    console.log("Segundo paso get Usrs")
     var colsRol = ["Referencia", "Perfil", "Descripción"];
-    var llamadaPRO = getTBL(uriserv + "/initial/getRoles", "showDataProfile", "tblroles", colsRol);
+    var pRol = getTBL(uriserv + "/initial/getRoles", "showDataProfile", "tblroles", colsRol);
 
-    $.when( llamadaPRO, llamadaAREA).done(function (ajaxPROResults, ajaxAREAResults) {
-        //console.log("Generando listbox");
-        //this code is executed when all ajax calls are done
-        //
-        //TABLA areas
-        tableViewFormat("tblareas", 3, 4); //Agregar columnas de edicion y borrado
-        //permite ordenar en cabecera
-        tableHeaderSelection("tblareas", [1, 2]);
-        //Falta llenar el listbox de areas en el dialogo de modal de usuarios
-        var resultSetArea = convertTojsonArray(ajaxAREAResults[0]);
-        //console.log(resultSetArea);
-        UpdateListBox("perf2", resultSetArea, 0, 1);//atributo value = columna[0], atributo innerHTML=columna[4]
-        //TABLA roles
-        tableViewFormat("tblroles", 3, 4); //Agregar columnas de edicion y borrado
-        //permite ordenar en cabecera
+    console.log("Lanzando ambas peticiones…");
+    try {
+        const [areaRes, rolRes] = await Promise.all([pArea, pRol]); // {rows, count} cada uno, hay que quedarnos solo con nombres
+        
+        const areaObjs = (areaRes.rows || []).map(item => 
+            typeof item === 'string' ? JSON.parse(item) : item
+            );
+        const nombresAreas = areaObjs.map(a => a.nombreArea);
+        console.log(nombresAreas);
+        
+        const rolObjs= (rolRes.rows || []).map(item => 
+            typeof item ==="string" ? JSON.parse(item):item
+            );
+        const nombresRoles = rolObjs.map(r => r.nombre);
+        console.log(nombresRoles)
+        // === TABLA ÁREAS (ya creada por getTBL) ===
+        tableViewFormat("tblareas", 3, 4);           // columnas edición/borrado
+        tableHeaderSelection("tblareas", [1, 2]);    // ordenar por cabecera
+        // Llenar listbox de áreas en modal de usuarios
+        UpdateListBox("perf2", areaObjs, 0, 1); 
+
+        // === TABLA ROLES (ya creada por getTBL) ===
+        tableViewFormat("tblroles", 3, 4);
         tableHeaderSelection("tblroles", [1, 2]);
 
-        //Tabla roles para el dialogo modal
-        CreateTableFromJSON("showDataRol", "roles", colsRol); //parametros regerencia div, nombre tabla , arreglo json, cabecera
-        var resultSet = convertTojsonArray(ajaxPROResults[0]);
-        UpdateTableRows("roles", resultSet);
-        var tbl = "<input type='checkbox' name='perfilapp'>";
-        insertColumnK("roles", 3, "Selección", "Opción: "); //inserta columna de esdicion (columna que no pertenece a los datos)                    
-        updateTableColumns("roles", 3, tbl);
+        // Tabla extra de roles en el diálogo modal
+        CreateTableFromJSON("showDataRol", "roles", colsRol);
+        UpdateTableRows("roles", rolObjs);
+
+        const chkTpl = "<input type='checkbox' name='perfilapp'>";
+        insertColumnK("roles", 3, "Selección", "Opción: ");
+        updateTableColumns("roles", 3, chkTpl);
 
         backGroundColor("roles", "rgba(88,142,255,.5)", "#000000", "#7F7F7F", "#FFFFFF");
-        rowColor("roles", "#00FFFF", "#000000", "#7F7F7F", "#FFFFFF", "#ffffff", "#000000"); //puntero raton (b,c); pares (b,c); impares (b,c)
-       
-    });
+        rowColor("roles", "#00FFFF", "#000000", "#7F7F7F", "#FFFFFF", "#ffffff", "#000000");
+
+    } catch (e) {
+        console.error("Fallo al cargar tablas:", e);
+        alert("No se pudieron cargar las tablas.");
+    }
 }
 
 
