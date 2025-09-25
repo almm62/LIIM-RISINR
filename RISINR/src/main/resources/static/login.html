@@ -5,17 +5,17 @@
         <title>LOGIN PAGE</title>
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <script src="http://code.jquery.com/jquery-2.2.0.min.js"></script><!-- CDN de jQuery-->
-        <link rel="stylesheet" type="text/css" href="css/styleslogin.css">
+        <link rel="stylesheet" type="text/css" href="css/RIS.css">
         <script src="js/Control/FSM.js"></script>
         <script src="js/Control/loginlibs.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jsrsasign/10.6.0/jsrsasign-all-min.js"></script>
     </head>
 
-     <body onload="nobackbutton();">
+     <body  id="login" onload="nobackbutton();">
 
         <div class="bg-img">
             <!-- Image loader -->
-            <div id='fadelogin' style='display: none;'>
+            <div id='fadelogin' >
                 <img id='loaderlogin' src="img/loading.gif" alt="imgspinner"/>  
             </div>
             <!-- Image loader -->            
@@ -32,20 +32,20 @@
             <!--div class="modalUSUARIOS" hidden-->
             <div class="modalUSUARIOS">
                 <div >
-                    <h1 style="color:yellow">Seleccione el perfil de ingreso al sistema</h1>
+                    <h1>Seleccione el perfil de ingreso al sistema</h1>
                 </div>                
                 <div class="modalUSUARIOS-content">
                     <form id="USUARIOS">
                         <hr>
                         <!--p style='color:black; text-align: left; padding: 5px 0 0 40px;'><b>Nombre de usuario</b></p-->
                         
-                        <div id="datosuasuario" style='color:black; text-align: left; padding: 5px 0 0 40px;'>
-                            <h4 id="usuarioactivo" style="color: #5a6171">Bienvenido:</h4>
+                        <div id="datosuasuario" >
+                            <h4 id="usuarioactivo">Bienvenido:</h4>
                         </div>                         
 
-                        <p style='color:black; text-align: left; padding: 5px 0 0 40px;'><b>Perfil</b></p>
-                        <div id="perfilcreate" style='color:black; text-align: left; padding: 10px 0 0 40px;'>
-                            <select style='color:black; font-size: 16px;' name="perf2" id="perf2">
+                        <p style=''><b>Perfil</b></p>
+                        <div id="perfilcreate">
+                            <select name="perf2" id="perf2">
                                 <option value="0">Seleccione rol</option>
                             </select>    
                         </div>                         
@@ -53,8 +53,8 @@
 
                         <div class="flex-container">
                             <!--"Ingresar", Mensaje del estado login (boton inicial) cuando el usuario tiene multiples perfiles-->
-                            <button type="button" id="guardarUSUARIOS"  class="button button1" style="flex-basis:200px; font-size: 15px;">Ingresar al sistema</button>
-                            <button type="button" id="cancelarUSUARIOS" class="button button1" style="flex-basis:200px; font-size: 15px;">Cancelar</button> 
+                            <button type="button" id="guardarUSUARIOS"  class="button button1">Ingresar al sistema</button>
+                            <button type="button" id="cancelarUSUARIOS" class="button button1" >Cancelar</button> 
                         </div>  
                         <hr>                        
                     </form>                    
