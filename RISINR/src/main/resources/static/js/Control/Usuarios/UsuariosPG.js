@@ -437,7 +437,7 @@ function SelRadioButtonTablaUSR(){
     html_VisibleElement("btnEdtUsrtbl");
 }
 
-function CrudUSR(e){
+async function CrudUSR(e){
     if(typeof e === "string"){
         accion=e;
     }else{
@@ -533,16 +533,13 @@ function CrudUSR(e){
                 cleanCheckboxValues("perfilapp"); //limpia todas las casilla para evitar previa seleccion 
                 var cadperfil = columnasrow[7].innerHTML; //columna del perfil es la 6
                 //codigo para activar los push buttons de los perfiles del usuario en la tabla del dialogo modal.
-                console.log(cadperfil);
                 var arregloroles = cadperfil.split(",");
-                console.log(arregloroles)
                 let renglones = [];//arreglo de seleccion
                 for (var i = 0; i < arregloroles.length; i++) {
                     var rolk = arregloroles[i];
                     var renglonk = compareTableColumns("roles", 1, rolk) - 1; //columna 1 de tabla roles = perfil 
                     renglones.push(renglonk);
                 }
-                console.log(renglones);
                 if(renglones[0]!==-1)
                   setSelectedCheckboxValues("perfilapp", renglones); //activar checkboxes de acuerdo al contenido de la tabla, si no tiene perfil no hay selección   
                 document.querySelector("#USRrowid").value = valorRadioPK;
@@ -597,18 +594,17 @@ function CrudUSR(e){
                 areaser=Number(areaser)
                 var Data = {"usuarioID": usrId, "nombre": nombre, "apellidoPaterno": apaterno, "apellidoMaterno": amaterno, 
                                         "correoElectronico":correo, "curp": curp, "numEmpleado":numEmpleado, "area": areaser, "roles": valuesCLV, "estado":refregx};
-                console.log(Data);
-                
-                postRestService(uriserv + "/user/create", Data)
-                .done(function () {
-                    // Esto se ejecuta cuando terminó bien
+                try{
+                  const data= await getServicio(uriserv + "/user/create","POST", Data) 
+                  console.log("Todo funciono increible");
+                }catch (err){
+                    alert("Error al procesar la respuesta " + err.message);
+                } finally{
                     cambiaEstadoModal(".modalUSUARIOS", false);
                     document.getElementById("USUARIOS").reset(); //Borra datos del formulario
                     CrudUSR('btnCatUSRtbl');
-                })
-                .fail(function () {
-                    alert("No se pudo crear el usuario");
-                });
+                }
+                
             } 
             break;
         case "actualizaUSUARIO":
@@ -616,7 +612,6 @@ function CrudUSR(e){
             if (r === true){
                 var tabla = "tblusuarios";
                 var valorRadioPK = getRadioValIndice("radio" + tabla) + 1;//valor de 0 a k-1, sumarle 1
-                console.log(valorRadioPK);
                 if ((valorRadioPK) > 0) {
                     var cellsOfRow = getRowCells(valorRadioPK, tabla);
                     //var usid = document.querySelector("#USRrowid").value; 
@@ -634,29 +629,22 @@ function CrudUSR(e){
                         valuesRow += '"' + PERFILES[1].innerHTML + '"' + ",";
                         valuesCLV.push(parseInt(PERFILES[0].innerHTML));
                     }
-                    var roles = valuesRow.substring(0, valuesRow.length - 1) + "]";//elimina la coma al final de la cadena
-                    var tiposel = getRadioVal("estado");
-                    console.log("Selección de estado: "+tiposel);
                     var lixboxsel = document.getElementById("perf2");
                     var areaser = parseInt(lixboxsel[lixboxsel.selectedIndex].value); //pkey table perfil              
                     var refregx = getRadioVal("estado");      
-                    console.log(refregx);
-                    //guardar en BD.
-                    // Se guardan los datos adquiridos de la vista en la variable jsonData
+                    // Se guardan los datos adquiridos del form en jsonData
                     var jsonData = {"curp": curp, "numEmpleado": numEmpleado, "nombre": nombre, "apellidoPaterno": apaterno, "apellidoMaterno": amaterno, "correoElectronico":correo, "area": areaser, "roles": valuesCLV, "estado":refregx};
-                    console.log(jsonData); 
                     
-
-                    postRestService(uriserv + "/user/create", Data)
-                .done(function () {
-                    // Esto se ejecuta cuando terminó bien
-                    cambiaEstadoModal(".modalUSUARIOS", false);
-                    document.getElementById("USUARIOS").reset(); //Borra datos del formulario
-                    CrudUSR('btnCatUSRtbl');
-                })
-                .fail(function () {
-                    alert("No se pudo crear el usuario");
-                });
+                    try{
+                        const data = getServicio(uriserv + "/user/update","POST",jsonData)
+                        console.log("Todo funciono increible")
+                    } catch(err){
+                        alert("Error al procesar la respuesta " + err.message);                        
+                    } finally{
+                        cambiaEstadoModal(".modalUSUARIOS", false);
+                        document.getElementById("USUARIOS").reset(); //Borra datos del formulario
+                        CrudUSR('btnCatUSRtbl');
+                    }
                 } else {
                     alert("Seleccione un registro de la tabla");
                 }
@@ -676,15 +664,24 @@ async function getUsrs() {
 
     console.log("Lanzando ambas peticiones…");
     try {
-        const [areaRes, rolRes] = await Promise.all([pArea, pRol]); // {rows, count} cada uno
-        console.log("Áreas:", areaRes.count, "Perfiles:", rolRes.count);
-
+        const [areaRes, rolRes] = await Promise.all([pArea, pRol]); // {rows, count} cada uno, hay que quedarnos solo con nombres
+        
+        const areaObjs = (areaRes.rows || []).map(item => 
+            typeof item === 'string' ? JSON.parse(item) : item
+            );
+        const nombresAreas = areaObjs.map(a => a.nombreArea);
+        console.log(nombresAreas);
+        
+        const rolObjs= (rolRes.rows || []).map(item => 
+            typeof item ==="string" ? JSON.parse(item):item
+            );
+        const nombresRoles = rolObjs.map(r => r.nombre);
+        console.log(nombresRoles)
         // === TABLA ÁREAS (ya creada por getTBL) ===
         tableViewFormat("tblareas", 3, 4);           // columnas edición/borrado
         tableHeaderSelection("tblareas", [1, 2]);    // ordenar por cabecera
         // Llenar listbox de áreas en modal de usuarios
-        // Antes: convertTojsonArray(ajaxAREAResults[0]); —> ahora ya tienes el arreglo en areaRes.rows
-        UpdateListBox("perf2", areaRes.rows, 0, 1);  // value = col[0], label = col[1] (ajusta si tu función usa otra columna)
+        UpdateListBox("perf2", areaObjs, 0, 1); 
 
         // === TABLA ROLES (ya creada por getTBL) ===
         tableViewFormat("tblroles", 3, 4);
@@ -692,7 +689,7 @@ async function getUsrs() {
 
         // Tabla extra de roles en el diálogo modal
         CreateTableFromJSON("showDataRol", "roles", colsRol);
-        UpdateTableRows("roles", rolRes.rows);
+        UpdateTableRows("roles", rolObjs);
 
         const chkTpl = "<input type='checkbox' name='perfilapp'>";
         insertColumnK("roles", 3, "Selección", "Opción: ");
