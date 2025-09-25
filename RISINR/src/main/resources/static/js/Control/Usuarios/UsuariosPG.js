@@ -6,7 +6,6 @@ var host = "http://" + location.host + "/RISSERVER/";
 async function getTBL(uriServ, nameDivContainer, tablName, columnas) {
     console.log("Hola desde async");
   // (1) Estado de carga opcional (si tienes un spinner)
-  showLoading(nameDivContainer, true);
 
   try {
     const res = await fetch(uriServ, { method: 'GET', headers: { 'Accept': 'application/json' } });
@@ -24,7 +23,7 @@ async function getTBL(uriServ, nameDivContainer, tablName, columnas) {
       throw new Error('Respuesta no es JSON válido');
     }
 
-    // (3) Normalización en caso de ser necesario
+    // (3) Normalización en caso de ser necesario (En este caso ya lo es
     const resultSet = Array.isArray(data) ? data : convertTojsonArray(data);
     console.log("Array is Array?"+Array.isArray(data));
 
@@ -40,8 +39,6 @@ async function getTBL(uriServ, nameDivContainer, tablName, columnas) {
     // Puedes re-lanzar si quieres que el caller maneje el error:
     // throw err;
     return { rows: [], count: 0 };
-  } finally {
-    showLoading(nameDivContainer, false);
   }
 }
 
@@ -73,17 +70,22 @@ function getTBL(uriServ, nameDivContainer, tablName, columnas) {
     });
 }
 */
-function getRestService(uriServ, tipohttp) {
-    return $.ajax({
-        url: uriServ,
-        type: tipohttp, // 'get', // Tipo de envio 
-        dataType: 'json' //Tipo de Respuesta
-    }).fail(function (jqXHR, textStatus, errorThrown) {
-        console.log("Sesion");
-        alert("No hay datos" + errorThrown);
-    }).always(function (jqXHROrData, textStatus, jqXHROrErrorThrown) {
-        //console.log(jqXHROrData);
+async function getServicio(url, tipohttp = 'GET', body = null) {
+    const headers = { 'Accept': 'application/json' };
+    if (body) headers['Content-Type'] = 'application/json';
+
+    const res = await fetch(url, {
+        method: tipohttp,
+        headers,
+        body: body ? JSON.stringify(body) : undefined,
+        credentials: 'include' // quita si no usas cookies
     });
+
+    if (!res.ok) {
+        throw new Error(`HTTP ${res.status}`);
+    }
+
+    return res.json();
 }
 
 
@@ -369,7 +371,6 @@ function salir() {
   $.ajax({
     url: '/RISSERVER/access/logout?tipoCierre=' + encodeURIComponent(tc),
     type: 'POST',
-    xhrFields: { withCredentials: true }, // enviará la cookie 'token'
     // No body ni headers necesarios
     success: function () {
       // ok, el backend marcó horaFin/tipoCierre y borró cookie
@@ -411,13 +412,23 @@ function actualizaPerfilSeleccionado(e) {
     //perfilupdate.value=lixboxseltxt; //opcion default;
 }
 
-window.onload = function () {
-    //console.log("ID medico: "+document.getElementById("medID").value);          
-    var actualizarol = getRestService("/RISSERVER/rest/USRSesionRST/rol/Admin", "GET");//se actualiza la tabla de sesion
-    $.when(actualizarol.done(function (data) {
-        document.getElementById("usuartioactivonombre").innerHTML = data.nombre + " , " + data.area + " , " + data.rolActivo;
-    }));
-    nobackbutton();
+window.onload = async function () {
+    try {
+    // Llama a tu helper basado en fetch
+    const data = await getServicio('/RISSERVER/rest/USRSesionRST/rol/Admin', 'GET');
+
+    // Actualiza el DOM si el elemento existe
+    const el = document.getElementById('usuartioactivonombre');
+    if (el && data) {
+        el.textContent = `${data.nombre} , ${data.area} , ${data.rolActivo}`;
+    }
+    } catch (err) {
+        console.error('Error obteniendo rol activo:', err);
+        alert('No hay datos: ' + err.message);
+    } finally {
+    // Lo que hacías al final de onload
+        nobackbutton();
+    }
 };
 
 
@@ -654,43 +665,46 @@ function CrudUSR(e){
     }
 }
 
-function getUsrs() {
-
+async function getUsrs() {
+    console.log("Primer paso getUsrs")
     var colsArea = ["Referencia", "Área", "Descripción"];
-    var llamadaAREA = getTBL(uriserv + "/initial/getAreas", "showDataArea", "tblareas", colsArea);
+    var pArea = getTBL(uriserv + "/initial/getAreas", "showDataArea", "tblareas", colsArea);
 
+    console.log("Segundo paso get Usrs")
     var colsRol = ["Referencia", "Perfil", "Descripción"];
-    var llamadaPRO = getTBL(uriserv + "/initial/getRoles", "showDataProfile", "tblroles", colsRol);
+    var pRol = getTBL(uriserv + "/initial/getRoles", "showDataProfile", "tblroles", colsRol);
 
-    $.when( llamadaPRO, llamadaAREA).done(function (ajaxPROResults, ajaxAREAResults) {
-        //console.log("Generando listbox");
-        //this code is executed when all ajax calls are done
-        //
-        //TABLA areas
-        tableViewFormat("tblareas", 3, 4); //Agregar columnas de edicion y borrado
-        //permite ordenar en cabecera
-        tableHeaderSelection("tblareas", [1, 2]);
-        //Falta llenar el listbox de areas en el dialogo de modal de usuarios
-        var resultSetArea = convertTojsonArray(ajaxAREAResults[0]);
-        //console.log(resultSetArea);
-        UpdateListBox("perf2", resultSetArea, 0, 1);//atributo value = columna[0], atributo innerHTML=columna[4]
-        //TABLA roles
-        tableViewFormat("tblroles", 3, 4); //Agregar columnas de edicion y borrado
-        //permite ordenar en cabecera
+    console.log("Lanzando ambas peticiones…");
+    try {
+        const [areaRes, rolRes] = await Promise.all([pArea, pRol]); // {rows, count} cada uno
+        console.log("Áreas:", areaRes.count, "Perfiles:", rolRes.count);
+
+        // === TABLA ÁREAS (ya creada por getTBL) ===
+        tableViewFormat("tblareas", 3, 4);           // columnas edición/borrado
+        tableHeaderSelection("tblareas", [1, 2]);    // ordenar por cabecera
+        // Llenar listbox de áreas en modal de usuarios
+        // Antes: convertTojsonArray(ajaxAREAResults[0]); —> ahora ya tienes el arreglo en areaRes.rows
+        UpdateListBox("perf2", areaRes.rows, 0, 1);  // value = col[0], label = col[1] (ajusta si tu función usa otra columna)
+
+        // === TABLA ROLES (ya creada por getTBL) ===
+        tableViewFormat("tblroles", 3, 4);
         tableHeaderSelection("tblroles", [1, 2]);
 
-        //Tabla roles para el dialogo modal
-        CreateTableFromJSON("showDataRol", "roles", colsRol); //parametros regerencia div, nombre tabla , arreglo json, cabecera
-        var resultSet = convertTojsonArray(ajaxPROResults[0]);
-        UpdateTableRows("roles", resultSet);
-        var tbl = "<input type='checkbox' name='perfilapp'>";
-        insertColumnK("roles", 3, "Selección", "Opción: "); //inserta columna de esdicion (columna que no pertenece a los datos)                    
-        updateTableColumns("roles", 3, tbl);
+        // Tabla extra de roles en el diálogo modal
+        CreateTableFromJSON("showDataRol", "roles", colsRol);
+        UpdateTableRows("roles", rolRes.rows);
+
+        const chkTpl = "<input type='checkbox' name='perfilapp'>";
+        insertColumnK("roles", 3, "Selección", "Opción: ");
+        updateTableColumns("roles", 3, chkTpl);
 
         backGroundColor("roles", "rgba(88,142,255,.5)", "#000000", "#7F7F7F", "#FFFFFF");
-        rowColor("roles", "#00FFFF", "#000000", "#7F7F7F", "#FFFFFF", "#ffffff", "#000000"); //puntero raton (b,c); pares (b,c); impares (b,c)
-       
-    });
+        rowColor("roles", "#00FFFF", "#000000", "#7F7F7F", "#FFFFFF", "#ffffff", "#000000");
+
+    } catch (e) {
+        console.error("Fallo al cargar tablas:", e);
+        alert("No se pudieron cargar las tablas.");
+    }
 }
 
 
@@ -698,8 +712,8 @@ function getUsrs() {
 
 $(document).ready(function () {
     $("#includedCatEquipo").load("CatEquipoRIS.html"); // página externa
-    //$("#includedAgendaADM").load("../../Templates/AgendaRIS.html"); // página externa
-    //$("#includedUSRADM").load("../../Templates/ModuloUsuarios.html"); // página externa
+    $("#includedAgendaADM").load("../../Templates/AgendaRIS.html"); // página externa
+    $("#includedUSRADM").load("../../Templates/ModuloUsuarios.html"); // página externa
    getUsrs(); //roles y areas
  
 });

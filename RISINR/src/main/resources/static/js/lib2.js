@@ -293,7 +293,6 @@ function UpdateTableRows(tablename, jsonarray) {
             var tabCell = document.createElement('td');          // TABLE DEFINITION.
             tabCell = tr.insertCell(-1);
             tabCell.innerHTML = jsonarray[i][col[j]];// ADD VALUES TO EACH CELL.
-            console.log(col[j]);
             
         }
     }
