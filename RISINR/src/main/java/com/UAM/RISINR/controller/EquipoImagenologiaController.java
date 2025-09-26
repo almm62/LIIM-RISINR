@@ -60,8 +60,9 @@ public class EquipoImagenologiaController {
      * @param token 
      * @return ResponseEntity con la lista de {@link EquipoImagenologiaDTO} (que Spring convierte a JSON)y código HTTP 200.
      */
-    @PostMapping("/requestALL")
+    @GetMapping("/requestALL")
     public ResponseEntity<List<EquipoImagenologiaDTO>> consultarTodos(@CookieValue(value = "token", required = false) String token){
+        System.out.println("Entró al controlador");
         List<EquipoImagenologiaDTO> datos = service.consultarTodos(token);
         return ResponseEntity.ok(datos);
     }

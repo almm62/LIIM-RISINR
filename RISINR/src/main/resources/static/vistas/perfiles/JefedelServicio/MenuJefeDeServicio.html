@@ -4,7 +4,10 @@
     <title>Gestión de Equipo - RIS</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!--<link rel="stylesheet" type="text/css" href="../../../css/SuMainPages.css"-->
     <link rel="stylesheet" type="text/css" href="../../../css/SuMainPages.css">
+    <link rel="stylesheet" type="text/css" href="../../../css/prueba.css">
+    <link rel="stylesheet" type="text/css" href="../../../css/RIS.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <script src="http://code.jquery.com/jquery-2.2.0.min.js"></script>  
     <script src="../../../js/lib2.js"></script>
@@ -18,7 +21,7 @@
         <h2 style="text-align:center">APP RIS</h2>       
         <header>
             <div class="contenedor-logout">
-                <button id="salir" value="salir" onclick="salir()">Salir del sistema</button>
+                <button id="salir" value="salir">Salir del sistema</button>
             </div>            
         </header>          
 
@@ -32,8 +35,8 @@
             <div id="EQUIPOTAB" class="tabcontent" style="display:block;">
                 <h2 style="text-align:center">Administración de Equipo</h2>
                 <div class="flex-container">
-                    <button id="btnCatEqpAreatbl" onclick="barraBotonesEQP(event)" class="button button1 fa fa-list"> Consultar Equipo</button>
-                    <button id="btnEdtEqptbl" onclick="barraBotonesEQP(event)" class="button button1 fa fa-pencil"> Editar</button>
+                    <button type="button" id="btnCatEqpAreatbl" class="button button1 fa fa-list"> Consultar Equipo</button>
+                    <button type="button" id="btnEdtEqptbl" class="button button1 fa fa-pencil"> Editar</button>
                 </div>  
                 <br>
                 <div id="showDataEQP" class="scrollcell"></div> 
@@ -44,81 +47,62 @@
                     <form id="formEquipoRIS">
                         <input type="hidden" id="tblid" name="tblid" value="-1">
                         <input type="hidden" id="rowid" name="rowid" value="-1">
-                        <h1 style="color:#2179FC; text-align: center" >Control Equipo</h1>
+                        <h1>Control Equipo</h1>
                         <hr>
                         <br>
                         <!--p style='color:black; text-align: left; padding: 0 0 0 20px;'><b>ID</b></p> 
                         <p style='color:black; text-align: left; padding: 0 0 0 20px' >0</p>
                         <input type="text" id="profileid" name="profileid" style="margin: 0px 0px 0px 0.9%; width:90%;" disabled-->                        
                         
-                        <p id="secSerie" style='color:black; text-align: left; padding: 10px 0 0 20px;'>
+                        <p id="secSerie">
                           <b>N. Serie:</b>
                           <input type="text" id="nserEQP" name="nserEQP" style="margin: 0px 0px 0px 0.9%; width:90%;"  autocomplete="off" readonly>                        
                         </p>                        
-                        <p style='color:black; text-align: left; padding: 10px 0 0 20px;'>
+                        <p>
                           <b>Nombre:</b>
                           <input type="text" id="nomEQP" name="nomEQP" style="margin: 0px 0px 0px 0.9%; width:90%;" autocomplete="off" readonly>                        
                         </p>
-                        <p style='color:black; text-align: left; padding: 10px 0 0 20px;'>
+                        <p>
                             <b>Marca:</b>
                             <input type="text" id="marcaEQP" name="marcaEQP" style="margin: 0px 0px 0px 2.0%; width:90%;"  autocomplete="off" readonly>                             
                         </p>
-                        <p style='color:black; text-align: left; padding: 10px 0 0 20px;'>
+                        <p>
                             <b>Modelo:</b> 
                             <input type="text" id="modeloEQP" name="modeloEQP" style="margin: 0px 0px 0px 1.0%; width:90%;" autocomplete="off" readonly>                             
                         </p>  
                         
                         
-                        <p style='color:black; text-align: left; padding: 10px 0 0 20px; '>
+                        <p>
                             <b>Modalidad:</b> 
                             <input type="text" id="modalEQP" name="modalEQP" style="margin: 0px 0px 0px 0.1%; width:80%;" autocomplete="off" readonly>  
                         </p>   
                             <!--Corresponden a la tabla de Modalidades (hacer tabla), llenarlo con el contenido de la tabla -->
                                           
                             <!--<input type="text" style="margin: 0px 0px 0px 0.5%; width:26%; height: 30px;" id="idmod" name="idmod"  autocomplete="off"> -->
-                            <p style='color:black; text-align: left; padding: 10px 0 0 20px; font-size: 14px;'>
+                            <p>
                             <b>Área: </b> 
                             <!--Corresponden a la tabla de áreas, llenarlo con el contenido de la tabla -->
-                            <select name="areEqp" id="areEqp" style='color:black; font-size: 14px; padding: 6px; width:21%;' onchange="updatePKSEqp(event)">
-                                <option id="area0" value="0">Seleccione área</option>
-                                <option id="area1" value="1">Rayos X</option>
-                                <option id="area2" value="2">Resonancia magnética</option>
-                                <option id="area3" value="3">Tomografía computada</option>
-                                <option id="area4" value="4">Médicina Núclear</option>
-                                <option id="area5" value="5">Desarrollo Tecnológico</option>
-                                <option id="area6" value="6">Ultrasonido</option>
-                                <option id="area7" value="7">Densitometria</option>
-                                <option id="area8" value="8">Subdirección de Rehabilitación</option>
-                            </select>
+                            <input name="areEqp" id="areEqp" style='color:black; font-size: 14px; padding: 6px; width:21%;' onchange="updatePKSEqp(event)" readonly>
+                              
                             <input type="text" id="idarea" name="idarea" style="margin: 0px 0px 0px 0.5%; width:21%; height: 30px;" autocomplete="off"  readonly>
                         </p>  
-                        <p style='color:black; text-align: left; padding: 10px 0 0 20px; font-size: 14px;'>
+                        <p>
                             <b>Estado: </b> 
-                            <select name="edoEqp" id="edoEqp" style='color:black; font-size: 14px; padding: 6px; margin: 0px 0px 0px 1.9%; width:20%;' onchange="updatePKSEqp(event)">
+                            <select name="edoEqp" id="edoEqp" onchange="updatePKSEqp(event)">
                                 <option id="edo0" value="0">Seleccione estado</option>
                                 <option id="edo1" value="Disponible">Disponible</option>
                                 <option id="edo2" value="Fuera de servicio">Fuera de servicio</option>
                                 <option id="edo3" value="Mantenimiento preventivo">Mantenimiento preventivo</option>
                                 <option id="edo4" value="Mantenimiento Correctivo">Mantenimiento Correctivo</option>
-                            </select>
-                            <!--<input type="text" id="idedo" name="idedo" style="margin: 0px 0px 0px 0.5%; width:26%; height: 30px;"  autocomplete="off" >      -->                      
-                        </p>  
-                        <!--p style='color:black; text-align: left; padding: 10px 0 0 20px; font-size: 14px;'>
-                            <b>Fecha de instalación: </b> 
-                            <input type="date" id="fechaIns" name="fechaIns" style="margin: 0px 0px 0px 0.5%; width:26%; height: 30px;">                            
-                        </p>  
-                        <p style='color:black; text-align: left; padding: 10px 0 0 20px; font-size: 14px;'>
-                            <b>Fecha de actulización: </b> 
-                            <input type="date" id="fechaUp" name="fechaUp" style="margin: 0px 0px 0px 0.5%; width:26%; height: 30px;">                            
-                        </p-->                        
+                            </select>                      
+                        </p>                     
                        <br>                        
                        <hr>
                        <br>
                     </form>		
                     <div class="flex-container">
-                      <button id="updateEQPRIS"   onclick="listenermodalEQPRIS(event)" class="button button1" style="flex-basis:200px; font-size: 15px;">Actualizar Registro</button>
-                      <button id="agregarEQPRIS"  onclick="listenermodalEQPRIS(event)" class="button button1" style="flex-basis:200px; font-size: 15px;">Agregar Registro</button>                          
-                      <button id="cancelarEQPRIS" onclick="listenermodalEQPRIS(event)" class="button button1" style="flex-basis:200px; font-size: 15px;">Cancelar</button>                        
+                      <button type="button" id="updateEQPRISJEFE" class="button button1">Actualizar Registro</button>
+                      <button type="button" id="cancelarEQPRIS" class="button button1">Cancelar</button>                        
                     </div>                      
                 </div>
             </div>  
