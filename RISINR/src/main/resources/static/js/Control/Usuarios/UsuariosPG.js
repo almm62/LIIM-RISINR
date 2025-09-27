@@ -201,66 +201,6 @@ function postRestService(urlser, jsonData) {
     });
 }
 
-async function postRestServiceFetch(jsonString, servicio,verbo) {
-    try {
-        console.log("entró al fetch post");
-        const response = await fetch(servicio, {
-            method: verbo,
-            body: jsonString,               // Ya es JSON, no hacer stringify
-            credentials: 'include',         // 🔑 envía cookies automáticamente
-            headers: {
-                'Content-Type': 'application/json'  // Indicamos que enviamos JSON
-            }
-        });
-
-        if (!response.ok) {
-            const mensaje = await response.text();
-            console.error('Error:', response.status, mensaje);
-            alert(mensaje);
-            return null;
-        }
-
-        const data = await response.json();   // Parsear respuesta JSON
-        console.log(data);
-        return data;
-
-    } catch (error) {
-        console.error('Fetch falló:', error);
-        alert('Ocurrió un error al enviar los datos');
-        return null;
-    }
-}
-
-async function getRestServiceFetch(servicio,verbo) {
-    try {
-        console.log("entró al fetch get");
-        const response = await fetch(servicio, {
-            method: verbo,              // Ya es JSON, no hacer stringify
-            credentials: 'include',         // 🔑 envía cookies automáticamente
-            headers: {
-                'Content-Type': 'application/json'  // Indicamos que enviamos JSON
-            }
-        });
-
-        if (!response.ok) {
-            const mensaje = await response.text();
-            console.error('Error:', response.status, mensaje);
-            alert(mensaje);
-            return null;
-        }
-
-        const data = await response.json();   // Parsear respuesta JSON
-        console.log(data);
-        return data;
-
-    } catch (error) {
-        console.error('Fetch falló:', error);
-        alert('Ocurrió un error al enviar los datos');
-        return null;
-    }
-}
-
-
 function activamodal(str, form) {
     console.log("Forma: "+form.id);
     console.log("Forma: "+str);

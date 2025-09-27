@@ -248,6 +248,7 @@ function getFormData(crud, formname) {
     
 }
 
+// María de Jesús Rebolledo Bustillo
 function getDatos(formname){
     
     var formulario = document.forms.namedItem(formname);
@@ -265,12 +266,7 @@ function getDatos(formname){
     };
     
     console.log(datosJson);
-    
-    var datosJsonCadena = JSON.stringify(datosJson);
-    
-    console.log("Después de hacerlo cadena");
-    console.log(datosJsonCadena);
-    
+
     return datosJson; 
     
 }
@@ -280,10 +276,10 @@ function limpiarCampos() {
     document.getElementById("nomEQP").value = "";
     document.getElementById("marcaEQP").value = "";
     document.getElementById("modeloEQP").value = "";
-    document.getElementById("modalEQP").value = "";
-    document.getElementById("areEqp").value = "";
+    document.getElementById("modalEQP").value = "0";
+    document.getElementById("areEqp").value = "0";
     document.getElementById("idarea").value = "";
-    document.getElementById("edoEqp").value = "";
+    document.getElementById("edoEqp").value = "0";
 }
 
 
@@ -332,8 +328,6 @@ $(document).on('click', '#cancelarEQPRIS', function (e) {
   listenermodalEQPRIS(e);
 });
 
-
-
 //Agregar modal
 $(document).on('click', '#agregarEQPRIS', function (e) {
   listenermodalEQPRIS(e,1);
@@ -347,6 +341,10 @@ $(document).on('click', '#salir', function (e) {
 });
 
 $(document).on('change', '#edoEqp', function (e) {
+   updatePKSEqp(e);
+});
+
+$(document).on('change', '#areEqp', function (e) {
    updatePKSEqp(e);
 });
 

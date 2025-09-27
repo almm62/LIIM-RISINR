@@ -22,7 +22,6 @@ import com.UAM.RISINR.service.shared.JwtService;
 import com.UAM.RISINR.service.shared.RegistroEventoService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -31,11 +30,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.json.JSONObject;
-import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestBody;
 
 /**
  * Implementación de la interfaz del servicio de Equipos de Imagenología.
@@ -62,8 +58,10 @@ public class EquipoImagenologiaServiceImpl implements EquipoImagenologiaService{
     /** Mapper para convertir objetos a JSON */
     private final ObjectMapper objMapper;
     
+    /** Objeto que permite obtener la información del usuario del token*/
     public final JwtService jwtService;
     
+    /** Repositorio de usuario que permite consultar sus datos en la BD*/
     public final UsuarioRepository usuarioRepository;
     
     // Aplicaciones
@@ -75,7 +73,7 @@ public class EquipoImagenologiaServiceImpl implements EquipoImagenologiaService{
     private static final int EQUIPO_AGREGADO_EXITOSAMENTE = 3;
     private static final int EQUIPO_EDITADO_EXITOSAMENTE = 4 ;
     private static final int CATALOGO_CONSULTADO_EXITOSAMENTE = 5;
-     private static final int ESTADO_DE_EQUIPO_CAMBIADO = 11;
+    private static final int ESTADO_DE_EQUIPO_CAMBIADO = 11;
     private static final int NUM_SERIE_EXISTENTE = 1004;
     private static final int NUM_SERIE_NO_EXISTE = 1005;
     private static final int INFORMACION_INCOMPLETA_AGREGAR= 1012;
@@ -429,6 +427,15 @@ public class EquipoImagenologiaServiceImpl implements EquipoImagenologiaService{
         return usuarioOptional.get();
     }
     
+    
+    /**
+    * Obtiene los datos del usuario en un mapa, incluyendo el número de empleado, CURP y área.
+    * Este método utiliza la información contenida en el objeto `Usuario` para generar el mapa de datos.
+    * 
+    * @param usuario El objeto `Usuario` que contiene la información del usuario.
+    * @return Un mapa con claves y valores correspondientes al número de empleado, CURP y área del usuario para poder 
+    * almacenar estos datos en la base de datos.
+    */
     public  Map<String, Object> datosUsuario(Usuario usuario){
         Map<String, Object> datos = new HashMap<>();
         datos.put("NumEmpleado", usuario.getUsuarioPK().getNumEmpleado());

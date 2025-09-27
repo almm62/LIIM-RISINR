@@ -1,0 +1,22 @@
+#EQUIPOTAB {
+  display: block;
+}
+
+#modalEQP{  
+    margin: 0px 0px 0px 1.0%; 
+    width:85%;
+    background-color: white;
+    padding: 10px;
+}
+#idarea{  
+    
+    margin: 0px 0px 0px 1%; 
+    width:25%; 
+    height: 40px;
+    background-color: white;
+    padding: 10px;
+}
+
+#areEqp {
+    display: none;
+}

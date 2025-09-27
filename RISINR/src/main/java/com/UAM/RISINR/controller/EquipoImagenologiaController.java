@@ -114,6 +114,13 @@ public class EquipoImagenologiaController {
             }
         }
     
+    /**
+    * Consulta los equipos de imagenología en un área específica y devuelve una lista de los mismos.
+    * Este método utiliza el valor del token almacenado en la cookie para consultar los equipos.
+    * 
+    * @param token El token de autenticación almacenado en la cookie. Si no está presente, puede ser nulo.
+    * @return Un objeto `ResponseEntity` que contiene la lista de equipos de imagenología en el cuerpo de la respuesta.
+    */
     @GetMapping("/consultaEquiposArea")
     public ResponseEntity<Object> consultaJefeServicio(@CookieValue(value = "token", required = false) String token){
         List<EquipoImagenologiaDTO> equiposDTO = service.consultarEquipoArea(token);
