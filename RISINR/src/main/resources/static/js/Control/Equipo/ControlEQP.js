@@ -346,6 +346,11 @@ $(document).on('click', '#salir', function (e) {
   salir();
 });
 
+$(document).on('change', '#edoEqp', function (e) {
+   updatePKSEqp(e);
+});
+
+
 window.onload = function () {
     //$().ready(function () {   
     console.log("Cosntruyendo pagina EQP 3");
