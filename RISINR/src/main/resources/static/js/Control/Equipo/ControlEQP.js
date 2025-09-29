@@ -19,7 +19,11 @@ function barraBotonesEQP(e) {
     console.log("selección: " + opc);
     switch (opc) {
         case 'btnCatEqptbl':
-            readTblsEQP();
+            readTblsEQP(1);
+            break;
+            
+        case 'btnCatEqpAreatbl':
+            readTblsEQP(2);
             break;
         case 'btnAddEqptbl':
             var tablaref = "Eqptbl";
@@ -108,7 +112,7 @@ function updatePKSEqp(e) {
     }
 }
 
-function readTblsEQP() {
+function readTblsEQP(opc) {
     var divtable = "showDataEQP";
     var tabladatos = "Eqptbl";
     var columnaedicion = 9;
@@ -125,17 +129,40 @@ function readTblsEQP() {
     var colocultas = [5]; //se oculta id area
     var cabecerapac = ["Serie", "Nombre", "Marca", "Modelo", "Modalidad", "Id_area", "Área", "Estado","Fecha Instalación"];
     CreateTableFromJSON(divtable, tabladatos, cabecerapac); //parametros referencia div, nombre tabla , cabecera
-    var jsonData = {"nombre": "*"};
-    var getEquipoimg = postRestService(uriserv + "/EquipoImagenologia/requestALL", jsonData);
-    $.when(getEquipoimg.done(function (data) {
-        console.log(data);
-        //var array = convertTojsonArray(data[0]);
-        //UpdateTableRows(tabladatos, array);
-        UpdateTableRows(tabladatos, data);
-        tableRowColorCellSelectionKlib(tabladatos);
-        hideTableColumns(tabladatos, colocultas); //ocultar columnas (medico, idpac) 
-        addRadioButtonColumnPKTBL(tabladatos, columnaedicion, coleditar, roweditar, actionListener, columnaPK); //columna k con radiobutton y acctionlistne                     
-    }));
+    //var getEquipoimg = postRestService(uriserv + "/EquipoImagenologia/requestALL", jsonData);
+     //var getEquipoimg = postRestServiceFetch(jsonData, uriserv + "/EquipoImagenologia/requestALL");
+     var getEquipoimg;
+     switch (opc) {
+        case 1:
+            console.log("entró al caso 1");
+            getEquipoimg = getServicio(uriserv +"/EquipoImagenologia/requestALL"); 
+            console.log("SALIO DEL POST");
+            //getEquipoimg = postRestServiceFetch(jsonData, uriserv + "/EquipoImagenologia/requestALL",'POST');
+            break;
+            
+        case 2:
+            console.log("entró al caso 2");
+            getEquipoimg = getServicio(uriserv +"/EquipoImagenologia/consultaEquiposArea"); 
+            //getEquipoimg = getRestServiceFetch(uriserv + "/EquipoImagenologia/consultaEquiposArea",'GET');
+            break;
+    }
+     
+     
+    getEquipoimg.then(function(data) {
+      console.log(data);
+      // Actualizar la tabla con los datos recibidos
+      UpdateTableRows(tabladatos, data);
+      tableRowColorCellSelectionKlib(tabladatos);
+      hideTableColumns(tabladatos, colocultas); // Ocultar columnas
+      addRadioButtonColumnPKTBL(
+          tabladatos, columnaedicion, coleditar, roweditar,
+          actionListener, columnaPK
+      );
+  })
+  .catch(function(error) {
+      console.error("Error al obtener datos:", error);
+      alert("Ocurrió un error al obtener los datos del servidor");
+  });
 }
 
 function convertTojsonArray(arreglocadena) {
@@ -148,8 +175,12 @@ function convertTojsonArray(arreglocadena) {
     return resultSet;
 }
 
-function listenermodalEQPRIS(e) {
+function listenermodalEQPRIS(e,rol) {
     var opc = e.target.id;
+    if (opc === 'updateEQPRISJEFE'){
+        opc = 'updateEQPRIS';
+    }
+    
     switch (opc) {
         case 'cancelarEQPRIS':
             html_HideElement("btnEdtEqptbl"); //boton del modal de edición.
@@ -157,48 +188,53 @@ function listenermodalEQPRIS(e) {
             cambiaEstadoModal(".modalEquipoRIS", false); //true =activaer            
             break;
         case 'updateEQPRIS':
-            var formData = getFormData("UpdateEqp", "formEquipoRIS");
-            
+            var formData = getFormData("UpdateEqp", "formEquipoRIS"); 
             var datosJson = getDatos("formEquipoRIS");
-            //var getEquipoimg =POSTForDataFiles(formData, uriserv + "/FormularioEqpImg/UpdateEqp");
-            var getEquipoimg = POSTForDataFiles(datosJson, uriserv + "/EquipoImagenologia/editEquipo");
-            $.when(getEquipoimg.done(function (data) {
-                console.log(data);
-                //var resp = JSON.parse(data);
-                resp = data;
-                console.log(resp);
-                if (resp[0] === '1') {
-                    alert("Se actualizo el registro con exito");
-                    //actualizar la lista nuevamente                        
-                   readTblsEQP();
-                   html_HideElement("btnEdtEqptbl"); //boton del modal de edición.
-                   html_HideElement("btnDelEqptbl"); //boton del modal de edición.
+            // Usamos getServicio, que ya usa fetch
+            getServicio(uriserv + "/EquipoImagenologia/editEquipo", 'POST', datosJson)
+                .then(function(data) {
+                    console.log(data);
+                    var resp = data;
+                    console.log(resp);
+                    if (resp[0] === '1') {
+                        alert("Se actualizó el registro con éxito");
+                        // Actualizar la lista nuevamente                        
+                        readTblsEQP(rol);
+                        html_HideElement("btnEdtEqptbl"); // Botón del modal de edición.
+                        html_HideElement("btnDelEqptbl"); // Botón del modal de edición.
+                    } else {
+                        alert("Error al actualizar el registro");
+                    }
+                })
+                .catch(function(error) {
+                    console.error("Error al realizar la solicitud:", error);
+                    alert("Ocurrió un error al actualizar el registro");
+                });
 
-                } else {
-                    alert("Error al actualizar el registro");
-                }
-            }));
-            cambiaEstadoModal(".modalEquipoRIS", false); //true =activaer                                 
+            cambiaEstadoModal(".modalEquipoRIS", false); // true = activar
             break;
         case 'agregarEQPRIS':
             var formData = getFormData("CreateEqp", "formEquipoRIS");
-            console.log("Datos antes de la peticion" + formData);
-            console.log(formData);
-            
             var datosJson = getDatos("formEquipoRIS");
-            
-           
-            //var getEquipoimg =POSTForDataFiles(formData, uriserv + "/FormularioEqpImg/CreateEqp");
-            var getEquipoimg = POSTForDataFiles(datosJson, uriserv + "/EquipoImagenologia/addEquipo");
-            $.when(getEquipoimg.done(function (data) {
-                console.log(data);
-                alert("Se agregó el registro con exito");
-                readTblsEQP();
-                //var resp = JSON.parse(data);
-            }));
-            cambiaEstadoModal(".modalEquipoRIS", false); //true =activaer                 
-            break;
-    }
+            console.log("Datos antes de la petición:", datosJson);
+
+            // Usamos getServicio con fetch para enviar los datos
+            getServicio(uriserv + "/EquipoImagenologia/addEquipo", 'POST', datosJson)
+                .then(function(data) {
+                    console.log(data);
+                    alert("Se agregó el registro con éxito");
+                    readTblsEQP(rol);
+                    // Procesar la respuesta si es necesario
+                })
+                .catch(function(error) {
+                    console.error("Error al agregar el registro:", error);
+                    alert("Ocurrió un error al agregar el registro");
+                });
+
+            cambiaEstadoModal(".modalEquipoRIS", false); // false = desactivar
+            break;  
+
+}
 }
 
 function getFormData(crud, formname) {
@@ -212,6 +248,7 @@ function getFormData(crud, formname) {
     
 }
 
+// María de Jesús Rebolledo Bustillo
 function getDatos(formname){
     
     var formulario = document.forms.namedItem(formname);
@@ -229,13 +266,8 @@ function getDatos(formname){
     };
     
     console.log(datosJson);
-    
-    var datosJsonCadena = JSON.stringify(datosJson);
-    
-    console.log("Después de hacerlo cadena");
-    console.log(datosJsonCadena);
-    
-    return datosJsonCadena; 
+
+    return datosJson; 
     
 }
 
@@ -244,11 +276,77 @@ function limpiarCampos() {
     document.getElementById("nomEQP").value = "";
     document.getElementById("marcaEQP").value = "";
     document.getElementById("modeloEQP").value = "";
-    document.getElementById("modalEQP").value = "";
-    document.getElementById("areEqp").value = "";
+    document.getElementById("modalEQP").value = "0";
+    document.getElementById("areEqp").value = "0";
     document.getElementById("idarea").value = "";
-    document.getElementById("edoEqp").value = "";
+    document.getElementById("edoEqp").value = "0";
 }
+
+
+
+function getCookie(name) {
+  return document.cookie.split('; ')
+    .find(row => row.startsWith(name + '='))
+    ?.split('=')[1];
+}
+
+
+//Botones 
+
+//Consulta equipo
+$(document).on('click', '#btnCatEqptbl', function (e) {
+  barraBotonesEQP(e);
+});
+
+$(document).on('click', '#btnCatEqpAreatbl', function (e) {
+  barraBotonesEQP(e);
+});
+
+//Editar botón en barra 
+$(document).on('click', '#btnEdtEqptbl', function (e) {
+  barraBotonesEQP(e);
+});
+
+//Agregar barra
+$(document).on('click', '#btnAddEqptbl', function (e) {
+  barraBotonesEQP(e);
+});
+
+// Botón editar modal
+
+$(document).on('click', '#updateEQPRIS', function (e) {
+  listenermodalEQPRIS(e,1);
+});
+
+$(document).on('click', '#updateEQPRISJEFE', function (e) {
+  listenermodalEQPRIS(e,2);
+});
+
+
+//Cancelar modal
+$(document).on('click', '#cancelarEQPRIS', function (e) {
+  listenermodalEQPRIS(e);
+});
+
+//Agregar modal
+$(document).on('click', '#agregarEQPRIS', function (e) {
+  listenermodalEQPRIS(e,1);
+});
+
+
+//Salir
+
+$(document).on('click', '#salir', function (e) {
+  salir();
+});
+
+$(document).on('change', '#edoEqp', function (e) {
+   updatePKSEqp(e);
+});
+
+$(document).on('change', '#areEqp', function (e) {
+   updatePKSEqp(e);
+});
 
 
 window.onload = function () {

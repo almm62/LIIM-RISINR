@@ -1,0 +1,17 @@
+[
+    {"estado": [
+      {
+        "id": "INGRESAR",
+        "vista": "MenuJefeDeServicio.html",
+        "accedo": "login"
+      }
+    ],
+    "mensaje": [
+      {
+        "id": "ADM_ADD_USR",
+        "accion": "rest/UsersManager/Create",
+        "nextState": "ADMUSRS"
+      }
+        ]
+    }
+ ]

@@ -9,11 +9,16 @@ import com.UAM.RISINR.exceptions.ResourceNotFoundException;
 import com.UAM.RISINR.exceptions.ResourceFoundException;
 import com.UAM.RISINR.model.AreaDeServicio;
 import com.UAM.RISINR.model.EquipoImagenologia;
+import com.UAM.RISINR.model.Usuario;
+import com.UAM.RISINR.model.UsuarioPK;
 import com.UAM.RISINR.model.dto.equipoImagenologia.EquipoImagenologiaDTO;
 import com.UAM.RISINR.model.dto.equipoImagenologia.EquipoImagenologiaRequest;
 import com.UAM.RISINR.repository.EquipoImagenologiaRepository;
+import com.UAM.RISINR.repository.UsuarioRepository;
 import com.UAM.RISINR.service.areaDeServicio.AreaDeServicioService;
 import com.UAM.RISINR.service.equipoImagenologia.EquipoImagenologiaService;
+import com.UAM.RISINR.service.model.JwtSessionInfo;
+import com.UAM.RISINR.service.shared.JwtService;
 import com.UAM.RISINR.service.shared.RegistroEventoService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -22,12 +27,11 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.json.JSONObject;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestBody;
 
 /**
  * Implementación de la interfaz del servicio de Equipos de Imagenología.
@@ -54,6 +58,12 @@ public class EquipoImagenologiaServiceImpl implements EquipoImagenologiaService{
     /** Mapper para convertir objetos a JSON */
     private final ObjectMapper objMapper;
     
+    /** Objeto que permite obtener la información del usuario del token*/
+    public final JwtService jwtService;
+    
+    /** Repositorio de usuario que permite consultar sus datos en la BD*/
+    public final UsuarioRepository usuarioRepository;
+    
     // Aplicaciones
     private static final int APLICACION_CONSULTA = 1;
     private static final int APLICACION_EDITAR = 2;
@@ -63,7 +73,7 @@ public class EquipoImagenologiaServiceImpl implements EquipoImagenologiaService{
     private static final int EQUIPO_AGREGADO_EXITOSAMENTE = 3;
     private static final int EQUIPO_EDITADO_EXITOSAMENTE = 4 ;
     private static final int CATALOGO_CONSULTADO_EXITOSAMENTE = 5;
-     private static final int ESTADO_DE_EQUIPO_CAMBIADO = 11;
+    private static final int ESTADO_DE_EQUIPO_CAMBIADO = 11;
     private static final int NUM_SERIE_EXISTENTE = 1004;
     private static final int NUM_SERIE_NO_EXISTE = 1005;
     private static final int INFORMACION_INCOMPLETA_AGREGAR= 1012;
@@ -83,11 +93,13 @@ public class EquipoImagenologiaServiceImpl implements EquipoImagenologiaService{
      * @param registroEvento servicio para registrar eventos
      * @param objtMapper mapper para convertir objetos a JSON
      */
-    public EquipoImagenologiaServiceImpl(AreaDeServicioService areaService, EquipoImagenologiaRepository repository, RegistroEventoService registroEvento,ObjectMapper objtMapper ) {
+    public EquipoImagenologiaServiceImpl(AreaDeServicioService areaService, EquipoImagenologiaRepository repository, RegistroEventoService registroEvento,ObjectMapper objtMapper,JwtService jwtService,UsuarioRepository usuarioRepository ) {
         this.areaService = areaService;
         this.repository = repository;
         this.registroEvento = registroEvento;
         this.objMapper = objtMapper; 
+        this.jwtService = jwtService;
+        this.usuarioRepository = usuarioRepository; 
     }
     
     /**
@@ -98,8 +110,11 @@ public class EquipoImagenologiaServiceImpl implements EquipoImagenologiaService{
      */
     @Transactional(readOnly = true)
     @Override
-    public List<EquipoImagenologiaDTO> consultarTodos(){
-        
+    public List<EquipoImagenologiaDTO> consultarTodos(String token){
+        JwtSessionInfo info = jwtService.parseToken(token);
+        Usuario usuario = recuperarUsuario(info.getNumEmpleado(),info.getCurp());  
+        Map<String, Object> d = datosUsuario(usuario);
+        String datos = "";
         hora =  System.currentTimeMillis();
         List<EquipoImagenologia> equipos = repository.findAll();
         List<EquipoImagenologiaDTO> equiposDTO = new ArrayList();
@@ -108,7 +123,14 @@ public class EquipoImagenologiaServiceImpl implements EquipoImagenologiaService{
             EquipoImagenologiaDTO equipoDTO = convertirDTO(eqp);
             equiposDTO.add(equipoDTO);
         }
-        registroEvento.log(CATALOGO_CONSULTADO_EXITOSAMENTE, APLICACION_CONSULTA, hora, "{}");
+        
+        try {
+                 datos = objMapper.writeValueAsString(d); // JSON correcto
+                 System.out.println(d);
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();  // valor por defecto para no romper la app
+            }
+        registroEvento.log(CATALOGO_CONSULTADO_EXITOSAMENTE, APLICACION_CONSULTA, hora, datos);
         return equiposDTO;
     }   
     
@@ -329,6 +351,17 @@ public class EquipoImagenologiaServiceImpl implements EquipoImagenologiaService{
     return true;
     }
    
+        /**
+      * Registra un cambio de estado en el equipo.
+      *
+      * Si el estado actual y el nuevo estado son diferentes, se construye un mapa con
+      * los valores de estado y se serializa a JSON para registrar el evento
+      * correspondiente en el sistema de logs.
+      * 
+      * @param estadoActual estado en el que se encuentra actualmente el equipo.
+      * @param estadoNuevo  nuevo estado al que se desea cambiar el equipo.
+      */
+   
    
     public void registrarEstado(String estadoActual, String estadoNuevo){        
         if(!estadoActual.equals(estadoNuevo)){
@@ -344,7 +377,71 @@ public class EquipoImagenologiaServiceImpl implements EquipoImagenologiaService{
             }   
         }  
     }
+    
+    /**
+    * Consulta todos los equipos de imagenología asociados al área de servicio
+    * de un usuario identificado por el token proporcionado.
+    *
+    * @param token JWT que contiene la información de sesión del usuario.
+    * @return lista de equipos de imagenología en formato DTO pertenecientes
+    *         al área de servicio del usuario autenticado.
+    */
+ 
+   @Override
+    public List<EquipoImagenologiaDTO> consultarEquipoArea(String token){
+        hora =  System.currentTimeMillis();
+        JwtSessionInfo info = jwtService.parseToken(token);
+        Usuario usuario = recuperarUsuario(info.getNumEmpleado(),info.getCurp());  
+        Map<String, Object> d = datosUsuario(usuario);
+        String datos = ""; 
+        AreaDeServicio area = usuario.getAreaidArea();
+        
+        List<EquipoImagenologia> equipos = repository.findByareaDeServicioidArea(area);
+        List<EquipoImagenologiaDTO> equiposDTO = new ArrayList();
+        for (EquipoImagenologia eqp: equipos){
+            EquipoImagenologiaDTO equipoDTO = convertirDTO(eqp);
+            equiposDTO.add(equipoDTO);
+        }
+        try {
+                 datos = objMapper.writeValueAsString(d); // JSON correcto
+                 System.out.println(d);
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();  // valor por defecto para no romper la app
+            }
+        registroEvento.log(CATALOGO_CONSULTADO_EXITOSAMENTE, APLICACION_CONSULTA, hora, datos);
+        System.out.println(equiposDTO);
+        return equiposDTO;
+    }
+    
+    /**
+    * Recupera un usuario a partir de su número de empleado y CURP.
+    *
+    * @param numEmpleado número de empleado único del usuario.
+    * @param CURP        clave única de registro de población del usuario.
+    * @return el objeto Usuario correspondiente al identificador compuesto.
+    * @throws java.util.NoSuchElementException si el usuario no existe en la base de datos.
+    */
+    public Usuario recuperarUsuario(int numEmpleado, String CURP){
+        UsuarioPK usuarioPK = new UsuarioPK(numEmpleado, CURP);
+        Optional<Usuario> usuarioOptional = usuarioRepository.findById(usuarioPK);
+        return usuarioOptional.get();
+    }
+    
+    
+    /**
+    * Obtiene los datos del usuario en un mapa, incluyendo el número de empleado, CURP y área.
+    * Este método utiliza la información contenida en el objeto `Usuario` para generar el mapa de datos.
+    * 
+    * @param usuario El objeto `Usuario` que contiene la información del usuario.
+    * @return Un mapa con claves y valores correspondientes al número de empleado, CURP y área del usuario para poder 
+    * almacenar estos datos en la base de datos.
+    */
+    public  Map<String, Object> datosUsuario(Usuario usuario){
+        Map<String, Object> datos = new HashMap<>();
+        datos.put("NumEmpleado", usuario.getUsuarioPK().getNumEmpleado());
+        datos.put("CURP", usuario.getUsuarioPK().getCurp());
+        datos.put("Area", usuario.getAreaidArea().getNombre());
+        return datos;
+    }
   
-   
-   
  }

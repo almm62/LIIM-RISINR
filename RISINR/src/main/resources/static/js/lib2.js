@@ -242,6 +242,7 @@ function dateYYYYmmdd() {
 
 //construye una tabla html utilizando la informacion de un arreglo en json
 function CreateTableFromJSON(divnameref, tablename, refhed) {
+    console.log("Creando Tabla desde JSON")
     //console.log(refhed);
     // CREATE DYNAMIC TABLE.
     var table = document.createElement("table");
@@ -292,7 +293,6 @@ function UpdateTableRows(tablename, jsonarray) {
             var tabCell = document.createElement('td');          // TABLE DEFINITION.
             tabCell = tr.insertCell(-1);
             tabCell.innerHTML = jsonarray[i][col[j]];// ADD VALUES TO EACH CELL.
-            console.log(col[j]);
             
         }
     }
