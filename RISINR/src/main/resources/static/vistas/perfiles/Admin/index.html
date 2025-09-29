@@ -4,7 +4,7 @@
         <title>ADM TAB</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="stylesheet" type="text/css" href="../../../css/RIS.css">
+        <link rel="stylesheet" type="text/css" href="/RISSERVER/css/RIS.css">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
         <script src="http://code.jquery.com/jquery-2.2.0.min.js"></script> <!-- CDN de jQuery-->  
        
@@ -19,28 +19,28 @@
 
     <body id="index">
         <section> 
-            <h2 id="h2APP" style="text-align:center">APP RIS</h2>       
+            <h2 id="h2APP">APP RIS</h2>       
             <header>
                 <div class="contenedor-perfil"> 
-                    <p id="usuartioactivonombre" style="color: blue"></p>  
+                    <p id="usuartioactivonombre"></p>  
                 </div>
                 <div class="contenedor-logo">
                     <!--img src="../img/logo.png" alt="logoex" height="65" width="250"-->                        
                     <p></p>
                 </div>
                 <div class="contenedor-logout">
-                    <button id="salir" value="salir" onclick="salir()"> Salir del sistema <!--img src="img/exit_rojo.png" width="30" height="30"--> </button>
+                    <button id="salir" value="salir" class="button button1">Salir del sistema</button> <!--img src="img/exit_rojo.png" width="30" height="30"-->
                 </div>            
             </header>          
 
             <nav>
                 <div class="tab">
-                    <button class="tablinks" onclick="activeTab(event, 'USUARIOSTAB')">Gestión Usuarios</button>
-                    <button class="tablinks" onclick="activeTab(event, 'PERFILESTAB')">Gestión Roles</button>
-                    <button class="tablinks" onclick="activeTab(event, 'AREASTAB')">Gestión Áreas</button>  
-                    <button class="tablinks" onclick="activeTab(event, 'EQUIPOTAB')">Gestión de Equipo</button>
-                    <button class="tablinks" onclick="activeTab(event, 'AGENDAADMIN')">Agendar Estudios</button>
-                    <button id="modulos" class="tablinks" onclick="activeTab(event, 'MODULOSTAB')">Gestión Aplicaciones</button>
+                    <button class="tablinks" data-tab="USUARIOSTAB">Gestión Usuarios</button>
+                    <button class="tablinks" data-tab="PERFILESTAB">Gestión Roles</button>
+                    <button class="tablinks" data-tab="AREASTAB">Gestión Áreas</button>  
+                    <button class="tablinks" data-tab="EQUIPOTAB">Gestión de Equipo</button>
+                    <button class="tablinks" data-tab="AGENDAADMIN">Agendar Estudios</button>
+                    <button id="modulos" class="tablinks" data-tab="MODULOSTAB">Gestión Aplicaciones</button>
                     <!--button class="tablinks" onclick="regresar()">Regresar a aplicación</button-->
                 </div>
             </nav> 
@@ -49,11 +49,8 @@
                     <div id="includedUSRADM"></div>                    
                 </div>
                 <div id="PERFILESTAB" class="tabcontent">
-                    <h2 style="text-align:center">Administración de Perfiles</h2>
+                    <h2>Administración de Perfiles</h2>
                     <div class="flex-container">
-                        <div style="flex-grow: 3; background-color: #fff"></div>
-                        <div style="flex-grow: 3; background-color: #fff"></div>
-                        <div style="flex-grow: 3; background-color: #fff"></div> 
                         <!--button onclick="addProfile(this)" class="button button1" >Agrega nuevo perfil</button--> 
                         <button onclick="addEntityReg(this,'PERFILES')" class="button button1" >Agrega nuevo rol</button>                         
                     </div>  
@@ -61,11 +58,8 @@
                     <div id="showDataProfile" class="scrollcell"></div> 
                 </div>  
                 <div id="AREASTAB" class="tabcontent">
-                    <h2 style="text-align:center">Administración de Áreas de imagenología</h2>
+                    <h2>Administración de Áreas de imagenología</h2>
                     <div class="flex-container">
-                        <div style="flex-grow: 3; background-color: #fff"></div>
-                        <div style="flex-grow: 3; background-color: #fff"></div>
-                        <div style="flex-grow: 3; background-color: #fff"></div> 
                         <!--button onclick="addArea(this)" class="button button1" >Agrega nueva área</button--> 
                         <button onclick="addEntityReg(this,'AREAS')" class="button button1" >Agrega nueva área</button>                        
                     </div>  
@@ -97,21 +91,20 @@
                         <input type="hidden" id="AREArowid" name="AREArowid" value="-1">
                         
                         <!--h2 style="text-align:center; color: #2179FC">Renglon</h2-->
-                        <h1 style="color:#2179FC; text-align: center" >Areas</h1>
+                        <h1>Areas</h1>
                         <hr>
-                        <p style='color:black; text-align: left; padding: 0 0 0 20px;'><b>ID</b></p>
-                        <p style='color:black; text-align: left; padding: 0 0 0 20px' id="areaID">0</p>                        
+                        <p><b>ID</b></p>
+                        <pid="areaID">0</p>                        
 
-                        <p style='color:black; text-align: left; padding: 0 0 0 20px;'><b>Nombre área</b></p>
+                        <p><b>Nombre área</b></p>
                         <input placeholder="INGRESE NOMBRE ÁREA" name="nombrearea" type="text" id="nombrearea" autocomplete="off">
-                        <p style='color:black; text-align: left; padding: 0 0 0 20px;'><b>Descripción</b></p>                        
+                        <p><b>Descripción</b></p>                        
                         <input placeholder="INGRESE DESCRIPCIÓN" name="descarea" type="text" id="descarea" autocomplete="off">                        
                         
                         <div class="flex-container">
-                          <button id="guardarAREAS"  onclick="activamodal('Guardar', this.form)"  class="button button1" style="flex-basis:200px; font-size: 15px;">Actualizar Registro</button>
-                          <button id="agregarAREAS"  onclick="activamodal('Agregar', this.form)"  class="button button1" style="flex-basis:200px; font-size: 15px;">Agregar Registro</button>                          
-                          <button id="cancelarAREAS" onclick="activamodal('Cancelar', this.form)" class="button button1" style="flex-basis:200px; font-size: 15px;">Cancelar</button>                        
-                            
+                            <button id="guardarAREAS"  class="button button1" data-action="Guardar">Actualizar Registro</button>
+                            <button id="agregarAREAS"  class="button button1" data-action="Agregar">Agregar Registro</button>                          
+                            <button id="cancelarAREAS" class="button button1" data-action="Cancelar">Cancelar</button>
                         </div>                         
                     </form>
                     
@@ -131,18 +124,18 @@
                         <input type="hidden" id="rowid" name="rowid" value="-1">
 
                         <!--h2 style="text-align:center; color: #2179FC">Renglon</h2-->
-                        <h1 style="color:#2179FC; text-align: center" >Perfil</h1>
+                        <h1>Perfil</h1>
                         <hr>
-                        <p style='color:black; text-align: left; padding: 0 0 0 20px;'><b>ID</b></p> 
-                        <p style='color:black; text-align: left; padding: 0 0 0 20px' id="profileid">0</p>
+                        <p><b>ID</b></p> 
+                        <pid="profileid">0</p>
                         
                         <!--br> 
                         <p style='color:black; text-align: left; padding: 0 0 0 40px;'><b>Fecha de creación</b></p> 
                         <p style='color:black; text-align: left; padding: 10px 0 0 40px' id="fechacreacion">YYYYMMDD:</p-->
-                        <p style='color:black; text-align: left; padding: 0 0 0 20px;'><b>Nombre</b></p>    
+                        <p><b>Nombre</b></p>    
                         <input type="text" placeholder="INGRESE NOMBRE PERFIL"  id="nom" autocomplete="off">
                         
-                        <p style='color:black; text-align: left; padding: 0 0 0 20px;'><b>Descripción</b></p>    
+                        <p><b>Descripción</b></p>    
                         <input type="text" placeholder="INGRESE DESCRIPCIÓN"  id="desc" autocomplete="off">                        
 
                         <!--p style='color:black; text-align: left; padding: 0 0 0 40px;'><b>Tipo</b></p>            
@@ -158,9 +151,9 @@
                         <label><input type="radio" name="edo" value="2">Bloqueado</label>
                         <label><input type="radio" name="edo" value="3">Suspendido</label-->
                         <div class="flex-container">
-                          <button id="guardarPERFILES"  onclick="activamodal('Guardar', this.form)"  class="button button1" style="flex-basis:200px; font-size: 15px;">Actualizar Registro</button>
-                          <button id="agregarPERFILES"  onclick="activamodal('Agregar', this.form)"  class="button button1" style="flex-basis:200px; font-size: 15px;">Agregar Registro</button>                          
-                          <button id="cancelarPERFILES" onclick="activamodal('Cancelar', this.form)" class="button button1" style="flex-basis:200px; font-size: 15px;">Cancelar</button>                        
+                            <button id="guardarPERFILES"  class="button button1" data-action="Guardar">Actualizar Registro</button>
+                            <button id="agregarPERFILES"  class="button button1" data-action="Agregar">Agregar Registro</button>                          
+                            <button id="cancelarPERFILES" class="button button1" data-action="Cancelar">Cancelar</button>                       
                         </div>                        
                     </form>		
                      
