@@ -438,10 +438,13 @@ function SelRadioButtonTablaUSR(){
 }
 
 async function CrudUSR(e){
+    console.log("Entrando a CrudUSR")
     if(typeof e === "string"){
         accion=e;
+        console.log("Accion por String: "+accion)
     }else{
-    var accion=e.target.id;
+        var accion=e.target.id;
+        console.log("Accion por ID: "+accion)
     }
     switch (accion) {
         case "btnCatUSRtbl":
@@ -711,6 +714,35 @@ $(document).ready(function () {
     $("#includedCatEquipo").load("CatEquipoRIS.html"); // página externa
     $("#includedAgendaADM").load("../../Templates/AgendaRIS.html"); // página externa
     $("#includedUSRADM").load("../../Templates/ModuloUsuarios.html"); // página externa
-   getUsrs(); //roles y areas
- 
+    getUsrs(); //roles y areas 
 });
+
+document.addEventListener("DOMContentLoaded", () => {
+    // === BOTONES PERFILES y AREAS ===
+    const actionButtons = document.querySelectorAll("#guardarPERFILES, #agregarPERFILES, #cancelarPERFILES, #guardarAREAS, #agregarAREAS, #cancelarAREAS");
+
+    actionButtons.forEach(btn => {
+        btn.addEventListener("click", (e) => {
+            const action = btn.dataset.action;   // Guardar / Agregar / Cancelar
+            const form = btn.form;               // obtiene el formulario al que pertenece el botón
+            activamodal(action, form);
+        });
+    });
+
+
+    const salirBtn = document.getElementById("salir");
+
+    salirBtn.addEventListener("click", () => {
+        salir();
+    });
+
+
+});
+
+$(document).on(
+    'click',
+    '#btnCatUSRtbl, #btnAdtUsrtbl, #btnEdtUsrtbl, #actualizaUSUARIO, #nuevoUSUARIO, #cancelarUSUARIO',
+    function (e) {
+      CrudUSR(e);
+    }
+);

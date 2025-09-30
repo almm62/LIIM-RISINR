@@ -38,18 +38,19 @@ body, html {
 
 /* Full-width input fields */
 input[type=text], input[type=password] , input[type=email]{
-    width: 90%;
-    padding: 15px;
-    margin: 5px 0 22px 0;
+    width: 95%;
+    padding: 5px;
+    margin: 5px 0 10px 0;
+    /*border: none;*/
     border: 1px solid #000;
     background: #f1f1f1;
 }
-input[type=text]:focus, input[type=password]:focus, input[type=email]:focus {
+input[type=text]:focus, input[type=password]:focus {
     background-color: #ddd;
     outline: none;
 }
 
-h1 {
+#login h1 {
     color: #ffff00;
     text-align: center;
 }
@@ -97,10 +98,11 @@ button {
   height: 100%; 
   background-color: rgba(0, 0, 0, 0.5);
 }
-.modalUSUARIOS h1{
+/*
+#login .modalUSUARIOS h1{
     color: yellow;
 }
-
+*/
 .modalUSUARIOS-content {
   position: relative; 
   background-color: white;
@@ -173,8 +175,7 @@ button {
     overflow: auto;
 }
 
-
-.footer {
+footer {
   background-color: rgba(88,142,255,.5);
   color: black;
   text-align: center;
@@ -182,10 +183,83 @@ button {
 
 
 /* -------------- ADMIN index.html ------------*/
+#index h2{
+    text-align: center;
+}
 
+.flex-container {
+    display: flex;
+    justify-content: flex-end;
+    background-color: rgba(255,255,255,.5);
+    /*background-color: rgba(128,128,128,0.3);*/
+    align-items: center;
+    gap: 10px;
+}
+.flex-container > div {
+    background-color: #f1f1f1;
+    /*background-color: rgba(255,255,255,.5);*/
+    width: 15px;
+    margin: 5px;
+    /*text-align: left;*/
+    text-align: center;
+    line-height: 20px;
+    font-size: 20px;
+}
 
+.contenedor-perfil p{
+    color: blue;
+}
 
+#Areas h1{
+    color: #2179fc;
+    text-align: center;
+}
 
+#Areas p{
+    color: black;
+    text-align: left;
+    padding: 0 0 0 20px;
+}
+#PERFILES h1{
+    color: #2179fc;
+    text-align: center;
+}
+
+#PERFILES p{
+    color: black;
+    text-align: left;
+    padding: 0 0 0 20px;
+}
+
+/* ------------  Modal Usuarios ------------------*/
+#ModuloUsuarios h1{
+    color: black;
+    text-align: center;
+}
+
+#ModuloUsuarios h2{
+    text-align: center;
+}
+
+#ModuloUsuarios #USUARIOS{
+    color:black; 
+    text-align: left;
+}
+
+#ModuloUsuarios #USUARIOS p{
+    padding: 0 0 0 20px;
+}
+
+#ModuloUsuarios #USUARIOS select{
+    font-size: 14px;
+    padding: 6px;
+}
+
+#ModuloUsuarios #USUARIOS #showDataRol{
+    height: 140px;
+    overflow: auto;
+    padding: 10px 20px 0 20px;
+}
 
 
 
