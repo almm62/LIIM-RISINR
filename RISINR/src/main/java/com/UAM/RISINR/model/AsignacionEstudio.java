@@ -17,7 +17,6 @@ import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 import java.io.Serializable;
 import java.util.Date;
-import org.antlr.v4.runtime.misc.NotNull;
 
 
 @Entity
@@ -31,7 +30,6 @@ public class AsignacionEstudio implements Serializable {
     protected AsignacionEstudioPK asignacionEstudioPK;
     
     @Basic(optional = false)
-    @NotNull
     @Column(name = "Fecha")
     @Temporal(TemporalType.TIMESTAMP)
     private Date fecha;

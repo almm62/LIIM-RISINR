@@ -2,8 +2,6 @@ package com.UAM.RISINR.model;
 
 import java.io.Serializable;
 import java.util.Collection;
-import jakarta.persistence.Basic;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;

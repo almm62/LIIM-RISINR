@@ -14,6 +14,7 @@ import com.UAM.RISINR.repository.AreaDeServicioRepository;
 import com.UAM.RISINR.repository.DatosAccesoRepository;
 import com.UAM.RISINR.repository.PerfilRepository;
 import com.UAM.RISINR.repository.RolRepository;
+import com.UAM.RISINR.repository.SesionRepository;
 import com.UAM.RISINR.repository.UsuarioRepository;
 import com.UAM.RISINR.service.model.JwtSessionInfo;
 import com.UAM.RISINR.service.shared.RegistroEventoService;
@@ -35,6 +36,7 @@ public class UserServiceImpl implements UserService{
     private final AreaDeServicioRepository areaDeServicioRepo;
     private final PerfilRepository perfilRepo;
     private final RolRepository rolRepo;
+    private final SesionRepository sesionRepo;
     private final ObjectMapper objectMapper;
     
     private static final int USER_CREATE_SUCCESS=6;
@@ -53,7 +55,9 @@ public class UserServiceImpl implements UserService{
     private static final int APLICACION_ACTUALIZACION_USUARIOS = 5; // Separar por aplicaciones:
     
     
-public UserServiceImpl(RegistroEventoService registroEvento, UsuarioRepository usuarioRepo, DatosAccesoRepository datosAccesoRepo, AreaDeServicioRepository areaDeServicioRepo, PerfilRepository perfilRepo, RolRepository rolRepo, ObjectMapper objectMapper){
+public UserServiceImpl(RegistroEventoService registroEvento, UsuarioRepository usuarioRepo, DatosAccesoRepository datosAccesoRepo, 
+                        AreaDeServicioRepository areaDeServicioRepo, PerfilRepository perfilRepo, RolRepository rolRepo, 
+                        ObjectMapper objectMapper, SesionRepository sesionRepo){
     this.registroEvento=registroEvento;
     this.areaDeServicioRepo=areaDeServicioRepo;
     this.usuarioRepo=usuarioRepo;
@@ -61,12 +65,31 @@ public UserServiceImpl(RegistroEventoService registroEvento, UsuarioRepository u
     this.perfilRepo=perfilRepo;
     this.rolRepo= rolRepo;
     this.objectMapper=objectMapper;
+    this.sesionRepo = sesionRepo;
     }
 
     @Override
     @Transactional
-    public List<UsuarioResumenDTO> getAll() {
-        var usuarios= usuarioRepo.findAll();
+    public List<UsuarioResumenDTO> getAll(String token) {
+        Usuario sesionUsr= null;
+        String sesionRol = null;
+        List<Usuario> usuarios = null;
+
+        try{
+            //Extaemos datos del token
+            JwtSessionInfo info= objectMapper.readValue(token, JwtSessionInfo.class);
+            var sesPK = sesionRepo.findById(new SesionPK(info.getHoraInicio(),info.getNumEmpleado(), info.getCurp(), info.getAplicacionId()));
+            sesionRol = sesPK.get().getRolNombre();
+            sesionUsr = usuarioRepo.findById(new UsuarioPK(info.getNumEmpleado(), info.getCurp())).get();
+            System.out.println("Hola");
+        }catch (Exception e){
+            
+        }
+        if ("JefedelServicio".equals(sesionRol)){
+            usuarios = usuarioRepo.findByAreaidArea(sesionUsr.getAreaidArea());
+        } else{
+            usuarios = usuarioRepo.findAll();
+        }
         return usuarios.stream()
             .map(this::convertToResumenDTO)
             .collect(Collectors.toList());

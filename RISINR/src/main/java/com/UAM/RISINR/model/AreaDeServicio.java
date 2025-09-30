@@ -1,6 +1,5 @@
 package com.UAM.RISINR.model;
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import java.io.Serializable;
 import java.util.Collection;
 import jakarta.persistence.Basic;

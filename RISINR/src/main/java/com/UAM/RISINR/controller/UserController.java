@@ -28,7 +28,12 @@ public class UserController {
     
     @GetMapping("/getAll")
     public ResponseEntity<List<UsuarioResumenDTO>> getAll(HttpServletRequest httpReq) {
-        List<UsuarioResumenDTO> resp=userService.getAll();
+        var auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || auth.getPrincipal() == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        String subjectJson = (String) auth.getPrincipal();
+        List<UsuarioResumenDTO> resp=userService.getAll(subjectJson);
         return ResponseEntity.ok(resp);
     }
 
