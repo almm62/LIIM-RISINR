@@ -9,11 +9,13 @@ import com.UAM.RISINR.exceptions.ResourceNotFoundException;
 import com.UAM.RISINR.exceptions.ResourceFoundException;
 import com.UAM.RISINR.model.AreaDeServicio;
 import com.UAM.RISINR.model.EquipoImagenologia;
+import com.UAM.RISINR.model.SesionPK;
 import com.UAM.RISINR.model.Usuario;
 import com.UAM.RISINR.model.UsuarioPK;
 import com.UAM.RISINR.model.dto.equipoImagenologia.EquipoImagenologiaDTO;
 import com.UAM.RISINR.model.dto.equipoImagenologia.EquipoImagenologiaRequest;
 import com.UAM.RISINR.repository.EquipoImagenologiaRepository;
+import com.UAM.RISINR.repository.SesionRepository;
 import com.UAM.RISINR.repository.UsuarioRepository;
 import com.UAM.RISINR.service.areaDeServicio.AreaDeServicioService;
 import com.UAM.RISINR.service.equipoImagenologia.EquipoImagenologiaService;
@@ -27,7 +29,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.springframework.stereotype.Service;
@@ -50,7 +51,10 @@ public class EquipoImagenologiaServiceImpl implements EquipoImagenologiaService{
     private final AreaDeServicioService areaService; 
     
     /** Repositorio de equipos de imagenología */
-    private final EquipoImagenologiaRepository repository; 
+    private final EquipoImagenologiaRepository repository;
+
+    /** Repositorio que permite recuperar datos de la sesión activa */
+    private final SesionRepository sesionRepo;
     
     /** Servicio para registrar eventos */
     private final RegistroEventoService registroEvento; 
@@ -93,13 +97,16 @@ public class EquipoImagenologiaServiceImpl implements EquipoImagenologiaService{
      * @param registroEvento servicio para registrar eventos
      * @param objtMapper mapper para convertir objetos a JSON
      */
-    public EquipoImagenologiaServiceImpl(AreaDeServicioService areaService, EquipoImagenologiaRepository repository, RegistroEventoService registroEvento,ObjectMapper objtMapper,JwtService jwtService,UsuarioRepository usuarioRepository ) {
+    public EquipoImagenologiaServiceImpl(AreaDeServicioService areaService, EquipoImagenologiaRepository repository, 
+                                        RegistroEventoService registroEvento,ObjectMapper objtMapper,JwtService jwtService,
+                                        UsuarioRepository usuarioRepository, SesionRepository sesionRepo) {
         this.areaService = areaService;
         this.repository = repository;
         this.registroEvento = registroEvento;
         this.objMapper = objtMapper; 
         this.jwtService = jwtService;
-        this.usuarioRepository = usuarioRepository; 
+        this.usuarioRepository = usuarioRepository;
+        this.sesionRepo = sesionRepo;
     }
     
     /**
@@ -111,12 +118,30 @@ public class EquipoImagenologiaServiceImpl implements EquipoImagenologiaService{
     @Transactional(readOnly = true)
     @Override
     public List<EquipoImagenologiaDTO> consultarTodos(String token){
-        JwtSessionInfo info = jwtService.parseToken(token);
-        Usuario usuario = recuperarUsuario(info.getNumEmpleado(),info.getCurp());  
-        Map<String, Object> d = datosUsuario(usuario);
+        Usuario sesionUsr= null;
+        String sesionRol = null;
+        List<EquipoImagenologia> equipos = null;
+
+        try{
+            //Extaemos datos del token
+            JwtSessionInfo info= objMapper.readValue(token, JwtSessionInfo.class);
+            var sesPK = sesionRepo.findById(new SesionPK(info.getHoraInicio(),info.getNumEmpleado(), info.getCurp(), info.getAplicacionId()));
+            sesionRol = sesPK.get().getRolNombre();
+            sesionUsr = usuarioRepository.findById(new UsuarioPK(info.getNumEmpleado(), info.getCurp())).get();
+            System.out.println("Extraccion de Token correcta");
+        }catch (Exception e){
+            
+        }
+        Map<String, Object> d = datosUsuario(sesionUsr);
         String datos = "";
         hora =  System.currentTimeMillis();
-        List<EquipoImagenologia> equipos = repository.findAll();
+        // Jefe de Servicio hace consulta
+
+        if ("JefedelServicio".equals(sesionRol)){
+            equipos = repository.findByareaDeServicioidArea(sesionUsr.getAreaidArea());
+        } else{
+            equipos = repository.findAll();
+        }
         List<EquipoImagenologiaDTO> equiposDTO = new ArrayList();
         
         for (EquipoImagenologia eqp: equipos){
@@ -376,55 +401,6 @@ public class EquipoImagenologiaServiceImpl implements EquipoImagenologiaService{
                 Logger.getLogger(EquipoImagenologiaServiceImpl.class.getName()).log(Level.SEVERE, null, ex);
             }   
         }  
-    }
-    
-    /**
-    * Consulta todos los equipos de imagenología asociados al área de servicio
-    * de un usuario identificado por el token proporcionado.
-    *
-    * @param token JWT que contiene la información de sesión del usuario.
-    * @return lista de equipos de imagenología en formato DTO pertenecientes
-    *         al área de servicio del usuario autenticado.
-    */
- 
-   @Override
-    public List<EquipoImagenologiaDTO> consultarEquipoArea(String token){
-        hora =  System.currentTimeMillis();
-        JwtSessionInfo info = jwtService.parseToken(token);
-        Usuario usuario = recuperarUsuario(info.getNumEmpleado(),info.getCurp());  
-        Map<String, Object> d = datosUsuario(usuario);
-        String datos = ""; 
-        AreaDeServicio area = usuario.getAreaidArea();
-        
-        List<EquipoImagenologia> equipos = repository.findByareaDeServicioidArea(area);
-        List<EquipoImagenologiaDTO> equiposDTO = new ArrayList();
-        for (EquipoImagenologia eqp: equipos){
-            EquipoImagenologiaDTO equipoDTO = convertirDTO(eqp);
-            equiposDTO.add(equipoDTO);
-        }
-        try {
-                 datos = objMapper.writeValueAsString(d); // JSON correcto
-                 System.out.println(d);
-            } catch (JsonProcessingException e) {
-                e.printStackTrace();  // valor por defecto para no romper la app
-            }
-        registroEvento.log(CATALOGO_CONSULTADO_EXITOSAMENTE, APLICACION_CONSULTA, hora, datos);
-        System.out.println(equiposDTO);
-        return equiposDTO;
-    }
-    
-    /**
-    * Recupera un usuario a partir de su número de empleado y CURP.
-    *
-    * @param numEmpleado número de empleado único del usuario.
-    * @param CURP        clave única de registro de población del usuario.
-    * @return el objeto Usuario correspondiente al identificador compuesto.
-    * @throws java.util.NoSuchElementException si el usuario no existe en la base de datos.
-    */
-    public Usuario recuperarUsuario(int numEmpleado, String CURP){
-        UsuarioPK usuarioPK = new UsuarioPK(numEmpleado, CURP);
-        Optional<Usuario> usuarioOptional = usuarioRepository.findById(usuarioPK);
-        return usuarioOptional.get();
     }
     
     

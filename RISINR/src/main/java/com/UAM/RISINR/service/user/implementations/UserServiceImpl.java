@@ -106,9 +106,9 @@ public UserServiceImpl(RegistroEventoService registroEvento, UsuarioRepository u
             //Extaemos datos del token
             JwtSessionInfo info= objectMapper.readValue(token, JwtSessionInfo.class);
             var datosObj= new EventoDatos(dto, new SesionPK(info.getHoraInicio(),
-                                                                                                                                info.getNumEmpleado(),
-                                                                                                                                info.getCurp(),
-                                                                                                                                info.getAplicacionId())
+                                                            info.getNumEmpleado(),
+                                                            info.getCurp(),
+                                                            info.getAplicacionId())
                                                                             );
             datos=objectMapper.writeValueAsString(datosObj); //Json Listo para registrar cualquier evento
             System.out.println("Hola");
