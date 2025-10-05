@@ -2,7 +2,6 @@
 window._loginCache = null;
 var host = "http://" + location.host+"/RISSERVER/";
 var FSM2;
-var contador_intentos=0;
 
 
 function agregarPreloader(servicio) {
