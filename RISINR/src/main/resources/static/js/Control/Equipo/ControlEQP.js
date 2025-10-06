@@ -349,10 +349,3 @@ $(document).on('change', '#areEqp', function (e) {
 });
 
 
-window.onload = function () {
-    //$().ready(function () {   
-    console.log("Cosntruyendo pagina EQP 3");
-    //dragElement(document.getElementById("mymodalEquipoRIS")); //modal que se puede arrastrar cabecera
-    //html_disableItem('btnDelEqptbl', false,'#cccccc','#ffffff');
-};
-//});
