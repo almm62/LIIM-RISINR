@@ -1,5 +1,6 @@
 
 function activeTab(evt, opcionMenu) {
+    console.log(`Creando tabla ${opcionMenu}`)
     var i, tabcontent, tablinks;
     //console.log(evt.currentTarget);
     tabcontent = document.getElementsByClassName("tabcontent");
@@ -13,8 +14,9 @@ function activeTab(evt, opcionMenu) {
     }
 
     document.getElementById(opcionMenu).style.display = "block";
-    strtablinks = evt.currentTarget.className;
-    if (strtablinks === "tablinks")
+    tablinks = evt.currentTarget.className;
+    console.log(tablinks)
+    if (tablinks === "tablinks")
         evt.currentTarget.className += " active";//solo para la clase del menu
     if(opcionMenu==='USUARIOSTAB'){
         CrudUSR('btnCatUSRtbl');

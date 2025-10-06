@@ -271,6 +271,9 @@ footer {
     font-size: 20px;
 }
 
+.flex-container button{
+    background-color: rgba(88,142,255,.5);
+}
 .contenedor-perfil p{
     color: blue;
 }
