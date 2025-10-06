@@ -2,7 +2,7 @@
     {"estado": [
       {
         "id": "INGRESAR",
-        "vista": "MenuJefeDeServicio.html",
+        "vista": "index.html",
         "accedo": "login"
       }
     ],

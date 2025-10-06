@@ -737,18 +737,3 @@ function POSTForDataFiles(formData, servicio) {
     }).always(function (jqXHROrData, textStatus, jqXHROrErrorThrown) {
     });
 }
-
-
-// Espera a que todo el DOM esté cargado antes de ejecutar
-document.addEventListener("DOMContentLoaded", () => {
-    // Selecciona todos los botones que tengan la clase "tablinks"
-    const tabButtons = document.querySelectorAll(".tablinks");
-
-    // A cada botón le asignamos un addEventListener
-    tabButtons.forEach(btn => {
-        btn.addEventListener("click", (event) => {
-            const tabName = btn.dataset.tab; // lee el atributo data-tab del botón
-            activeTab(event, tabName);       // llama a tu función pasando el tab correspondiente
-        });
-    });
-});

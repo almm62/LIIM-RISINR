@@ -10,6 +10,11 @@ body, html {
     background: #FFFFFF; /* Color de fondo de la pagina*/
     font-family: 'Open Sans', sans-serif;	/* Tipo de letra, principal 'Open Sans', secundaria 'sans-serif' */
 }
+
+main{
+    background-color: white;
+    min-height: 690px; 
+ }
 /* ---------- Header ----------- */
 header {
 	/*padding: 20px;*/
