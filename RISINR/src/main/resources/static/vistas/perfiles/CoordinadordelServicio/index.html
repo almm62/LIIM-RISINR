@@ -8,9 +8,6 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
   <script src="http://code.jquery.com/jquery-2.2.0.min.js"></script> <!-- CDN de jQuery-->
   <script src="../../../js/main.js"></script>
-  <script src="../../../js/lib2.js"></script>
-  <script src="../../../js/Control/Usuarios/UsuariosPG2.js"></script>
-  <script src="../../../js/Control/Equipo/ControlEQP.js"></script>
   <script src="../../../js/sessionWatch.js"></script>
   <script>
       sessionWatcher.init();
@@ -22,18 +19,13 @@
   <!-- DECLARAMOS AQUÍ los botones del menú -->
   <template id="menuButtons">
     <button class="tablinks" data-tab="USUARIOSTAB">Gestión Usuarios</button>
-    <button class="tablinks" data-tab="EQUIPOTAB">Gestión de Equipo</button>
   </template>
 
 
   <main>
+    <h1>Perfil de Coordinador del Servicio</h1>
     <div id="USUARIOSTAB" class="tabcontent">
       <div id="includedUSRADM"></div>                    
-    </div>
-
-    <div id="EQUIPOTAB" class="tabcontent">
-      <!--Página con referencia externa, ver UsuariosPG.js (carga incial de pagina)-->
-      <div id="includedCatEquipo"></div>
     </div>
   </main>
 

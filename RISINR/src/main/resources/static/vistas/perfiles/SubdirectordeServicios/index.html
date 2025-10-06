@@ -5,16 +5,30 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Página ADMIN</title>
   <link rel="stylesheet" href="../../../css/RIS.css">
-  <script src="http://code.jquery.com/jquery-2.2.0.min.js"></script> <!-- CDN de jQuery-->  
-  <script src="../../../js/Loaders.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <script src="http://code.jquery.com/jquery-2.2.0.min.js"></script> <!-- CDN de jQuery-->
+  <script src="../../../js/main.js"></script>
   <script src="../../../js/sessionWatch.js"></script>
+  <script>
+      sessionWatcher.init();
+  </script>
 </head>
 <body>
+  <!-- En este div se cargarán los botones -->
   <div id="header"></div>
+  <!-- DECLARAMOS AQUÍ los botones del menú -->
+  <template id="menuButtons">
+    <button class="tablinks" data-tab="EQUIPOTAB">Gestión de Equipo</button>
+  </template>
+
 
   <main>
-    <h1>Subdirector de Servicios</h1>
+    <h1>Perfil de Subdirector de Servicios</h1>
+    <div id="EQUIPOTAB" class="tabcontent">
+      <div id="includedCatEquipo"></div>
+    </div>
   </main>
+
 
   <div id="footer"></div>
 </body>
