@@ -73,6 +73,57 @@ function avisoBtn(e, tabName){
   alert(`Boton ${tabName}`)
 }
 
+async function getUsrs() {
+  console.log("Primer paso getUsrs")
+  var colsArea = ["Referencia", "Área", "Descripción"];
+  var pArea = getTBL(uriserv + "/initial/getAreas", "showDataArea", "tblareas", colsArea);
+
+  console.log("Segundo paso get Usrs")
+  var colsRol = ["Referencia", "Perfil", "Descripción"];
+  var pRol = getTBL(uriserv + "/initial/getRoles", "showDataProfile", "tblroles", colsRol);
+
+  console.log("Lanzando ambas peticiones…");
+  try {
+      const [areaRes, rolRes] = await Promise.all([pArea, pRol]); // {rows, count} cada uno, hay que quedarnos solo con nombres
+      
+      const areaObjs = (areaRes.rows || []).map(item => 
+          typeof item === 'string' ? JSON.parse(item) : item
+          );
+      const nombresAreas = areaObjs.map(a => a.nombreArea);
+      console.log(areaObjs, nombresAreas);
+      
+      const rolObjs= (rolRes.rows || []).map(item => 
+          typeof item ==="string" ? JSON.parse(item):item
+          );
+      const nombresRoles = rolObjs.map(r => r.nombre);
+      console.log(rolObjs,nombresRoles)
+      // === TABLA ÁREAS (ya creada por getTBL) ===
+      tableViewFormat("tblareas", 3, 4);           // columnas edición/borrado
+      tableHeaderSelection("tblareas", [1, 2]);    // ordenar por cabecera
+      // Llenar listbox de áreas en modal de usuarios
+      UpdateListBox("perf2", areaObjs, 0, 1); 
+
+      // === TABLA ROLES (ya creada por getTBL) ===
+      tableViewFormat("tblroles", 3, 4);
+      tableHeaderSelection("tblroles", [1, 2]);
+
+      // Tabla extra de roles en el diálogo modal
+      CreateTableFromJSON("showDataRol", "roles", colsRol);
+      UpdateTableRows("roles", rolObjs);
+
+      const chkTpl = "<input type='checkbox' name='perfilapp'>";
+      insertColumnK("roles", 3, "Selección", "Opción: ");
+      updateTableColumns("roles", 3, chkTpl);
+
+      backGroundColor("roles", "rgba(88,142,255,.5)", "#000000", "#7F7F7F", "#FFFFFF");
+      rowColor("roles", "#00FFFF", "#000000", "#7F7F7F", "#FFFFFF", "#ffffff", "#000000");
+
+  } catch (e) {
+      console.error("Fallo al cargar tablas:", e);
+      alert("No se pudieron cargar las tablas.");
+  }
+}
+
 // --- Cuando la página cargue ---
 window.onload = async function () {
   nobackbutton();  // Bloquea botón atrás en esta vista
@@ -103,4 +154,6 @@ window.onload = async function () {
           activeTab(event, tabName);       // llama a tu función pasando el tab correspondiente
       });
   });
+
+  getUsrs(); //Obtiene Roles y Areas
 };

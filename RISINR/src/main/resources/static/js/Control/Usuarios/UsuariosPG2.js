@@ -312,77 +312,13 @@ function deleteRegister(cel, tablename) {
 //***********************************
 
 
-//FUNCIONES PARA INVALIDAR NAVEGACION ENTRE  PAGINAS
-function preventBack() {
-    window.history.forward();
-}
 
-setTimeout("preventBack()", 0);
 
-window.onunload = function () {
-    null;
-};
 
-function nobackbutton() {
-    window.location.hash = "no-back-button";
-    window.location.hash = "Again-No-back-button";
-    window.onhashchange = function () {
-        window.location.hash = "no-back-button";
-    };
-}
 //
 
-function regresar() {
-    //invalidar los botones de navegación.
-    window.location = host + 'MainPageRes.html';
-}
-
-function salir() {
-  var tc = 'Normal';
-
-  $.ajax({
-    url: '/RISSERVER/access/logout?tipoCierre=' + encodeURIComponent(tc),
-    type: 'POST',
-    // No body ni headers necesarios
-    success: function () {
-      // ok, el backend marcó horaFin/tipoCierre y borró cookie
-    },
-    statusCode: {
-      401: function () { console.warn('Logout 401: no autenticado'); },
-      404: function () { console.warn('Logout 404: sesión no encontrada'); }
-    },
-    error: function (xhr) {
-      console.error('Error en logout', xhr.status);
-    },
-    complete: function () {
-      // Limpieza del lado cliente, pase lo que pase
-      document.cookie = 'token=; Max-Age=0; Path=/; SameSite=Lax';
-      sessionStorage.removeItem('token');
-      window.location = host + 'login.html';
-    }
-  });
-}
-
-function getsession() {
-    $.ajax({
-        url: uriserv + '/session',
-        type: 'GET', // Tipo de envio 
-        dataType: 'json' //Tipo de Respuesta
-    }).done(function (data, textStatus, jqXHR) {
-        console.log(data);
-        document.getElementById("usuartioactivonombre").innerHTML = data.nombre + " , " + data.area + " , " + data.perfil;
-    }).fail(function (jqXHR, textStatus, errorThrown) {
-        //alert("espera");
-        window.location = host + 'login.html';
-    });
-}
 
 
-function actualizaPerfilSeleccionado(e) {
-    var lixboxseltxt = document.getElementById("perf2")[e].innerText;
-    document.getElementById("perfil").innerHTML = "Selección: " + lixboxseltxt;
-    //perfilupdate.value=lixboxseltxt; //opcion default;
-}
 
 
 
@@ -611,56 +547,6 @@ async function CrudUSR(e){
     }
 }
 
-async function getUsrs() {
-    console.log("Primer paso getUsrs")
-    var colsArea = ["Referencia", "Área", "Descripción"];
-    var pArea = getTBL(uriserv + "/initial/getAreas", "showDataArea", "tblareas", colsArea);
-
-    console.log("Segundo paso get Usrs")
-    var colsRol = ["Referencia", "Perfil", "Descripción"];
-    var pRol = getTBL(uriserv + "/initial/getRoles", "showDataProfile", "tblroles", colsRol);
-
-    console.log("Lanzando ambas peticiones…");
-    try {
-        const [areaRes, rolRes] = await Promise.all([pArea, pRol]); // {rows, count} cada uno, hay que quedarnos solo con nombres
-        
-        const areaObjs = (areaRes.rows || []).map(item => 
-            typeof item === 'string' ? JSON.parse(item) : item
-            );
-        const nombresAreas = areaObjs.map(a => a.nombreArea);
-        console.log(nombresAreas);
-        
-        const rolObjs= (rolRes.rows || []).map(item => 
-            typeof item ==="string" ? JSON.parse(item):item
-            );
-        const nombresRoles = rolObjs.map(r => r.nombre);
-        console.log(nombresRoles)
-        // === TABLA ÁREAS (ya creada por getTBL) ===
-        tableViewFormat("tblareas", 3, 4);           // columnas edición/borrado
-        tableHeaderSelection("tblareas", [1, 2]);    // ordenar por cabecera
-        // Llenar listbox de áreas en modal de usuarios
-        UpdateListBox("perf2", areaObjs, 0, 1); 
-
-        // === TABLA ROLES (ya creada por getTBL) ===
-        tableViewFormat("tblroles", 3, 4);
-        tableHeaderSelection("tblroles", [1, 2]);
-
-        // Tabla extra de roles en el diálogo modal
-        CreateTableFromJSON("showDataRol", "roles", colsRol);
-        UpdateTableRows("roles", rolObjs);
-
-        const chkTpl = "<input type='checkbox' name='perfilapp'>";
-        insertColumnK("roles", 3, "Selección", "Opción: ");
-        updateTableColumns("roles", 3, chkTpl);
-
-        backGroundColor("roles", "rgba(88,142,255,.5)", "#000000", "#7F7F7F", "#FFFFFF");
-        rowColor("roles", "#00FFFF", "#000000", "#7F7F7F", "#FFFFFF", "#ffffff", "#000000");
-
-    } catch (e) {
-        console.error("Fallo al cargar tablas:", e);
-        alert("No se pudieron cargar las tablas.");
-    }
-}
 
 $(document).on(
     'click',
