@@ -328,7 +328,6 @@ function SelRadioButtonTablaUSR(){
 }
 
 async function CrudUSR(e){
-    await loadHTML("includedUSRADM", "../../Templates/ModuloUsuarios.html")
     console.log("Entrando a CrudUSR")
     if(typeof e === "string"){
         accion=e;
@@ -496,7 +495,7 @@ async function CrudUSR(e){
                 } finally{
                     cambiaEstadoModal(".modalUSUARIOS", false);
                     document.getElementById("USUARIOS").reset(); //Borra datos del formulario
-                    CrudUSR('btnCatUSRtbl');
+                    await CrudUSR('btnCatUSRtbl');
                 }
                 
             } 
@@ -537,7 +536,7 @@ async function CrudUSR(e){
                     } finally{
                         cambiaEstadoModal(".modalUSUARIOS", false);
                         document.getElementById("USUARIOS").reset(); //Borra datos del formulario
-                        CrudUSR('btnCatUSRtbl');
+                        await CrudUSR('btnCatUSRtbl');
                     }
                 } else {
                     alert("Seleccione un registro de la tabla");
@@ -555,3 +554,43 @@ $(document).on(
       CrudUSR(e);
     }
 );
+
+async function getUsrs() {
+    var colsRol = ["Referencia", "Perfil", "Descripción"];
+    
+    console.log("Primer paso getUsrs getAreas")
+    pArea = await getServicio(uriserv + "/initial/getAreas");
+    console.log(pArea)
+    console.log("Segundo paso getUsrs getRoles")
+    pRol = await getServicio(uriserv + "/initial/getRoles");
+    console.log(pRol)
+  
+    console.log("Lanzando ambas peticiones…");
+    try {
+        const areaObjs = pArea.map(item => JSON.parse(item));
+        const rolObjs  = pRol.map(item => JSON.parse(item));
+        const nombresAreas = areaObjs.map(a => a.nombreArea);
+        console.log(areaObjs, nombresAreas);
+        const nombresRoles = rolObjs.map(r => r.nombre);
+        console.log(rolObjs,nombresRoles)
+  
+        // Llenar select de áreas en modal de usuarios
+        UpdateListBox("perf2", areaObjs, 0, 1); 
+        // Tabla extra de roles en el diálogo modal
+        CreateTableFromJSON("showDataRol", "roles", colsRol);
+        UpdateTableRows("roles", rolObjs);
+  
+        const chkTpl = "<input type='checkbox' name='perfilapp'>";
+        insertColumnK("roles", 3, "Selección", "Opción: ");
+        updateTableColumns("roles", 3, chkTpl);
+  
+        backGroundColor("roles", "rgba(88,142,255,.5)", "#000000", "#7F7F7F", "#FFFFFF");
+        rowColor("roles", "#00FFFF", "#000000", "#7F7F7F", "#FFFFFF", "#ffffff", "#000000");
+
+        await CrudUSR("btnCatUSRtbl")
+  
+    } catch (e) {
+        console.error("Fallo al cargar tablas:", e);
+        alert("No se pudieron cargar las tablas.");
+    }
+  }

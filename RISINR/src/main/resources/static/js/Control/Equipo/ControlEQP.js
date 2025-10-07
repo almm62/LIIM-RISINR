@@ -334,12 +334,6 @@ $(document).on('click', '#agregarEQPRIS', function (e) {
 });
 
 
-//Salir
-
-$(document).on('click', '#salir', function (e) {
-  salir();
-});
-
 $(document).on('change', '#edoEqp', function (e) {
    updatePKSEqp(e);
 });
