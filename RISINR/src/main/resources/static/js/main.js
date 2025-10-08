@@ -69,23 +69,18 @@ function nobackbutton() {
   };
 }
 
-function avisoBtn(e, tabName){
-  alert(`Boton ${tabName}`)
-}
-
 // Método que carga plantillas y ejecuta lo inicial
 async function inicial(e, tabName){
   switch(tabName){
     case "USUARIOSTAB":
       console.log("Entro a USUARIOSTAB");
-      await loadHTML("includedUSRADM", "../../Templates/ModuloUsuarios.html");
+      await loadHTML("includeTBL", "../../Templates/ModuloUsuarios.html");
       await getUsrs();
       break;
     
     case "EQUIPOTAB":
       console.log("Entro a EQUIPOTAB");
-      await loadHTML("includedCatEquipo", "../../Templates/CatEquipoRIS.html");
-      alert("HOLAAA")
+      await loadHTML("includeTBL", "../../Templates/CatEquipoRIS.html");
       break;
     
     default:
