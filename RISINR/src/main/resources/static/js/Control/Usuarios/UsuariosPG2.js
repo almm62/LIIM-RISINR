@@ -323,19 +323,20 @@ function deleteRegister(cel, tablename) {
 
 
 function SelRadioButtonTablaUSR(){
-    html_VisibleElement("btnAdtUsrtbl");
     html_VisibleElement("btnEdtUsrtbl");
 }
 
 async function CrudUSR(e){
-    console.log("Entrando a CrudUSR")
-    if(typeof e === "string"){
-        accion=e;
-        console.log("Accion por String: "+accion)
-    }else{
-        var accion=e.target.id;
-        console.log("Accion por ID: "+accion)
+    const btn  = e.target
+    var rol    = btn.dataset.rol
+    if (rol==="JS"){
+        html_HideElement("btnAdtUsrtbl")
     }
+    var accion = btn.id; //Botones arriba de la tabla
+    if (!accion){
+        var accion = btn.dataset.accion //Boton del menú
+    }
+    console.log("Accion por ID: "+accion)
     switch (accion) {
         case "btnCatUSRtbl":
         //alert("Por implementar");
@@ -362,7 +363,6 @@ async function CrudUSR(e){
                   tableHeaderSelection(tabladatosUSR, [1, 2, 3, 4, 5, 6]);
                   addRadioButtonColumnPKTBL(tabladatosUSR, 9, roweditarUSR, coleditarUSR, actionListenerUSR, columnaPKUSR); //columna 5 PK RFC
                   tableRowColorCellSelectionKlib(tabladatosUSR);
-                //console.log(data); //los datos llegan como un arreglo de cadenas ordenadas como se presentaran en la tabla
                 
             }).fail(function (jqXHR, textStatus, errorThrown) {
                 alert("Error al recuperar informacion " + errorThrown);
@@ -546,33 +546,19 @@ async function CrudUSR(e){
     }
 }
 
-
-$(document).on(
-    'click',
-    '#btnCatUSRtbl, #btnAdtUsrtbl, #btnEdtUsrtbl, #actualizaUSUARIO, #nuevoUSUARIO, #cancelarUSUARIO',
-    function (e) {
-      CrudUSR(e);
-    }
-);
-
-async function getUsrs() {
+async function getUsrs(e) {
+    await CrudUSR(e)
     var colsRol = ["Referencia", "Perfil", "Descripción"];
     
     console.log("Primer paso getUsrs getAreas")
     pArea = await getServicio(uriserv + "/initial/getAreas");
-    console.log(pArea)
     console.log("Segundo paso getUsrs getRoles")
     pRol = await getServicio(uriserv + "/initial/getRoles");
-    console.log(pRol)
-  
-    console.log("Lanzando ambas peticiones…");
     try {
         const areaObjs = pArea.map(item => JSON.parse(item));
         const rolObjs  = pRol.map(item => JSON.parse(item));
         const nombresAreas = areaObjs.map(a => a.nombreArea);
-        console.log(areaObjs, nombresAreas);
         const nombresRoles = rolObjs.map(r => r.nombre);
-        console.log(rolObjs,nombresRoles)
   
         // Llenar select de áreas en modal de usuarios
         UpdateListBox("perf2", areaObjs, 0, 1); 
@@ -586,11 +572,22 @@ async function getUsrs() {
   
         backGroundColor("roles", "rgba(88,142,255,.5)", "#000000", "#7F7F7F", "#FFFFFF");
         rowColor("roles", "#00FFFF", "#000000", "#7F7F7F", "#FFFFFF", "#ffffff", "#000000");
-
-        await CrudUSR("btnCatUSRtbl")
   
     } catch (e) {
         console.error("Fallo al cargar tablas:", e);
         alert("No se pudieron cargar las tablas.");
     }
-  }
+}
+
+
+function asignaEventosUSRS(e){
+    console.log("Entró a asignar Eventos")
+    const rol = e.target.dataset.rol;
+    const crudButtons = document.querySelectorAll(".crud");
+    crudButtons.forEach(btn => {
+        btn.dataset.rol = rol;
+        btn.addEventListener("click", (event) => {
+            CrudUSR(event);
+        });
+    });
+}

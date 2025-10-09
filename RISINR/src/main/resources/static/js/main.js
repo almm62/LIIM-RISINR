@@ -70,17 +70,21 @@ function nobackbutton() {
 }
 
 // Método que carga plantillas y ejecuta lo inicial
-async function inicial(e, tabName){
+async function inicial(e){
+  var tabName = e.target.dataset.tab;
+  console.log(tabName)
   switch(tabName){
     case "USUARIOSTAB":
       console.log("Entro a USUARIOSTAB");
       await loadHTML("includeTBL", "../../Templates/ModuloUsuarios.html");
-      await getUsrs();
+      await getUsrs(e);
+      asignaEventosUSRS(e);
       break;
     
     case "EQUIPOTAB":
       console.log("Entro a EQUIPOTAB");
       await loadHTML("includeTBL", "../../Templates/CatEquipoRIS.html");
+      asignaEventosEQP(e);
       break;
     
     default:
@@ -113,8 +117,7 @@ window.onload = async function () {
   // A cada botón se le asigna un addEventListener
   tabButtons.forEach(btn => {
       btn.addEventListener("click", (event) => {
-          const tabName = btn.dataset.tab; // lee el atributo data-tab del botón
-          inicial(event, tabName);       // llama a función inicial del tab correspondiente
+          inicial(event);       // llama a función inicial del tab correspondiente
       });
   });
 };

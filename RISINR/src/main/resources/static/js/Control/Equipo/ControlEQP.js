@@ -9,21 +9,24 @@ function activaBotonesEQP(table, bandera) {
 
 
 function evaluaRadioButtonTablaPK0(tabla, colPK) {
-    html_VisibleElement("btnAddEqptbl");
     html_VisibleElement("btnEdtEqptbl");
-    html_VisibleElement("btnDelEqptbl");
 }
 
 function barraBotonesEQP(e) {
+    const btn  = e.target;
+    var rol    = btn.dataset.rol;
+    if (rol==="JS"){
+        html_HideElement("btnAddEqptbl");
+    }
     var opc = e.target.id;
+    if (!opc){
+        var opc = btn.dataset.accion //Boton del menú
+    }
     console.log("selección: " + opc);
     switch (opc) {
         case 'btnCatEqptbl':
-            readTblsEQP(1);
-            break;
-            
-        case 'btnCatEqpAreatbl':
-            readTblsEQP(2);
+            html_HideElement("btnEdtEqptbl");
+            readTblsEQP();
             break;
         case 'btnAddEqptbl':
             var tablaref = "Eqptbl";
@@ -112,7 +115,7 @@ function updatePKSEqp(e) {
     }
 }
 
-function readTblsEQP(opc) {
+function readTblsEQP() {
     var divtable = "showDataEQP";
     var tabladatos = "Eqptbl";
     var columnaedicion = 9;
@@ -131,32 +134,20 @@ function readTblsEQP(opc) {
     CreateTableFromJSON(divtable, tabladatos, cabecerapac); //parametros referencia div, nombre tabla , cabecera
     //var getEquipoimg = postRestService(uriserv + "/EquipoImagenologia/requestALL", jsonData);
      //var getEquipoimg = postRestServiceFetch(jsonData, uriserv + "/EquipoImagenologia/requestALL");
-     var getEquipoimg;
-     switch (opc) {
-        case 1:
-            console.log("entró al caso 1");
-            getEquipoimg = getServicio(uriserv +"/EquipoImagenologia/requestALL"); 
-            console.log("SALIO DEL POST");
-            //getEquipoimg = postRestServiceFetch(jsonData, uriserv + "/EquipoImagenologia/requestALL",'POST');
-            break;
-            
-        case 2:
-            console.log("entró al caso 2");
-            getEquipoimg = getServicio(uriserv +"/EquipoImagenologia/consultaEquiposArea"); 
-            //getEquipoimg = getRestServiceFetch(uriserv + "/EquipoImagenologia/consultaEquiposArea",'GET');
-            break;
-    }
+    var getEquipoimg;
+    getEquipoimg = getServicio(uriserv +"/EquipoImagenologia/requestALL"); 
+    console.log("SALIO DEL POST");
      
      
     getEquipoimg.then(function(data) {
-      console.log(data);
-      // Actualizar la tabla con los datos recibidos
-      UpdateTableRows(tabladatos, data);
-      tableRowColorCellSelectionKlib(tabladatos);
-      hideTableColumns(tabladatos, colocultas); // Ocultar columnas
-      addRadioButtonColumnPKTBL(
-          tabladatos, columnaedicion, coleditar, roweditar,
-          actionListener, columnaPK
+    console.log(data);
+    // Actualizar la tabla con los datos recibidos
+    UpdateTableRows(tabladatos, data);
+    tableRowColorCellSelectionKlib(tabladatos);
+    hideTableColumns(tabladatos, colocultas); // Ocultar columnas
+    addRadioButtonColumnPKTBL(
+        tabladatos, columnaedicion, coleditar, roweditar,
+        actionListener, columnaPK
       );
   })
   .catch(function(error) {
@@ -292,7 +283,20 @@ function getCookie(name) {
 
 
 //Botones 
+function asignaEventosEQP(e){
+    console.log("Entró a asignar Eventos")
+    const rol = e.target.dataset.rol;
+    const crudButtons = document.querySelectorAll(".crud");
+    crudButtons.forEach(btn => {
+        btn.dataset.rol = rol;
+        btn.addEventListener("click", (event) => {
+            barraBotonesEQP(event);
+        });
+    });
+    barraBotonesEQP(e);
+}
 
+/*
 //Consulta equipo
 $(document).on('click', '#btnCatEqptbl', function (e) {
   barraBotonesEQP(e);
@@ -311,6 +315,8 @@ $(document).on('click', '#btnEdtEqptbl', function (e) {
 $(document).on('click', '#btnAddEqptbl', function (e) {
   barraBotonesEQP(e);
 });
+*/
+
 
 // Botón editar modal
 
