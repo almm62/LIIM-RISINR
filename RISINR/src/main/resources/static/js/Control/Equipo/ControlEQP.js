@@ -18,12 +18,12 @@ function barraBotonesEQP(e) {
     if (rol==="JS"){
         html_HideElement("btnAddEqptbl");
     }
-    var opc = e.target.id;
-    if (!opc){
-        var opc = btn.dataset.accion //Boton del menú
+    var accion = e.target.id;
+    if (!accion){
+        var accion = btn.dataset.accion //Boton del menú
     }
-    console.log("selección: " + opc);
-    switch (opc) {
+
+    switch (accion) {
         case 'btnCatEqptbl':
             html_HideElement("btnEdtEqptbl");
             readTblsEQP();
@@ -36,11 +36,6 @@ function barraBotonesEQP(e) {
             html_ShowElement("secSerie"); //seccion de numero de serie
             //document.getElementById("nserEQP").disabled = false; //número de serie (activo al geenrar uno nuevo)
             limpiarCampos();
-            
-            /*
-            document.getElementById("nomEQP").value = "";
-            document.getElementById("marcaEQP").value = "";
-             */
             cambiaEstadoModal(".modalEquipoRIS", true); //true =activaer
             actualizaDialogoModal(".modalEquipoRIS-content", "12%", "1%", "60%", "50%"); //top 12%
             
@@ -61,26 +56,8 @@ function barraBotonesEQP(e) {
                 console.log("Radio sel: " + valorRadioPK);
                 console.log(columnasrow);
                 clearRadioSelNumber("radio" + tabla, valorRadioPK - 1); //limpiar renglon seleccionado
-                //nserEQP,nomEQP,marcaEQP,modeloEQP, modalEqp->idmod,areEqp->idarea,edoEqp->idedo
-                //var cabecerapac = ["Serie", "Nombre", "Marca", "Modelo", "Modalida", "Id_area", "Área","Estado"];   
-                document.getElementById("nserEQP").value = columnasrow[0].innerText;
-                document.getElementById("nomEQP").value = columnasrow[1].innerText;
-                document.getElementById("marcaEQP").value = columnasrow[2].innerText;
-                document.getElementById("modeloEQP").value = columnasrow[3].innerText;
 
-                document.getElementById("modalEQP").value = columnasrow[4].innerText;
-                //listbox modalidad
-                //document.getElementById("idmod").value = columnasrow[4].innerText;
-                //listbox modalidad                
-
-                document.getElementById("areEqp").value = columnasrow[5].innerText;
-                //listbox area
-                document.getElementById("idarea").value = columnasrow[6].innerText; //campo de area actual
-
-                document.getElementById("edoEqp").value = columnasrow[7].innerText; //listbox estado
-                //document.getElementById("idedo").value = columnasrow[7].innerText; //campo de estado actual
-
-
+                preparaModal(rol);
                 cambiaEstadoModal(".modalEquipoRIS", true); //true =activaer 
                 actualizaDialogoModal(".modalEquipoRIS-content", "12%", "1%", "60%", "50%"); //top 12%                
             } else {
@@ -94,6 +71,24 @@ function barraBotonesEQP(e) {
     }
 
 }
+
+function preparaModal(rol){
+    //Llena inputs con valores de la tabla
+    document.getElementById("nserEQP").value = columnasrow[0].innerText;
+    document.getElementById("nomEQP").value = columnasrow[1].innerText;
+    document.getElementById("marcaEQP").value = columnasrow[2].innerText;
+    document.getElementById("modeloEQP").value = columnasrow[3].innerText;
+    document.getElementById("modalEQP").value = columnasrow[4].innerText;
+    document.getElementById("areEqp").value = columnasrow[5].innerText;
+    document.getElementById("idarea").value = columnasrow[6].innerText;
+    document.getElementById("edoEqp").value = columnasrow[7].innerText;
+    if (rol==="JS"){
+        //Bloqueamos todos los campos excepto estado
+
+    }
+}
+
+
 
 //funcion para listboxes al cambiar actualizar campos
 function updatePKSEqp(e) {
