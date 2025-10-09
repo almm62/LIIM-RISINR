@@ -339,124 +339,67 @@ async function CrudUSR(e){
     console.log("Accion por ID: "+accion)
     switch (accion) {
         case "btnCatUSRtbl":
-        //alert("Por implementar");
             html_HideElement("btnEdtUsrtbl")
-            var columnaPKUSR = 6; //se toma como llave primaria para busquedas la columna 6 curp
-            var coleditarUSR = "Ref";
-            var roweditarUSR = "Sel ";
-            var tabladatosUSR="tblusuarios";
-            //var actionListenerUSR = "SelRadioButtonTablaUSR('" + tabladatosUSR + "'," + columnaPKUSR + ")";
-            var actionListenerUSR = "SelRadioButtonTablaUSR()";
-            var colsUSR = ["Empleado", "Nombre", "Apellido paterno", "Apellido materno", "Correo Electrónico","Área hospitalaria", "CURP", "Perfil", "Estado"];
-            $.ajax({
-                url: uriserv + "/user/getAll",
-                type: 'GET', // Tipo de envio 
-                dataType: 'json' //Tipo de Respuesta
-            }).done(function (data, textStatus, jqXHR) {
-                
-                //Bloque de código para integrar la funcionalidad de JSON Webt Token
-                var datosjson = data; // Se guarda la información en la variable datosjson
-                //A continuación se realiza un condicional para saber si es correcta la validación
-                  
-                  CreateTableFromJSON("showDataUser", "tblusuarios", colsUSR); //parametros referencia div, nombre tabla , arreglo json, cabecera
-                  UpdateTableRows("tblusuarios", data);//Se colocan los resultados en la Tabla
-                  tableHeaderSelection(tabladatosUSR, [1, 2, 3, 4, 5, 6]);
-                  addRadioButtonColumnPKTBL(tabladatosUSR, 9, roweditarUSR, coleditarUSR, actionListenerUSR, columnaPKUSR); //columna 5 PK RFC
-                  tableRowColorCellSelectionKlib(tabladatosUSR);
-                
-            }).fail(function (jqXHR, textStatus, errorThrown) {
-                alert("Error al recuperar informacion " + errorThrown);
-                //removerPreloader(servicio);
-            }).always(function (jqXHROrData, textStatus, jqXHROrErrorThrown) {
-                //removerPreloader(servicio); 
-            });  
+            await ConsultaCatalogoUSRS()
             break;
         case "btnAdtUsrtbl": //Boton de barra de nuevo usuario
-            html_HideElement("Activo"); //boton del modal de edición.
-            html_HideElement("_Activo"); //boton del modal de edición.
-            html_HideElement("Suspendido"); //boton del modal de edición.
-            html_HideElement("_Suspendido"); //boton del modal de edición.
-            html_HideElement("Bloqueado"); //boton del modal de edición.
-            html_HideElement("_Bloqueado"); //boton del modal de edición.
-            html_HideElement("Dado_de_baja"); //boton del modal de edición.
-            html_HideElement("_Dado_de_baja"); //boton del modal de edición.
-            html_HideElement("actualizaUSUARIO"); //boton del modal de edición.
+            //Ocultamos Estados para que solo quede disponible "Inicial"
+            html_HideElement("Activo");
+            html_HideElement("_Activo");
+            html_HideElement("Suspendido");
+            html_HideElement("_Suspendido");
+            html_HideElement("Bloqueado");
+            html_HideElement("_Bloqueado");
+            html_HideElement("Dado_de_baja");
+            html_HideElement("_Dado_de_baja");
+
+            //Ocultamos Boton de Actualizar y dejamos solo Agregar y Cancelar
+            html_HideElement("actualizaUSUARIO");
             html_ShowElement("nuevoUSUARIO");
             
-            
-            html_ShowElement("usrId"); //boton del modal de edición.
-            html_ShowElement("_usrId"); //boton del modal de edición.
-            html_ShowElement("_curp"); //boton del modal de edición.
-            html_ShowElement("curp"); //boton del modal de edición.
-            html_ShowElement("numEmpleado"); //boton del modal de edición.
-            html_ShowElement("_numEmpleado"); //boton del modal de edición.
-            
-            html_HideElement("perfilupdate");    //seccion de numero de serie               
+            /*
+            html_ShowElement("usrId"); 
+            html_ShowElement("_usrId"); 
+            html_ShowElement("_curp"); 
+            html_ShowElement("curp"); 
+            html_ShowElement("numEmpleado"); 
+            html_ShowElement("_numEmpleado"); 
+            */
+
+            html_HideElement("perfilupdate");            
             cleanCheckboxValues("perfilapp"); //limpia todas las casilla para evitar previa seleccion 
             
             cambiaEstadoModal(".modalUSUARIOS", true); //true =activaer               
             break;
         case "btnEdtUsrtbl": //Boton de barra de edición de usuario
-            html_ShowElement("Activo"); //boton del modal de edición.
-            html_ShowElement("_Activo"); //boton del modal de edición.
-            html_ShowElement("Suspendido"); //boton del modal de edición.
-            html_ShowElement("_Suspendido"); //boton del modal de edición.
-            html_ShowElement("Bloqueado"); //boton del modal de edición.
-            html_ShowElement("_Bloqueado"); //boton del modal de edición.
-            html_ShowElement("Inicial"); //boton del modal de edición.
-            html_ShowElement("_Inicial"); //boton del modal de edición.
-            html_ShowElement("Dado_de_baja"); //boton del modal de edición.
-            html_ShowElement("_Dado_de_baja"); //boton del modal de edición.
+            // Mostramos los demás estados
+            html_ShowElement("Activo");
+            html_ShowElement("_Activo");
+            html_ShowElement("Suspendido");
+            html_ShowElement("_Suspendido");
+            html_ShowElement("Bloqueado");
+            html_ShowElement("_Bloqueado");
+            html_ShowElement("Inicial");
+            html_ShowElement("_Inicial");
+            html_ShowElement("Dado_de_baja");
+            html_ShowElement("_Dado_de_baja");
             
-            html_HideElement("usrId"); //boton del modal de edición.
-            html_HideElement("_usrId"); //boton del modal de edición.
+            /*
+            html_HideElement("usrId");
+            html_HideElement("_usrId");
             
-            html_HideElement("_curp"); //boton del modal de edición.
-            html_HideElement("curp"); //boton del modal de edición.
+            html_HideElement("_curp");
+            html_HideElement("curp");
             
-            html_HideElement("_numEmpleado"); //boton del modal de edición.
-            html_HideElement("numEmpleado"); //boton del modal de edición.
-            var tabla = "tblusuarios";
-            var valorRadioPK = getRadioValIndice("radio" + tabla) + 1;//valor de 0 a k-1, sumarle 1
-            if ((valorRadioPK) > 0) {
-                html_ShowElement("actualizaUSUARIO"); //boton del modal de edición.
-                html_HideElement("nuevoUSUARIO");
-                html_HideElement("perfilupdate");    //seccion de numero de serie                  
-                var columnasrow = getRowCells(valorRadioPK, tabla);
-                cleanCheckboxValues("perfilapp"); //limpia todas las casilla para evitar previa seleccion 
-                var cadperfil = columnasrow[7].innerHTML; //columna del perfil es la 6
-                //codigo para activar los push buttons de los perfiles del usuario en la tabla del dialogo modal.
-                var arregloroles = cadperfil.split(",");
-                let renglones = [];//arreglo de seleccion
-                for (var i = 0; i < arregloroles.length; i++) {
-                    var rolk = arregloroles[i];
-                    var renglonk = compareTableColumns("roles", 1, rolk) - 1; //columna 1 de tabla roles = perfil 
-                    renglones.push(renglonk);
-                }
-                if(renglones[0]!==-1)
-                  setSelectedCheckboxValues("perfilapp", renglones); //activar checkboxes de acuerdo al contenido de la tabla, si no tiene perfil no hay selección   
-                document.querySelector("#USRrowid").value = valorRadioPK;
-                document.querySelector("#USRtblid").value = tabla;  
-                document.getElementById("uname").value = columnasrow[1].innerHTML;
-                document.getElementById("apaterno").value = columnasrow[2].innerHTML;
-                document.getElementById("amaterno").value = columnasrow[3].innerHTML;
-                document.getElementById("correo").value = columnasrow[4].innerHTML;
-                setSelectedIndex(document.getElementById("perf2"), columnasrow[5].innerHTML); //poner en  el listbox el dato del englon seleccionado
-                document.getElementById("perfil").innerHTML = "CURP: " + columnasrow[6].innerHTML;
-                var valor=columnasrow[8].innerHTML;
-                document.querySelector(`input[name="estado"][value="${valor}"]`).checked = true;
-                cambiaEstadoModal(".modalUSUARIOS", true); //true =activaer     
-                //actualizaDialogoModal(".modalUSUARIOS-content", "12%", "1%", "60%", "50%"); //top 12%                
-            } else {
-                alert("Seleccione un registro de la tabla");
-            }           
-
+            html_HideElement("_numEmpleado");
+            html_HideElement("numEmpleado");
+            */
+            llenaFormulario(rol);
             break;
         
-        case "cancelarUSUARIO":
-            //boton del dialogo modal cancelar dialogo
+        case "cancelarUSUARIO": //Boton del modal
             document.getElementById("USUARIOS").reset(); //Borra datos del formulario
-            cambiaEstadoModal(".modalUSUARIOS", false); //true =activaer     
+            cambiaEstadoModal(".modalUSUARIOS", false); //Desactivamos Modal    
             break;
         case "nuevoUSUARIO": //Boton del dialogo modal de nuevo usuario
             var r = confirm("Desea Agregar el registro ");
@@ -544,6 +487,79 @@ async function CrudUSR(e){
             }             
             break;
     }
+}
+
+async function ConsultaCatalogoUSRS(){
+    var columnaPKUSR = 6; //se toma como llave primaria para busquedas la columna 6 curp
+    var coleditarUSR = "Ref";
+    var roweditarUSR = "Sel ";
+    var tabladatosUSR="tblusuarios";
+    //var actionListenerUSR = "SelRadioButtonTablaUSR('" + tabladatosUSR + "'," + columnaPKUSR + ")";
+    var actionListenerUSR = "SelRadioButtonTablaUSR()";
+    var colsUSR = ["Empleado", "Nombre", "Apellido paterno", "Apellido materno", "Correo Electrónico","Área hospitalaria", "CURP", "Perfil", "Estado"];
+    try {
+        // 1) Llamada GET
+        const data = await getServicio(uriserv + "/user/getAll", "GET");
+        CreateTableFromJSON("showDataUser", "tblusuarios", colsUSR);      // referencia div, nombre tabla, cabecera
+        UpdateTableRows("tblusuarios", data);                              // coloca resultados
+        tableHeaderSelection(tabladatosUSR, [1, 2, 3, 4, 5, 6]);
+        addRadioButtonColumnPKTBL(
+          tabladatosUSR,
+          9,
+          roweditarUSR,
+          coleditarUSR,
+          actionListenerUSR,
+          columnaPKUSR
+        );
+        tableRowColorCellSelectionKlib(tabladatosUSR);
+    
+      } catch (err) {
+        alert("Error al recuperar información: " + err.message);
+      }
+}
+
+function llenaFormulario(rol){
+    var tabla = "tblusuarios";
+    var valorRadioPK = getRadioValIndice("radio" + tabla) + 1;//valor de 0 a k-1, sumarle 1
+    if ((valorRadioPK) > 0) {
+        html_ShowElement("actualizaUSUARIO"); //boton del modal de edición.
+        html_HideElement("nuevoUSUARIO");
+        html_HideElement("perfilupdate");    //seccion de numero de serie                  
+        var columnasrow = getRowCells(valorRadioPK, tabla);
+        cleanCheckboxValues("perfilapp"); //limpia todas las casilla para evitar previa seleccion 
+        var cadperfil = columnasrow[7].innerHTML; //columna del perfil es la 6
+        //codigo para activar los push buttons de los perfiles del usuario en la tabla del dialogo modal.
+        var arregloroles = cadperfil.split(",");
+        let renglones = [];//arreglo de seleccion
+        for (var i = 0; i < arregloroles.length; i++) {
+            var rolk = arregloroles[i];
+            var renglonk = compareTableColumns("roles", 1, rolk) - 1; //columna 1 de tabla roles = perfil 
+            renglones.push(renglonk);
+        }
+        if(renglones[0]!==-1)
+          setSelectedCheckboxValues("perfilapp", renglones); //activar checkboxes de acuerdo al contenido de la tabla, si no tiene perfil no hay selección   
+        document.querySelector("#USRrowid").value = valorRadioPK;
+        document.querySelector("#USRtblid").value = tabla;  
+        document.getElementById("uname").value = columnasrow[1].innerHTML;
+        document.getElementById("apaterno").value = columnasrow[2].innerHTML;
+        document.getElementById("amaterno").value = columnasrow[3].innerHTML;
+        document.getElementById("correo").value = columnasrow[4].innerHTML;
+        setSelectedIndex(document.getElementById("perf2"), columnasrow[5].innerHTML); //poner en  el listbox el dato del englon seleccionado
+        document.getElementById("perfil").innerHTML = "CURP: " + columnasrow[6].innerHTML;
+        var valor=columnasrow[8].innerHTML;
+        document.querySelector(`input[name="estado"][value="${valor}"]`).checked = true;
+
+        // Ya que se llenó el formulario, Bloqueamos campos dependiendo el rol
+        // Empezando por las llaves primarias:
+        document.getElementById().readOnly=true;
+        if (rol==="JS"){
+
+        }
+        cambiaEstadoModal(".modalUSUARIOS", true); //true =activaer     
+        //actualizaDialogoModal(".modalUSUARIOS-content", "12%", "1%", "60%", "50%"); //top 12%                
+    } else {
+        alert("Seleccione un registro de la tabla");
+    }           
 }
 
 async function getUsrs(e) {
