@@ -79,6 +79,10 @@ function preparaModal(rol, tabla, valorRadioPK){
     document.getElementById("areEqp").value = columnasrow[5].innerText;
     document.getElementById("idarea").value = columnasrow[6].innerText;
     document.getElementById("edoEqp").value = columnasrow[7].innerText;
+
+    //Bloqueamos Llave Primaria
+    document.getElementById("nserEQP").readOnly=true
+    //Si se accede como Jefe de Servicio (JS) bloqueamos todo excepto estado
     if (rol==="JS"){
         //Escondemos los Select
         html_HideElement("modalEQP")

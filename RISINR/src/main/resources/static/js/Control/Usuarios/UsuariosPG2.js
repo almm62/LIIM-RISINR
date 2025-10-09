@@ -336,7 +336,13 @@ async function CrudUSR(e){
     if (!accion){
         var accion = btn.dataset.accion //Boton del menú
     }
-    console.log("Accion por ID: "+accion)
+
+    var rol    = btn.dataset.rol
+    if (rol==="JS"){
+        html_HideElement("btnAdtUsrtbl")
+    }
+
+
     switch (accion) {
         case "btnCatUSRtbl":
             html_HideElement("btnEdtUsrtbl")
@@ -369,7 +375,8 @@ async function CrudUSR(e){
             html_HideElement("perfilupdate");            
             cleanCheckboxValues("perfilapp"); //limpia todas las casilla para evitar previa seleccion 
             
-            cambiaEstadoModal(".modalUSUARIOS", true); //true =activaer               
+            cambiaEstadoModal(".modalUSUARIOS", true); //true =activaer
+            actualizaDialogoModal(".modalUSUARIOS-content", "12%", "1%", "60%", "70%");               
             break;
         case "btnEdtUsrtbl": //Boton de barra de edición de usuario
             // Mostramos los demás estados
@@ -395,6 +402,9 @@ async function CrudUSR(e){
             html_HideElement("numEmpleado");
             */
             llenaFormulario(rol);
+
+            cambiaEstadoModal(".modalUSUARIOS", true);  
+            actualizaDialogoModal(".modalUSUARIOS-content", "12%", "1%", "60%", "50%");   
             break;
         
         case "cancelarUSUARIO": //Boton del modal
@@ -524,7 +534,9 @@ function llenaFormulario(rol){
     if ((valorRadioPK) > 0) {
         html_ShowElement("actualizaUSUARIO"); //boton del modal de edición.
         html_HideElement("nuevoUSUARIO");
-        html_HideElement("perfilupdate");    //seccion de numero de serie                  
+        html_HideElement("perfilupdate");    //seccion de numero de serie 
+        html_HideElement("_usrId"); 
+        html_HideElement("usrId");                  
         var columnasrow = getRowCells(valorRadioPK, tabla);
         cleanCheckboxValues("perfilapp"); //limpia todas las casilla para evitar previa seleccion 
         var cadperfil = columnasrow[7].innerHTML; //columna del perfil es la 6
@@ -540,23 +552,27 @@ function llenaFormulario(rol){
           setSelectedCheckboxValues("perfilapp", renglones); //activar checkboxes de acuerdo al contenido de la tabla, si no tiene perfil no hay selección   
         document.querySelector("#USRrowid").value = valorRadioPK;
         document.querySelector("#USRtblid").value = tabla;  
+        document.getElementById("numEmpleado").value = columnasrow[0].innerHTML;
         document.getElementById("uname").value = columnasrow[1].innerHTML;
         document.getElementById("apaterno").value = columnasrow[2].innerHTML;
         document.getElementById("amaterno").value = columnasrow[3].innerHTML;
         document.getElementById("correo").value = columnasrow[4].innerHTML;
         setSelectedIndex(document.getElementById("perf2"), columnasrow[5].innerHTML); //poner en  el listbox el dato del englon seleccionado
         document.getElementById("perfil").innerHTML = "CURP: " + columnasrow[6].innerHTML;
+        document.getElementById("curp").value = columnasrow[6].innerHTML;
         var valor=columnasrow[8].innerHTML;
         document.querySelector(`input[name="estado"][value="${valor}"]`).checked = true;
 
         // Ya que se llenó el formulario, Bloqueamos campos dependiendo el rol
         // Empezando por las llaves primarias:
-        document.getElementById().readOnly=true;
-        if (rol==="JS"){
+        document.getElementById("usrId").readOnly=true;
+        document.getElementById("curp").readOnly=true;
+        document.getElementById("numEmpleado").readOnly=true;
 
-        }
-        cambiaEstadoModal(".modalUSUARIOS", true); //true =activaer     
-        //actualizaDialogoModal(".modalUSUARIOS-content", "12%", "1%", "60%", "50%"); //top 12%                
+        //Si el rol es de Jefe de Servicio (JS)
+        if (rol==="JS"){
+            html_HideElement("showDataRol");
+        }         
     } else {
         alert("Seleccione un registro de la tabla");
     }           
