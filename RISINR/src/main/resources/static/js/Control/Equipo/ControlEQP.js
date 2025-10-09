@@ -52,12 +52,8 @@ function barraBotonesEQP(e) {
             if ((valorRadioPK) > 0) {
                 //console.log("llave primaria renglon: "+valorRadioPK);
                 //var tablerowref = findDatainTable(tabla, colPK, valorRadioPK);
-                var columnasrow = getRowCells(valorRadioPK, tabla);
-                console.log("Radio sel: " + valorRadioPK);
-                console.log(columnasrow);
                 clearRadioSelNumber("radio" + tabla, valorRadioPK - 1); //limpiar renglon seleccionado
-
-                preparaModal(rol);
+                preparaModal(rol, tabla, valorRadioPK);
                 cambiaEstadoModal(".modalEquipoRIS", true); //true =activaer 
                 actualizaDialogoModal(".modalEquipoRIS-content", "12%", "1%", "60%", "50%"); //top 12%                
             } else {
@@ -72,8 +68,9 @@ function barraBotonesEQP(e) {
 
 }
 
-function preparaModal(rol){
+function preparaModal(rol, tabla, valorRadioPK){
     //Llena inputs con valores de la tabla
+    var columnasrow = getRowCells(valorRadioPK, tabla);
     document.getElementById("nserEQP").value = columnasrow[0].innerText;
     document.getElementById("nomEQP").value = columnasrow[1].innerText;
     document.getElementById("marcaEQP").value = columnasrow[2].innerText;
@@ -83,8 +80,20 @@ function preparaModal(rol){
     document.getElementById("idarea").value = columnasrow[6].innerText;
     document.getElementById("edoEqp").value = columnasrow[7].innerText;
     if (rol==="JS"){
-        //Bloqueamos todos los campos excepto estado
+        //Escondemos los Select
+        html_HideElement("modalEQP")
+        html_HideElement("_modalEQP")
 
+        html_HideElement("areEqp")
+        html_HideElement("_areEqp")
+        //Bloqueamos todos los campos excepto estado
+        document.getElementById("nserEQP").readOnly=true
+        document.getElementById("nomEQP").readOnly=true
+        document.getElementById("marcaEQP").readOnly=true
+        document.getElementById("modeloEQP").readOnly=true
+        document.getElementById("modalEQP").readOnly=true
+        document.getElementById("areEqp").readOnly=true
+        document.getElementById("idarea").readOnly=true
     }
 }
 
@@ -234,6 +243,21 @@ function getFormData(crud, formname) {
     
 }
 
+
+//Botones 
+function asignaEventosEQP(e){
+    console.log("Entró a asignar Eventos")
+    const rol = e.target.dataset.rol;
+    const crudButtons = document.querySelectorAll(".crud");
+    crudButtons.forEach(btn => {
+        btn.dataset.rol = rol;
+        btn.addEventListener("click", (event) => {
+            barraBotonesEQP(event);
+        });
+    });
+    barraBotonesEQP(e);
+}
+
 // María de Jesús Rebolledo Bustillo
 function getDatos(formname){
     
@@ -276,20 +300,6 @@ function getCookie(name) {
     ?.split('=')[1];
 }
 
-
-//Botones 
-function asignaEventosEQP(e){
-    console.log("Entró a asignar Eventos")
-    const rol = e.target.dataset.rol;
-    const crudButtons = document.querySelectorAll(".crud");
-    crudButtons.forEach(btn => {
-        btn.dataset.rol = rol;
-        btn.addEventListener("click", (event) => {
-            barraBotonesEQP(event);
-        });
-    });
-    barraBotonesEQP(e);
-}
 
 /*
 //Consulta equipo
