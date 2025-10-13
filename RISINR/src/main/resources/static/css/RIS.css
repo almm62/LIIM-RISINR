@@ -24,24 +24,55 @@ header {
 	display: flex;
 	flex-direction: row;
 }
-/* LOGOUT */
-.contenedor-logout {
-	width: 100%;
+/* BOTONES INICIALES */
+.contenedor-settings, .contenedor-logout {
+    flex: 1 1 0;
     display: flex;
-    justify-content: flex-end;
+    align-items: center;
 }
-.contenedor-logout #salir {
+
+#salir, #config {
 	width: 100%;
 	height: 100%;
-	background-color: #666;
 	border: none;
 	color: #fff;
 	font-size: 15px;
 }
 
-.contenedor-logout #salir:hover {
-	background-color: #f1f1f1;
+/* Izquierda CONFIGURACION */
+.contenedor-settings{
+    justify-content: flex-start;
 }
+#config{
+	background-color: #08bb17;
+}
+
+#config:hover {
+	background-color: #11c720;
+}
+
+/* Derecha LOGOUT */
+.contenedor-logout {
+    justify-content: flex-end;
+}
+
+#salir{
+	background-color: #666;
+}
+
+#salir:hover {
+	background-color: #7b7b7b;
+}
+
+/*--- Modal de Configuracion de cuenta ---*/
+label{
+    display: block;
+    margin-bottom: 0.5rem;
+}
+label input{
+    width: 100%;
+}
+
 /*Tablas (Menu con botones)*/
 .tab {
     overflow: hidden;

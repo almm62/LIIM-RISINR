@@ -1,5 +1,6 @@
 var uriserv = "/RISSERVER";
 var host = "http://" + location.host + "/RISSERVER/";
+var configModal;
 
 // JavaScript encargado de cargar el header, menú, boton de salir del sistema y  footer
 
@@ -28,7 +29,42 @@ function salir() {
     }
   });
 }
+// --- Funcion de config (Activa y limpia modal) ---
+function activaModalConfig(){
+  configModal.showModal();
+  pwd.value = '';
+  pwd2.value = '';
+  pwd.focus();
+  //Evitamos que el modal se cierre con ESC
+  configModal.addEventListener("cancel", (e) =>{
+    e.preventDefault();
+  })
+  // Comportamiento para tipos de cierre
+  configModal.addEventListener('close', () => {
+    if (configModal.returnValue === 'aceptar') {
+      console.log('Aceptar');
+    } else if (configModal.returnValue === 'cancelar') {
+      console.log('Cancelar');
+    }
+	});
+}
 
+// --- Funcion al presionar botones en formulario de configuracion ---
+function formCongif(e){
+  const submitter = e.submitter?.value;
+  if (submitter === 'aceptar') {
+    if (!form.reportValidity()) {
+      e.preventDefault();
+      return;
+    }
+    if (pwd.value !== pwd2.value) {
+      e.preventDefault(); // evita que se cierre
+      errorEl.textContent = 'Las contraseñas no coinciden.';
+    } else {
+      errorEl.textContent = '';
+    }
+  }
+}
 // --- Cargar templates HTML ---
 async function loadHTML(id, url) {
   const resp = await fetch(url);
@@ -107,7 +143,12 @@ window.onload = async function () {
   } else {
     console.warn("No se encontró el botón #salir en el header");
   }
-  
+  // Boton Configuracion
+  configModal = document.getElementById("configDialog")
+  const configBtn = document.getElementById("config");
+  if (configBtn && configModal){
+    configBtn.addEventListener("click", activaModalConfig);
+  }
   // Insertar los botones definidos en index.html (template) hacia el header
   insertMenuButtonsFromTemplate();
 
