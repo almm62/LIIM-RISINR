@@ -4,13 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Página ADMIN</title>
-  <link rel="stylesheet" type="text/css" href="../../../css/RIS.css">
+  <link rel="stylesheet" href="../../../css/RIS.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
   <script src="http://code.jquery.com/jquery-2.2.0.min.js"></script> <!-- CDN de jQuery-->
   <script src="../../../js/main.js"></script>
-  <script src="../../../js/lib2.js"></script>
-  <script src="../../../js/Control/Usuarios/UsuariosPG2.js"></script>
-  <script src="../../../js/Control/Equipo/ControlEQP.js"></script>
   <script src="../../../js/sessionWatch.js"></script>
   <script>
       sessionWatcher.init();
@@ -21,14 +18,14 @@
   <div id="header"></div>
   <!-- DECLARAMOS AQUÍ los botones del menú -->
   <template id="menuButtons">
-    <button class="tablinks" data-tab="USUARIOSTAB" data-rol="JS" data-accion="btnCatUSRtbl">Gestión Usuarios</button>
-    <button class="tablinks" data-tab="EQUIPOTAB" data-rol="JS" data-accion="btnCatEqptbl">Gestión de Equipo</button>
+    <button class="tablinks" data-tab="EQUIPOTAB">Gestión de Equipo</button>
   </template>
 
 
   <main>
-    <div id="USUARIOSTAB" class="tabcontent">
-      <div id="includeTBL"></div>                    
+    <h1>Perfil de Subdirector de Servicios</h1>
+    <div id="EQUIPOTAB" class="tabcontent">
+      <div id="includedCatEquipo"></div>
     </div>
   </main>
 

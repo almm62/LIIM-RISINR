@@ -1,7 +1,5 @@
 package com.UAM.RISINR.controller;
 
-import com.UAM.RISINR.model.dto.shared.AreaDTO;
-import com.UAM.RISINR.model.dto.shared.RolDTO;
 import com.UAM.RISINR.service.shared.InitialService;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;

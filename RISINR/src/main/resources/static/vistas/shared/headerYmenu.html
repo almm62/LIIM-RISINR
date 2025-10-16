@@ -1,0 +1,60 @@
+<section> 
+    <h2 id="h2APP">APP RIS</h2>       
+    <header>
+        <div class="contenedor-perfil"> 
+            <p id="usuartioactivonombre"></p>  
+        </div>
+        <div class="contenedor-logo">
+            <!--img src="../img/logo.png" alt="logoex" height="65" width="250"-->                        
+            <p></p>
+        </div>
+        <div class="contenedor-settings">
+            <button id="config" value="config" class="button button1">Configuración de la cuenta</button>
+        </div>
+        <div class="contenedor-logout">
+            <button id="salir" value="salir" class="button button1">Salir del sistema</button> <!--img src="img/exit_rojo.png" width="30" height="30"-->
+        </div>
+    </header>          
+
+    <nav>
+        <div class="tab">
+            <!-- Aqui se cargar los botones declarados en el index.html:
+            <button class="tablinks" data-tab="USUARIOSTAB">Gestión Usuarios</button>
+            -->
+        </div>
+    </nav>
+    <!-- Dialogo para cambiar la contraseña y correo -->
+    <dialog id="configDialog">
+        <form id="configForm" method="dialog">
+            <h2>Configuración</h2>
+
+            <label>
+                Nueva contraseña
+                <input id="pwd" name="pwd" type="password"/>
+            </label>
+
+            <label>
+                Confirmar contraseña
+                <input id="pwd2" name="pwd2" type="password"/>
+            </label>
+
+            <label>
+                Nuevo correo electrónico
+                <input id="mail" name="mail" type="email"/>
+            </label>
+
+            <label>
+                Confirmar correo electrónico
+                <input id="mail2" name="mail2" type="email"/>
+            </label>
+
+            <p id="error"  style="color:#b00020; margin: .5rem 0 0; min-height:1.25em;"></p>
+
+            <div style="display:flex; gap:.5rem; justify-content:flex-end; margin-top:1rem;">
+                <!-- INPUT para Contraseña actual -->
+                <button value="cancelar">Cancelar</button>
+                <button value="aceptar">Aceptar</button>
+            </div>
+        </form>
+    </dialog>
+</section>

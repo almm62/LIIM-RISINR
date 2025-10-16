@@ -9,21 +9,24 @@ function activaBotonesEQP(table, bandera) {
 
 
 function evaluaRadioButtonTablaPK0(tabla, colPK) {
-    html_VisibleElement("btnAddEqptbl");
     html_VisibleElement("btnEdtEqptbl");
-    html_VisibleElement("btnDelEqptbl");
 }
 
 function barraBotonesEQP(e) {
-    var opc = e.target.id;
-    console.log("selección: " + opc);
-    switch (opc) {
+    const btn  = e.target;
+    var rol    = btn.dataset.rol;
+    if (rol==="JS"){
+        html_HideElement("btnAddEqptbl");
+    }
+    var accion = e.target.id;
+    if (!accion){
+        var accion = btn.dataset.accion //Boton del menú
+    }
+
+    switch (accion) {
         case 'btnCatEqptbl':
-            readTblsEQP(1);
-            break;
-            
-        case 'btnCatEqpAreatbl':
-            readTblsEQP(2);
+            html_HideElement("btnEdtEqptbl");
+            readTblsEQP();
             break;
         case 'btnAddEqptbl':
             var tablaref = "Eqptbl";
@@ -33,11 +36,6 @@ function barraBotonesEQP(e) {
             html_ShowElement("secSerie"); //seccion de numero de serie
             //document.getElementById("nserEQP").disabled = false; //número de serie (activo al geenrar uno nuevo)
             limpiarCampos();
-            
-            /*
-            document.getElementById("nomEQP").value = "";
-            document.getElementById("marcaEQP").value = "";
-             */
             cambiaEstadoModal(".modalEquipoRIS", true); //true =activaer
             actualizaDialogoModal(".modalEquipoRIS-content", "12%", "1%", "60%", "50%"); //top 12%
             
@@ -54,30 +52,8 @@ function barraBotonesEQP(e) {
             if ((valorRadioPK) > 0) {
                 //console.log("llave primaria renglon: "+valorRadioPK);
                 //var tablerowref = findDatainTable(tabla, colPK, valorRadioPK);
-                var columnasrow = getRowCells(valorRadioPK, tabla);
-                console.log("Radio sel: " + valorRadioPK);
-                console.log(columnasrow);
                 clearRadioSelNumber("radio" + tabla, valorRadioPK - 1); //limpiar renglon seleccionado
-                //nserEQP,nomEQP,marcaEQP,modeloEQP, modalEqp->idmod,areEqp->idarea,edoEqp->idedo
-                //var cabecerapac = ["Serie", "Nombre", "Marca", "Modelo", "Modalida", "Id_area", "Área","Estado"];   
-                document.getElementById("nserEQP").value = columnasrow[0].innerText;
-                document.getElementById("nomEQP").value = columnasrow[1].innerText;
-                document.getElementById("marcaEQP").value = columnasrow[2].innerText;
-                document.getElementById("modeloEQP").value = columnasrow[3].innerText;
-
-                document.getElementById("modalEQP").value = columnasrow[4].innerText;
-                //listbox modalidad
-                //document.getElementById("idmod").value = columnasrow[4].innerText;
-                //listbox modalidad                
-
-                document.getElementById("areEqp").value = columnasrow[5].innerText;
-                //listbox area
-                document.getElementById("idarea").value = columnasrow[6].innerText; //campo de area actual
-
-                document.getElementById("edoEqp").value = columnasrow[7].innerText; //listbox estado
-                //document.getElementById("idedo").value = columnasrow[7].innerText; //campo de estado actual
-
-
+                preparaModal(rol, tabla, valorRadioPK);
                 cambiaEstadoModal(".modalEquipoRIS", true); //true =activaer 
                 actualizaDialogoModal(".modalEquipoRIS-content", "12%", "1%", "60%", "50%"); //top 12%                
             } else {
@@ -91,6 +67,41 @@ function barraBotonesEQP(e) {
     }
 
 }
+
+function preparaModal(rol, tabla, valorRadioPK){
+    //Llena inputs con valores de la tabla
+    var columnasrow = getRowCells(valorRadioPK, tabla);
+    document.getElementById("nserEQP").value = columnasrow[0].innerText;
+    document.getElementById("nomEQP").value = columnasrow[1].innerText;
+    document.getElementById("marcaEQP").value = columnasrow[2].innerText;
+    document.getElementById("modeloEQP").value = columnasrow[3].innerText;
+    document.getElementById("modalEQP").value = columnasrow[4].innerText;
+    document.getElementById("areEqp").value = columnasrow[5].innerText;
+    document.getElementById("idarea").value = columnasrow[6].innerText;
+    document.getElementById("edoEqp").value = columnasrow[7].innerText;
+
+    //Bloqueamos Llave Primaria
+    document.getElementById("nserEQP").readOnly=true
+    //Si se accede como Jefe de Servicio (JS) bloqueamos todo excepto estado
+    if (rol==="JS"){
+        //Escondemos los Select
+        html_HideElement("modalEQP")
+        html_HideElement("_modalEQP")
+
+        html_HideElement("areEqp")
+        html_HideElement("_areEqp")
+        //Bloqueamos todos los campos excepto estado
+        document.getElementById("nserEQP").readOnly=true
+        document.getElementById("nomEQP").readOnly=true
+        document.getElementById("marcaEQP").readOnly=true
+        document.getElementById("modeloEQP").readOnly=true
+        document.getElementById("modalEQP").readOnly=true
+        document.getElementById("areEqp").readOnly=true
+        document.getElementById("idarea").readOnly=true
+    }
+}
+
+
 
 //funcion para listboxes al cambiar actualizar campos
 function updatePKSEqp(e) {
@@ -112,7 +123,7 @@ function updatePKSEqp(e) {
     }
 }
 
-function readTblsEQP(opc) {
+function readTblsEQP() {
     var divtable = "showDataEQP";
     var tabladatos = "Eqptbl";
     var columnaedicion = 9;
@@ -131,32 +142,20 @@ function readTblsEQP(opc) {
     CreateTableFromJSON(divtable, tabladatos, cabecerapac); //parametros referencia div, nombre tabla , cabecera
     //var getEquipoimg = postRestService(uriserv + "/EquipoImagenologia/requestALL", jsonData);
      //var getEquipoimg = postRestServiceFetch(jsonData, uriserv + "/EquipoImagenologia/requestALL");
-     var getEquipoimg;
-     switch (opc) {
-        case 1:
-            console.log("entró al caso 1");
-            getEquipoimg = getServicio(uriserv +"/EquipoImagenologia/requestALL"); 
-            console.log("SALIO DEL POST");
-            //getEquipoimg = postRestServiceFetch(jsonData, uriserv + "/EquipoImagenologia/requestALL",'POST');
-            break;
-            
-        case 2:
-            console.log("entró al caso 2");
-            getEquipoimg = getServicio(uriserv +"/EquipoImagenologia/consultaEquiposArea"); 
-            //getEquipoimg = getRestServiceFetch(uriserv + "/EquipoImagenologia/consultaEquiposArea",'GET');
-            break;
-    }
+    var getEquipoimg;
+    getEquipoimg = getServicio(uriserv +"/EquipoImagenologia/requestALL"); 
+    console.log("SALIO DEL POST");
      
      
     getEquipoimg.then(function(data) {
-      console.log(data);
-      // Actualizar la tabla con los datos recibidos
-      UpdateTableRows(tabladatos, data);
-      tableRowColorCellSelectionKlib(tabladatos);
-      hideTableColumns(tabladatos, colocultas); // Ocultar columnas
-      addRadioButtonColumnPKTBL(
-          tabladatos, columnaedicion, coleditar, roweditar,
-          actionListener, columnaPK
+    console.log(data);
+    // Actualizar la tabla con los datos recibidos
+    UpdateTableRows(tabladatos, data);
+    tableRowColorCellSelectionKlib(tabladatos);
+    hideTableColumns(tabladatos, colocultas); // Ocultar columnas
+    addRadioButtonColumnPKTBL(
+        tabladatos, columnaedicion, coleditar, roweditar,
+        actionListener, columnaPK
       );
   })
   .catch(function(error) {
@@ -248,6 +247,21 @@ function getFormData(crud, formname) {
     
 }
 
+
+//Botones 
+function asignaEventosEQP(e){
+    console.log("Entró a asignar Eventos")
+    const rol = e.target.dataset.rol;
+    const crudButtons = document.querySelectorAll(".crud");
+    crudButtons.forEach(btn => {
+        btn.dataset.rol = rol;
+        btn.addEventListener("click", (event) => {
+            barraBotonesEQP(event);
+        });
+    });
+    barraBotonesEQP(e);
+}
+
 // María de Jesús Rebolledo Bustillo
 function getDatos(formname){
     
@@ -291,8 +305,7 @@ function getCookie(name) {
 }
 
 
-//Botones 
-
+/*
 //Consulta equipo
 $(document).on('click', '#btnCatEqptbl', function (e) {
   barraBotonesEQP(e);
@@ -311,6 +324,8 @@ $(document).on('click', '#btnEdtEqptbl', function (e) {
 $(document).on('click', '#btnAddEqptbl', function (e) {
   barraBotonesEQP(e);
 });
+*/
+
 
 // Botón editar modal
 
@@ -334,12 +349,6 @@ $(document).on('click', '#agregarEQPRIS', function (e) {
 });
 
 
-//Salir
-
-$(document).on('click', '#salir', function (e) {
-  salir();
-});
-
 $(document).on('change', '#edoEqp', function (e) {
    updatePKSEqp(e);
 });
@@ -349,10 +358,3 @@ $(document).on('change', '#areEqp', function (e) {
 });
 
 
-window.onload = function () {
-    //$().ready(function () {   
-    console.log("Cosntruyendo pagina EQP 3");
-    //dragElement(document.getElementById("mymodalEquipoRIS")); //modal que se puede arrastrar cabecera
-    //html_disableItem('btnDelEqptbl', false,'#cccccc','#ffffff');
-};
-//});

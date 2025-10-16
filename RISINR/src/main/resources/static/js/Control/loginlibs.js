@@ -2,7 +2,6 @@
 window._loginCache = null;
 var host = "http://" + location.host+"/RISSERVER/";
 var FSM2;
-var contador_intentos=0;
 
 
 function agregarPreloader(servicio) {
@@ -16,11 +15,13 @@ function removerPreloader(servicio) {
 } 
 //mover a clase de vista general (paquete vista)
 function nobackbutton() {
-    window.location.hash = "no-back-button";
-    window.location.hash = "Again-No-back-button";
-    window.onhashchange = function () {
-        window.location.hash = "no-back-button";
-    };
+  // Empuja un estado inicial
+  history.pushState(null, null, location.href);
+
+  // Cada vez que el usuario intente retroceder, no lo dejamos
+  window.onpopstate = function () {
+    history.pushState(null, null, location.href);
+  };
 }
 
 
@@ -103,7 +104,7 @@ async function onModalIngresarClick(e) {
       return;
     }
 
-    window.location.href = `${location.origin}/RISSERVER/vistas/perfiles/${encodeURIComponent(rolNombre)}/${vista}`;
+    window.location.replace(`${location.origin}/RISSERVER/vistas/perfiles/${encodeURIComponent(rolNombre)}/${vista}`);
 
   } catch (err) {
     console.error('Error seleccionar-rol:', err);
@@ -191,8 +192,7 @@ async function logIn(e) {
           alert("No se encontró la vista para el estado 'INGRESAR'. Revisa la FSM.");
           return;
         }
-        window.location.href =
-          `${location.origin}/RISSERVER/vistas/perfiles/${encodeURIComponent(rolUnico)}/${vista}`;
+        window.location.replace(`${location.origin}/RISSERVER/vistas/perfiles/${encodeURIComponent(rolUnico)}/${vista}`);
 
   } catch (err) {
     console.error('Error login:', err.message);

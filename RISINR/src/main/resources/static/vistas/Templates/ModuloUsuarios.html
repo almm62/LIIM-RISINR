@@ -1,70 +1,60 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        <title>TODO supply a title</title>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="stylesheet" href="/RISSERVER/css/RIS.css">
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/jsrsasign/10.6.0/jsrsasign-all-min.js"></script>
-    </head>
-    <body id="ModuloUsuarios">
-        <h2>Administración de usuarios</h2>
-        <div class="flex-container">
-            <button id="btnCatUSRtbl" class="button button1 fa fa-plus">Consulta catálogo</button>            
-            <button id="btnAdtUsrtbl" class="button button1 fa fa-plus">Nuevo</button>    
-            <button id="btnEdtUsrtbl" class="button button1 fa fa-pencil">Editar</button>
-        </div>  
-        <br>
-        <div id="showDataUser" class="scrollcell"></div>  
-        <!--dialogo para editar los registros de los usuarios-->
-        <div class="modalUSUARIOS">
-            <div class="modalUSUARIOS-content">
-                <form id="USUARIOS">
-                    <input type="hidden" id="USRtblid" name="USRtblid" value="-1">
-                    <input type="hidden" id="USRrowid" name="USRrowid" value="-1">
-                    <h1>***Usuarios****</h1>
-                    <hr>
-                    <p id="_usrId"><b>UsuarioID</b></p>
-                    <input placeholder="INGRESE USUARIO_ID" name="usrId" type="text" id="usrId" autocomplete="off">
-                    <p><b>Nombre</b></p>
-                    <input placeholder="INGRESE NOMBRE DE USUARIO" name="uname" type="text" id="uname" autocomplete="off">
-                    <p ><b>A. Paterno</b></p>
-                    <input placeholder="INGRESE APELLIDO PATERNO" name="apaterno" type="text" id="apaterno" autocomplete="off">
-                    <p ><b>A. Materno</b></p>                        
-                    <input placeholder="INGRESE APELLIDO MATERNO" name="amaterno" type="text" id="amaterno" autocomplete="off">
-                    <p id="_curp" ><b>CURP</b></p>
-                    <input placeholder="INGRESE CURP" name="curp" type="text" id="curp" autocomplete="off">                       
-                    <p id="_numEmpleado" ><b>Numero de Empleado</b></p>
-                    <input placeholder="INGRESE NUMERO DE EMPLEADO" name="numEmpleado" type="text" id="numEmpleado" autocomplete="off">                        
-                    <p ><b>Correo Electrónico</b></p>
-                    <input placeholder="INGRESE CORREO ELECTRONICO" name="correo" type="text" id="correo" autocomplete="off">                        
-                    <div id="perfilcreate">
-                        <b>Area de adscripción: </b> 
-                        <select name="perf2" id="perf2">
-                            <option value="0">Seleccione Área</option>
-                        </select> 
-                        <b>Estado</b>            
-                        <label id="_Activo" ><input type="radio" id="Activo" name="estado" value="Activo" checked>Activo</label>          
-                        <label id="_Inicial"><input type="radio" id="Inicial" name="estado" value="Inicial" checked>Inicial</label>            
-                        <label id="_Bloqueado" ><input type="radio" id="Bloqueado" name="estado" value="Bloqueado">Bloqueado</label>
-                        <label id="_Suspendido" ><input type="radio" id="Suspendido" name="estado" value="Suspendido">Suspendido</label>
-                        <label id="_Dado_de_baja" ><input type="radio" id="Dado_de_baja" name="estado" value="Dado de baja">Dado de baja</label>
-                        
-                    </div>
+<section id="ModuloUsuarios">
+    <h2>Administración de usuarios</h2>
+    <div class="flex-container">
+        <button id="btnCatUSRtbl" class="crud button button1 fa fa-plus"> Consulta catálogo</button>            
+        <button id="btnAdtUsrtbl" class="crud button button1 fa fa-plus"> Nuevo</button>    
+        <button id="btnEdtUsrtbl" class="crud button button1 fa fa-pencil"> Editar</button>
+    </div>  
+    <br>
+    <div id="showDataUser" class="scrollcell"></div>  
+    <!--dialogo para editar los registros de los usuarios-->
+    <div class="modalUSUARIOS">
+        <div class="modalUSUARIOS-content">
+            <form id="USUARIOS">
+                <input type="hidden" id="USRtblid" name="USRtblid" value="-1">
+                <input type="hidden" id="USRrowid" name="USRrowid" value="-1">
+                <h1>***Usuarios****</h1>
+                <hr>
+                <p id="_usrId"><b>UsuarioID</b></p>
+                <input placeholder="INGRESE USUARIO_ID" name="usrId" type="text" id="usrId" autocomplete="off">
+                <p><b>Nombre</b></p>
+                <input placeholder="INGRESE NOMBRE DE USUARIO" name="uname" type="text" id="uname" autocomplete="off">
+                <p><b>A. Paterno</b></p>
+                <input placeholder="INGRESE APELLIDO PATERNO" name="apaterno" type="text" id="apaterno" autocomplete="off">
+                <p><b>A. Materno</b></p>                        
+                <input placeholder="INGRESE APELLIDO MATERNO" name="amaterno" type="text" id="amaterno" autocomplete="off">
+                <p><b>CURP</b></p>
+                <input placeholder="INGRESE CURP" name="curp" type="text" id="curp" autocomplete="off">                       
+                <p><b>Numero de Empleado</b></p>
+                <input placeholder="INGRESE NUMERO DE EMPLEADO" name="numEmpleado" type="text" id="numEmpleado" autocomplete="off">                        
+                <p><b>Correo Electrónico</b></p>
+                <input placeholder="INGRESE CORREO ELECTRONICO" name="correo" type="text" id="correo" autocomplete="off">                        
+                <div id="perfilcreate">
+                    <b>Area de adscripción: </b> 
+                    <select name="perf2" id="perf2">
+                        <option value="0">Seleccione Área</option>
+                    </select> 
+                    <b>Estado</b>            
+                    <label id="_Activo" ><input type="radio" id="Activo" name="estado" value="Activo" >Activo</label>          
+                    <label id="_Inicial"><input type="radio" id="Inicial" name="estado" value="Inicial" checked>Inicial</label>            
+                    <label id="_Bloqueado" ><input type="radio" id="Bloqueado" name="estado" value="Bloqueado">Bloqueado</label>
+                    <label id="_Suspendido" ><input type="radio" id="Suspendido" name="estado" value="Suspendido">Suspendido</label>
+                    <label id="_Dado_de_baja" ><input type="radio" id="Dado_de_baja" name="estado" value="Dado de baja">Dado de baja</label>
+                    
+                </div>
 
-                    <div id="perfilupdate" >
-                      <p id="perfil"></p>
-                    </div>
+                <div id="perfilupdate" >
+                    <p id="perfil"></p>
+                </div>
 
-                     <div id="showDataRol"></div>
-                 
-                </form>   
-                <div class="flex-container">
-                    <button id="actualizaUSUARIO" class="button button1">Actualizar Registro</button>
-                    <button id="nuevoUSUARIO" class="button button1">Agregar Registro</button>
-                    <button id="cancelarUSUARIO" class="button button1">Cancelar</button> 
-                </div> 
-            </div>
-        </div>        
-    </body>
-</html>
+                    <div id="showDataRol"></div>
+                
+            </form>   
+            <div class="flex-container">
+                <button id="actualizaUSUARIO" class="crud button button1">Actualizar Registro</button>
+                <button id="nuevoUSUARIO" class="crud button button1">Agregar Registro</button>
+                <button id="cancelarUSUARIO" class="crud button button1">Cancelar</button> 
+            </div> 
+        </div>
+    </div>        
+</section>
