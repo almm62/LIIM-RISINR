@@ -1,5 +1,15 @@
 package com.UAM.RISINR.service.user.implementations;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
+
 import com.UAM.RISINR.model.DatosAcceso;
 import com.UAM.RISINR.model.DatosAccesoPK;
 import com.UAM.RISINR.model.Perfil;
@@ -8,6 +18,8 @@ import com.UAM.RISINR.model.SesionPK;
 import com.UAM.RISINR.model.Usuario;
 import com.UAM.RISINR.model.UsuarioPK;
 import com.UAM.RISINR.model.dto.userManager.ActualizarUsuarioDTO;
+import com.UAM.RISINR.model.dto.userManager.ChangeMailDTO;
+import com.UAM.RISINR.model.dto.userManager.ChangePswdDTO;
 import com.UAM.RISINR.model.dto.userManager.CrearUsuarioDTO;
 import com.UAM.RISINR.model.dto.userManager.UsuarioResumenDTO;
 import com.UAM.RISINR.repository.AreaDeServicioRepository;
@@ -20,13 +32,6 @@ import com.UAM.RISINR.service.model.JwtSessionInfo;
 import com.UAM.RISINR.service.shared.RegistroEventoService;
 import com.UAM.RISINR.service.user.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 @Service
 public class UserServiceImpl implements UserService{
@@ -201,7 +206,7 @@ public UserServiceImpl(RegistroEventoService registroEvento, UsuarioRepository u
             datos=objectMapper.writeValueAsString(datosObj); 
            
         } catch (Exception e) {
-            // Si el subject no se puede parsear, no podemos cerrar sesión
+            // Si el subject no se puede parsear
         }
         var usrMatch=usuarioRepo.findById(new UsuarioPK(dto.getNumEmpleado(), dto.getcurp()));
         if (usrMatch.isEmpty()){
@@ -284,11 +289,120 @@ public UserServiceImpl(RegistroEventoService registroEvento, UsuarioRepository u
                 usr.getAreaidArea().getNombre(),
                 usr.getUsuarioPK().getCurp(),
                 perfiles,
-                usr.getDatosAcceso().getEstado());
-        
-        
+                usr.getDatosAcceso().getEstado());            
     }
     
+    @Override
+    @Transactional
+    public void changePswd(ChangePswdDTO dto, String token){
+        long hora= System.currentTimeMillis();
+        Usuario usr = null;
+        //Clase donde guardaremos los DatosJSON
+        record EventoDatos(String usrCurp, Integer usrNumEmpleado) {}
+        String datos = null;
+        try {
+            // subjectJson tiene { nme, curp, hst, asi } tal como se emite en JwtService
+            JwtSessionInfo info = objectMapper.readValue(token, JwtSessionInfo.class);
+            var datosObj =new EventoDatos(info.getCurp(),info.getNumEmpleado());
+            datos=objectMapper.writeValueAsString(datosObj); 
+            
+            var usrMatch=usuarioRepo.findById(new UsuarioPK(info.getNumEmpleado(), info.getCurp()));
+            if (usrMatch.isEmpty()){
+                registroEvento.log(USER_PK_NOT_FOUND, APLICACION_ACTUALIZACION_USUARIOS, hora, datos);
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no existe");
+            } else {
+                usr=usrMatch.get();
+            }
+        } catch (Exception e) {
+            // Si el subject no se puede parsear
+        }
+        DatosAcceso usrAccess = usr.getDatosAcceso();
+        //Comparamos contraseñas:
+        if(dto.getPswd1()==null || dto.getPswd2()==null || dto.getPswdActual()==null){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Algun campo es null");
+        }
+        if(!Objects.equals(dto.getPswd1(), dto.getPswd2())){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Contraseña nueva no coincide");
+        }
+        if(!Objects.equals(dto.getPswdActual(), usrAccess.getContrasena())){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Contraseña actual erronea");
+        }
+        if (Objects.equals(dto.getPswd1(), usrAccess.getContrasena())){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Contraseña nueva igual a la actual");            
+        }
+        usrAccess.setContrasena(dto.getPswd1());
+        datosAccesoRepo.save(usrAccess);
+    }
+    
+    @Override
+    @Transactional
+    public void changeMail(ChangeMailDTO dto, String token){
+        long hora= System.currentTimeMillis();
+        Usuario usr = null;
+        //Clase donde guardaremos los DatosJSON
+        record EventoDatos(String usrCurp, Integer usrNumEmpleado) {}
+        String datos = null;
+        try {
+            // subjectJson tiene { nme, curp, hst, asi } tal como se emite en JwtService
+            JwtSessionInfo info = objectMapper.readValue(token, JwtSessionInfo.class);
+            var datosObj =new EventoDatos(info.getCurp(),info.getNumEmpleado());
+            datos=objectMapper.writeValueAsString(datosObj); 
+            
+            var usrMatch=usuarioRepo.findById(new UsuarioPK(info.getNumEmpleado(), info.getCurp()));
+            if (usrMatch.isEmpty()){
+                registroEvento.log(USER_PK_NOT_FOUND, APLICACION_ACTUALIZACION_USUARIOS, hora, datos);
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no existe");
+            } else {
+                usr=usrMatch.get();
+            }
+        } catch (Exception e) {
+            // Si el subject no se puede parsear
+        }
+        DatosAcceso usrAccess = usr.getDatosAcceso(); // Para validar contraseña
+        //Comparamos correos:
+        if(dto.getmail1()==null || dto.getmail2()==null || dto.getpswd()==null){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Algun campo es null");
+        }
+        if(!Objects.equals(dto.getmail1(), dto.getmail2())){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Direccion de correo nueva no coincide");
+        }
+        if(!Objects.equals(dto.getpswd(), usrAccess.getContrasena())){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Contrasena erronea");
+        }
+        if (Objects.equals(dto.getmail1(), usr.getCorreoElectronico())){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Direccion de correo nueva igual a la actual");            
+        }
+        usr.setCorreoElectronico(dto.getmail1());
+        usuarioRepo.save(usr);
+    }
+    @Override
+    public UsuarioResumenDTO getUserSesion(String token) {
+        long hora= System.currentTimeMillis();
+        Usuario usr = null;
+        //Clase donde guardaremos los DatosJSON
+        record EventoDatos(String usrCurp, Integer usrNumEmpleado) {}
+        String datos = null;
+        try {
+            // subjectJson tiene { nme, curp, hst, asi } tal como se emite en JwtService
+            JwtSessionInfo info = objectMapper.readValue(token, JwtSessionInfo.class);
+            var datosObj =new EventoDatos(info.getCurp(),info.getNumEmpleado());
+            datos=objectMapper.writeValueAsString(datosObj); 
+            
+            var usrMatch=usuarioRepo.findById(new UsuarioPK(info.getNumEmpleado(), info.getCurp()));
+            if (usrMatch.isEmpty()){
+                registroEvento.log(USER_PK_NOT_FOUND, APLICACION_ACTUALIZACION_USUARIOS, hora, datos);
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no existe");
+            } else {
+                usr=usrMatch.get();
+            }
+        } catch (Exception e) {
+            // Si el subject no se puede parsear
+        }
+        
+        UsuarioResumenDTO respuesta= convertToResumenDTO(usr);
+        return respuesta;
+    }
+            
     private UsuarioResumenDTO convertToResumenDTO(Usuario usuario) {
         List<String> roles = usuario.getPerfilCollection().stream().map(perfil -> perfil.getRol().getNombre()).collect(Collectors.toList());
     return new UsuarioResumenDTO(
