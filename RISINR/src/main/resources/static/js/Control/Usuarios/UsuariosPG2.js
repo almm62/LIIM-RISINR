@@ -42,24 +42,6 @@ async function getTBL(uriServ, nameDivContainer, tablName, columnas) {
   }
 }
 
-async function getServicio(url, tipohttp = 'GET', body = null) {
-    const headers = { 'Accept': 'application/json' };
-    if (body) headers['Content-Type'] = 'application/json';
-
-    const res = await fetch(url, {
-        method: tipohttp,
-        headers,
-        body: body ? JSON.stringify(body) : undefined,
-        credentials: 'include' // quita si no usas cookies
-    });
-
-    if (!res.ok) {
-        throw new Error(`HTTP ${res.status}`);
-    }
-
-    return res.json();
-}
-
 
 //MPPS: Modality Procedure Performe Step, SCN: Study contnet Notification.
 
@@ -363,14 +345,6 @@ async function CrudUSR(e){
             html_HideElement("actualizaUSUARIO");
             html_ShowElement("nuevoUSUARIO");
             
-            /*
-            html_ShowElement("usrId"); 
-            html_ShowElement("_usrId"); 
-            html_ShowElement("_curp"); 
-            html_ShowElement("curp"); 
-            html_ShowElement("numEmpleado"); 
-            html_ShowElement("_numEmpleado"); 
-            */
 
             html_HideElement("perfilupdate");            
             cleanCheckboxValues("perfilapp"); //limpia todas las casilla para evitar previa seleccion 
@@ -390,17 +364,7 @@ async function CrudUSR(e){
             html_ShowElement("_Inicial");
             html_ShowElement("Dado_de_baja");
             html_ShowElement("_Dado_de_baja");
-            
-            /*
-            html_HideElement("usrId");
-            html_HideElement("_usrId");
-            
-            html_HideElement("_curp");
-            html_HideElement("curp");
-            
-            html_HideElement("_numEmpleado");
-            html_HideElement("numEmpleado");
-            */
+
             llenaFormulario(rol);
 
             cambiaEstadoModal(".modalUSUARIOS", true);  
@@ -434,7 +398,7 @@ async function CrudUSR(e){
                 console.log(valuesCLV);
                 var perfil = valuesRow.substring(0, valuesRow.length - 1) + "]";//elimina la coma al final de la cadena
                 var refregx = getRadioVal("estado");
-                console.log(refregx);
+                console.log("Estado", refregx);
                 var lixboxsel = document.getElementById("perf2");
                 var areaser = lixboxsel[lixboxsel.selectedIndex].value; //pkey table perfil      
                 areaser=Number(areaser)
@@ -448,7 +412,7 @@ async function CrudUSR(e){
                 } finally{
                     cambiaEstadoModal(".modalUSUARIOS", false);
                     document.getElementById("USUARIOS").reset(); //Borra datos del formulario
-                    await CrudUSR('btnCatUSRtbl');
+                    await ConsultaCatalogoUSRS();
                 }
                 
             } 
@@ -489,7 +453,7 @@ async function CrudUSR(e){
                     } finally{
                         cambiaEstadoModal(".modalUSUARIOS", false);
                         document.getElementById("USUARIOS").reset(); //Borra datos del formulario
-                        await CrudUSR('btnCatUSRtbl');
+                        await ConsultaCatalogoUSRS();;
                     }
                 } else {
                     alert("Seleccione un registro de la tabla");

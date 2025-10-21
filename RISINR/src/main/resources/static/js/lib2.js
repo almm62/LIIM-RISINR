@@ -1,3 +1,20 @@
+async function getServicio(url, tipohttp = 'GET', body = null) {
+    const headers = { 'Accept': 'application/json' };
+    if (body) headers['Content-Type'] = 'application/json';
+
+    const res = await fetch(url, {
+        method: tipohttp,
+        headers,
+        body: body ? JSON.stringify(body) : undefined,
+        credentials: 'include' // quita si no usas cookies
+    });
+
+    if (!res.ok) {
+        throw new Error(`HTTP ${res.status}`);
+    }
+
+    return res.json();
+}
 
 function activeTab(evt, opcionMenu) {
     console.log(`Creando tabla ${opcionMenu}`)

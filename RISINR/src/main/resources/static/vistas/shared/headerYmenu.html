@@ -28,32 +28,72 @@
         <form id="configForm" method="dialog">
             <h2>Configuración</h2>
 
-            <label>
-                Nueva contraseña
-                <input id="pwd" name="pwd" type="password"/>
-            </label>
+            <!-- Sección de Correo Electrónico -->
+            <div id="configEmail" class="config-section">
+                <h3>Correo Electrónico</h3>
+                
+                <!-- Mostrar correo actual con botón de editar -->
+                <div id="emailDisplay" style="display:flex; align-items:center; gap:1rem; margin-bottom:1rem;">
+                    <label>
+                        Correo actual
+                        <input id="emailActual" type="email" readonly style="background:#f5f5f5;" />
+                    </label>
+                    <button type="button" id="btnEditarEmail" title="Editar correo">✏️</button>
+                </div>
 
-            <label>
-                Confirmar contraseña
-                <input id="pwd2" name="pwd2" type="password"/>
-            </label>
+                <!-- Campos de edición de correo (ocultos por defecto) -->
+                <div id="emailEditFields" style="display:none;">
+                    <label>
+                        Nuevo correo electrónico
+                        <input id="mail" name="mail" type="email" disabled />
+                    </label>
 
-            <label>
-                Nuevo correo electrónico
-                <input id="mail" name="mail" type="email"/>
-            </label>
+                    <label>
+                        Confirmar correo electrónico
+                        <input id="mail2" name="mail2" type="email" disabled />
+                    </label>
+                </div>
+            </div>
 
-            <label>
-                Confirmar correo electrónico
-                <input id="mail2" name="mail2" type="email"/>
-            </label>
+            <hr style="margin:1.5rem 0;">
 
-            <p id="error"  style="color:#b00020; margin: .5rem 0 0; min-height:1.25em;"></p>
+            <!-- Sección de Contraseña -->
+            <div class="config-section">
+                <h3>Contraseña</h3>
+                
+                <button type="button" id="btnCambiarPassword" style="margin-bottom:1rem;">
+                    Cambiar contraseña
+                </button>
+
+                <!-- Campos de cambio de contraseña (ocultos por defecto) -->
+                <div id="passwordEditFields" style="display:none;">
+                    <label>
+                        Nueva contraseña
+                        <input id="pwd" name="pwd" type="password" disabled />
+                    </label>
+
+                    <label>
+                        Confirmar contraseña
+                        <input id="pwd2" name="pwd2" type="password" disabled />
+                    </label>
+                </div>
+            </div>
+
+            <hr style="margin:1.5rem 0;">
+
+            <!-- Contraseña actual para validar cambios -->
+            <div id="validationSection" style="display:none;">
+                <label>
+                    Contraseña actual (para confirmar cambios)
+                    <input id="passwordActual" name="passwordActual" type="password" disabled />
+                </label>
+            </div>
+
+            <p id="errorConfig" style="color:#b00020; margin:.5rem 0 0; min-height:1.25em;"></p>
 
             <div style="display:flex; gap:.5rem; justify-content:flex-end; margin-top:1rem;">
-                <!-- INPUT para Contraseña actual -->
-                <button value="cancelar">Cancelar</button>
-                <button value="aceptar">Aceptar</button>
+                <button id="configCancelar" type="button" value="cancelar">Cancelar</button>
+                <button id="configGuardar" type="submit" value="aceptar" disabled>Guardar cambios</button>
             </div>
         </form>
     </dialog>

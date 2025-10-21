@@ -1,6 +1,7 @@
 package com.UAM.RISINR.controller;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -67,7 +68,7 @@ public class UserController {
     }
 
     @PostMapping("/pswd")
-    public ResponseEntity<String> changePswd(@RequestBody ChangePswdDTO dto,
+    public ResponseEntity<Map<String,String>> changePswd(@RequestBody ChangePswdDTO dto,
                             HttpServletRequest httpReq) {
         var auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth == null || auth.getPrincipal() == null) {
@@ -75,11 +76,11 @@ public class UserController {
         }
         String subjectJson = (String) auth.getPrincipal();
         userService.changePswd(dto, subjectJson);
-        return ResponseEntity.ok("");
+        return ResponseEntity.ok(Map.of("message", "Constraseña actualizada exitosamente"));
     }
 
     @PostMapping("/email")
-    public ResponseEntity<String> changeMail(@RequestBody ChangeMailDTO dto,
+    public ResponseEntity<Map<String,String>> changeMail(@RequestBody ChangeMailDTO dto,
                             HttpServletRequest httpReq) {
         var auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth == null || auth.getPrincipal() == null) {
@@ -87,7 +88,7 @@ public class UserController {
         }
         String subjectJson = (String) auth.getPrincipal();
         userService.changeMail(dto, subjectJson);
-        return ResponseEntity.ok("");
+        return ResponseEntity.ok(Map.of("message", "Correo actualizado exitosamente"));
     }
 
     @GetMapping("/userSesion")

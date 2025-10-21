@@ -446,7 +446,83 @@ h2{
 }
 
 
+/* ------ Modal Configuracion ------ */
+#configDialog {
+  padding: 2rem;
+  border: none;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  max-width: 500px;
+  width: 90%;
+}
 
+#configDialog::backdrop {
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.config-section h3 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+}
+
+label {
+  display: block;
+  margin-bottom: 1rem;
+  font-weight: 500;
+}
+
+input {
+  display: block;
+  width: 100%;
+  padding: 0.5rem;
+  margin-top: 0.25rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+input:disabled {
+  background: #f5f5f5;
+  cursor: not-allowed;
+}
+
+button {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+#btnEditarEmail {
+  padding: 0.25rem 0.5rem;
+  font-size: 1.2rem;
+}
+
+#btnCambiarPassword {
+  background: #007bff;
+  color: white;
+}
+
+#btnCambiarPassword:hover {
+  background: #0056b3;
+}
+
+#configCancelar {
+  background: #6c757d;
+  color: white;
+}
+
+#configGuardar {
+  background: #28a745;
+  color: white;
+}
+
+#configGuardar:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
 
 
 
