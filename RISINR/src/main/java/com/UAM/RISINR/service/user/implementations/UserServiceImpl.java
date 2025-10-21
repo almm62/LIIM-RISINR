@@ -163,7 +163,7 @@ public UserServiceImpl(RegistroEventoService registroEvento, UsuarioRepository u
         
         var acceso = new DatosAcceso();
         acceso.setId(accesoPK);
-        acceso.setEstado("Activo");
+        acceso.setEstado(dto.getEstado());
         acceso.setContrasena(contraseña);
         datosAccesoRepo.save(acceso);
         
@@ -331,6 +331,9 @@ public UserServiceImpl(RegistroEventoService registroEvento, UsuarioRepository u
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Contraseña nueva igual a la actual");            
         }
         usrAccess.setContrasena(dto.getPswd1());
+        if (usrAccess.getEstado().equals("Inicial")){
+            usrAccess.setEstado("Activo");
+        }
         datosAccesoRepo.save(usrAccess);
     }
     
@@ -375,6 +378,7 @@ public UserServiceImpl(RegistroEventoService registroEvento, UsuarioRepository u
         usr.setCorreoElectronico(dto.getmail1());
         usuarioRepo.save(usr);
     }
+    
     @Override
     public UsuarioResumenDTO getUserSesion(String token) {
         long hora= System.currentTimeMillis();

@@ -1,9 +1,9 @@
 /*M!999999\- enable the sandbox mode */ 
--- MariaDB dump 10.19  Distrib 10.11.13-MariaDB, for debian-linux-gnu (x86_64)
+-- MariaDB dump 10.19-11.5.2-MariaDB, for Win64 (AMD64)
 --
 -- Host: localhost    Database: RISV1
 -- ------------------------------------------------------
--- Server version	10.11.13-MariaDB-0ubuntu0.24.04.1
+-- Server version	11.5.2-MariaDB
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -14,16 +14,24 @@
 /*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
-/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+/*M!100616 SET @OLD_NOTE_VERBOSITY=@@NOTE_VERBOSITY, NOTE_VERBOSITY=0 */;
 
 --
--- Table structure for table `AgendaDeServicio`
+-- Current Database: `RISV1`
 --
 
-DROP TABLE IF EXISTS `AgendaDeServicio`;
+CREATE DATABASE /*!32312 IF NOT EXISTS*/ `risv1` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_uca1400_ai_ci */;
+
+USE `RISV1`;
+
+--
+-- Table structure for table `agendadeservicio`
+--
+
+DROP TABLE IF EXISTS `agendadeservicio`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8mb4 */;
-CREATE TABLE `AgendaDeServicio` (
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `agendadeservicio` (
   `EquipoImagenologia_NSerie` varchar(50) NOT NULL,
   `Medico_NumEmpleado` int(11) NOT NULL,
   `Medico_CURP` varchar(45) NOT NULL,
@@ -34,28 +42,28 @@ CREATE TABLE `AgendaDeServicio` (
   `Descrpcion` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`EquipoImagenologia_NSerie`,`Medico_NumEmpleado`,`Medico_CURP`,`FechaControlPk`),
   KEY `fk_AgendaDeServicio_Medico1_idx` (`Medico_NumEmpleado`,`Medico_CURP`),
-  CONSTRAINT `fk_AgendaDeServicio_EquipoImagenologia1` FOREIGN KEY (`EquipoImagenologia_NSerie`) REFERENCES `EquipoImagenologia` (`NSerie`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `fk_AgendaDeServicio_Medico1` FOREIGN KEY (`Medico_NumEmpleado`, `Medico_CURP`) REFERENCES `Medico` (`NumEmpleado`, `CURP`) ON DELETE CASCADE ON UPDATE CASCADE
+  CONSTRAINT `fk_AgendaDeServicio_EquipoImagenologia1` FOREIGN KEY (`EquipoImagenologia_NSerie`) REFERENCES `equipoimagenologia` (`NSerie`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_AgendaDeServicio_Medico1` FOREIGN KEY (`Medico_NumEmpleado`, `Medico_CURP`) REFERENCES `medico` (`NumEmpleado`, `CURP`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `AgendaDeServicio`
+-- Dumping data for table `agendadeservicio`
 --
 
-LOCK TABLES `AgendaDeServicio` WRITE;
-/*!40000 ALTER TABLE `AgendaDeServicio` DISABLE KEYS */;
-/*!40000 ALTER TABLE `AgendaDeServicio` ENABLE KEYS */;
+LOCK TABLES `agendadeservicio` WRITE;
+/*!40000 ALTER TABLE `agendadeservicio` DISABLE KEYS */;
+/*!40000 ALTER TABLE `agendadeservicio` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
--- Table structure for table `Aplicacion`
+-- Table structure for table `aplicacion`
 --
 
-DROP TABLE IF EXISTS `Aplicacion`;
+DROP TABLE IF EXISTS `aplicacion`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8mb4 */;
-CREATE TABLE `Aplicacion` (
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `aplicacion` (
   `idAplicacion` int(11) NOT NULL,
   `Nombre` varchar(50) NOT NULL,
   `Descripcion` varchar(100) DEFAULT NULL,
@@ -64,12 +72,12 @@ CREATE TABLE `Aplicacion` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `Aplicacion`
+-- Dumping data for table `aplicacion`
 --
 
-LOCK TABLES `Aplicacion` WRITE;
-/*!40000 ALTER TABLE `Aplicacion` DISABLE KEYS */;
-INSERT INTO `Aplicacion` VALUES
+LOCK TABLES `aplicacion` WRITE;
+/*!40000 ALTER TABLE `aplicacion` DISABLE KEYS */;
+INSERT INTO `aplicacion` VALUES
 (0,'Login','Login al sistema'),
 (1,'Consulta de Equipos','Listar equipos existentes en BD'),
 (2,'Edicion de Equipo','Editar equipos existentes en BD'),
@@ -77,17 +85,17 @@ INSERT INTO `Aplicacion` VALUES
 (4,'Consulta de usuarios','Listar usuarios existentes en BD'),
 (5,'Edicion de Usuarios','Editar usuarios existentes en BD'),
 (6,'Alta de Usuarios','Alta de usuario nuevo');
-/*!40000 ALTER TABLE `Aplicacion` ENABLE KEYS */;
+/*!40000 ALTER TABLE `aplicacion` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
--- Table structure for table `AreaDeServicio`
+-- Table structure for table `areadeservicio`
 --
 
-DROP TABLE IF EXISTS `AreaDeServicio`;
+DROP TABLE IF EXISTS `areadeservicio`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8mb4 */;
-CREATE TABLE `AreaDeServicio` (
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `areadeservicio` (
   `idArea` int(11) NOT NULL,
   `Nombre` varchar(60) NOT NULL,
   `Descripcion` varchar(120) NOT NULL,
@@ -96,12 +104,12 @@ CREATE TABLE `AreaDeServicio` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `AreaDeServicio`
+-- Dumping data for table `areadeservicio`
 --
 
-LOCK TABLES `AreaDeServicio` WRITE;
-/*!40000 ALTER TABLE `AreaDeServicio` DISABLE KEYS */;
-INSERT INTO `AreaDeServicio` VALUES
+LOCK TABLES `areadeservicio` WRITE;
+/*!40000 ALTER TABLE `areadeservicio` DISABLE KEYS */;
+INSERT INTO `areadeservicio` VALUES
 (1,'Rayos X','Cuerpo 6 planta baja'),
 (2,'Resonancia Magnetica','Cuerpo 1 plata baja'),
 (3,'Tomografía Computada','Cuerpo 6 planta baja'),
@@ -110,17 +118,17 @@ INSERT INTO `AreaDeServicio` VALUES
 (6,'Ultrasonido','Cuerpo 1 planta baja'),
 (7,'Densitometria','Cuerpo 1 planta baja'),
 (8,'Subdirección de Rehabilitación','Subdirección de Rehabilitación');
-/*!40000 ALTER TABLE `AreaDeServicio` ENABLE KEYS */;
+/*!40000 ALTER TABLE `areadeservicio` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
--- Table structure for table `AsignacionEstudio`
+-- Table structure for table `asignacionestudio`
 --
 
-DROP TABLE IF EXISTS `AsignacionEstudio`;
+DROP TABLE IF EXISTS `asignacionestudio`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8mb4 */;
-CREATE TABLE `AsignacionEstudio` (
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `asignacionestudio` (
   `EquipoImagenologia_NSerie` varchar(50) NOT NULL,
   `Estudio_idEstudio` int(11) NOT NULL,
   `FechaPk` bigint(20) NOT NULL,
@@ -128,18 +136,18 @@ CREATE TABLE `AsignacionEstudio` (
   PRIMARY KEY (`EquipoImagenologia_NSerie`,`Estudio_idEstudio`,`FechaPk`),
   KEY `fk_EquipoImagenologia_has_Estudio_Estudio1_idx` (`Estudio_idEstudio`),
   KEY `fk_EquipoImagenologia_has_Estudio_EquipoImagenologia1_idx` (`EquipoImagenologia_NSerie`),
-  CONSTRAINT `fk_EquipoImagenologia_has_Estudio_EquipoImagenologia1` FOREIGN KEY (`EquipoImagenologia_NSerie`) REFERENCES `EquipoImagenologia` (`NSerie`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `fk_EquipoImagenologia_has_Estudio_Estudio1` FOREIGN KEY (`Estudio_idEstudio`) REFERENCES `Estudio` (`idEstudio`) ON DELETE CASCADE ON UPDATE CASCADE
+  CONSTRAINT `fk_EquipoImagenologia_has_Estudio_EquipoImagenologia1` FOREIGN KEY (`EquipoImagenologia_NSerie`) REFERENCES `equipoimagenologia` (`NSerie`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_EquipoImagenologia_has_Estudio_Estudio1` FOREIGN KEY (`Estudio_idEstudio`) REFERENCES `estudio` (`idEstudio`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `AsignacionEstudio`
+-- Dumping data for table `asignacionestudio`
 --
 
-LOCK TABLES `AsignacionEstudio` WRITE;
-/*!40000 ALTER TABLE `AsignacionEstudio` DISABLE KEYS */;
-INSERT INTO `AsignacionEstudio` VALUES
+LOCK TABLES `asignacionestudio` WRITE;
+/*!40000 ALTER TABLE `asignacionestudio` DISABLE KEYS */;
+INSERT INTO `asignacionestudio` VALUES
 ('EQUIPOPRUEBAA1',1,1636732800000,'2021-11-12 16:00:00'),
 ('EQUIPOPRUEBAA1',1,1636749000000,'2021-11-12 20:30:00'),
 ('EQUIPOPRUEBAA1',1,1636768800000,'2021-11-12 06:00:00'),
@@ -202,44 +210,44 @@ INSERT INTO `AsignacionEstudio` VALUES
 ('EQUIPOPRUEBAF1',33,1636763400000,'2021-11-13 00:30:00'),
 ('EQUIPOPRUEBAF1',34,1636749900000,'2021-11-12 20:45:00'),
 ('EQUIPOPRUEBAF1',34,1636767000000,'2021-11-13 01:30:00');
-/*!40000 ALTER TABLE `AsignacionEstudio` ENABLE KEYS */;
+/*!40000 ALTER TABLE `asignacionestudio` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
--- Table structure for table `ConfiguracionRIS`
+-- Table structure for table `configuracionris`
 --
 
-DROP TABLE IF EXISTS `ConfiguracionRIS`;
+DROP TABLE IF EXISTS `configuracionris`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8mb4 */;
-CREATE TABLE `ConfiguracionRIS` (
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `configuracionris` (
   `Equipo_NSerie` varchar(50) NOT NULL,
   `TipoConfiguracion` varchar(45) NOT NULL,
   `IPAddress` varchar(15) DEFAULT NULL,
   `Puerto` int(11) DEFAULT NULL,
   `NombreEntidad` varchar(16) DEFAULT NULL,
   PRIMARY KEY (`Equipo_NSerie`),
-  CONSTRAINT `fk_ConfiguracionRIS_Equipo1` FOREIGN KEY (`Equipo_NSerie`) REFERENCES `Equipo` (`NSerie`) ON DELETE CASCADE ON UPDATE CASCADE
+  CONSTRAINT `fk_ConfiguracionRIS_Equipo1` FOREIGN KEY (`Equipo_NSerie`) REFERENCES `equipo` (`NSerie`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `ConfiguracionRIS`
+-- Dumping data for table `configuracionris`
 --
 
-LOCK TABLES `ConfiguracionRIS` WRITE;
-/*!40000 ALTER TABLE `ConfiguracionRIS` DISABLE KEYS */;
-/*!40000 ALTER TABLE `ConfiguracionRIS` ENABLE KEYS */;
+LOCK TABLES `configuracionris` WRITE;
+/*!40000 ALTER TABLE `configuracionris` DISABLE KEYS */;
+/*!40000 ALTER TABLE `configuracionris` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
--- Table structure for table `ControlEstudios`
+-- Table structure for table `controlestudios`
 --
 
-DROP TABLE IF EXISTS `ControlEstudios`;
+DROP TABLE IF EXISTS `controlestudios`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8mb4 */;
-CREATE TABLE `ControlEstudios` (
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `controlestudios` (
   `Usuario_NumEmpleado` int(11) NOT NULL,
   `Usuario_CURP` varchar(45) NOT NULL,
   `Paciente_IDPaciente` varchar(20) NOT NULL,
@@ -253,29 +261,29 @@ CREATE TABLE `ControlEstudios` (
   KEY `fk_Usuario_has_Paciente_Paciente1_idx` (`Paciente_IDPaciente`),
   KEY `fk_Usuario_has_Paciente_Usuario1_idx` (`Usuario_NumEmpleado`,`Usuario_CURP`),
   KEY `fk_ControlEstudios_Estudio1_idx` (`Estudio_idEstudio`),
-  CONSTRAINT `fk_ControlEstudios_Estudio1` FOREIGN KEY (`Estudio_idEstudio`) REFERENCES `Estudio` (`idEstudio`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `fk_Usuario_has_Paciente_Paciente1` FOREIGN KEY (`Paciente_IDPaciente`) REFERENCES `Paciente` (`idPaciente`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `fk_Usuario_has_Paciente_Usuario1` FOREIGN KEY (`Usuario_NumEmpleado`, `Usuario_CURP`) REFERENCES `Usuario` (`NumEmpleado`, `CURP`) ON DELETE CASCADE ON UPDATE CASCADE
+  CONSTRAINT `fk_ControlEstudios_Estudio1` FOREIGN KEY (`Estudio_idEstudio`) REFERENCES `estudio` (`idEstudio`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_Usuario_has_Paciente_Paciente1` FOREIGN KEY (`Paciente_IDPaciente`) REFERENCES `paciente` (`idPaciente`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_Usuario_has_Paciente_Usuario1` FOREIGN KEY (`Usuario_NumEmpleado`, `Usuario_CURP`) REFERENCES `usuario` (`NumEmpleado`, `CURP`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `ControlEstudios`
+-- Dumping data for table `controlestudios`
 --
 
-LOCK TABLES `ControlEstudios` WRITE;
-/*!40000 ALTER TABLE `ControlEstudios` DISABLE KEYS */;
-/*!40000 ALTER TABLE `ControlEstudios` ENABLE KEYS */;
+LOCK TABLES `controlestudios` WRITE;
+/*!40000 ALTER TABLE `controlestudios` DISABLE KEYS */;
+/*!40000 ALTER TABLE `controlestudios` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
--- Table structure for table `DatosAcceso`
+-- Table structure for table `datosacceso`
 --
 
-DROP TABLE IF EXISTS `DatosAcceso`;
+DROP TABLE IF EXISTS `datosacceso`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8mb4 */;
-CREATE TABLE `DatosAcceso` (
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `datosacceso` (
   `Contraseña` varchar(20) NOT NULL,
   `UsuarioID` varchar(45) NOT NULL,
   `Usuario_NumEmpleado` int(11) NOT NULL,
@@ -283,17 +291,19 @@ CREATE TABLE `DatosAcceso` (
   `Estado` varchar(45) NOT NULL,
   PRIMARY KEY (`UsuarioID`,`Usuario_NumEmpleado`,`Usuario_CURP`),
   KEY `fk_DatosAcceso_Usuario1_idx` (`Usuario_NumEmpleado`,`Usuario_CURP`),
-  CONSTRAINT `fk_DatosAcceso_Usuario1` FOREIGN KEY (`Usuario_NumEmpleado`, `Usuario_CURP`) REFERENCES `Usuario` (`NumEmpleado`, `CURP`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  CONSTRAINT `fk_DatosAcceso_Usuario1` FOREIGN KEY (`Usuario_NumEmpleado`, `Usuario_CURP`) REFERENCES `usuario` (`NumEmpleado`, `CURP`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `DatosAcceso`
+-- Dumping data for table `datosacceso`
 --
 
-LOCK TABLES `DatosAcceso` WRITE;
-/*!40000 ALTER TABLE `DatosAcceso` DISABLE KEYS */;
-INSERT INTO `DatosAcceso` VALUES
+LOCK TABLES `datosacceso` WRITE;
+/*!40000 ALTER TABLE `datosacceso` DISABLE KEYS */;
+INSERT INTO `datosacceso` VALUES
+('15Octubre','15Octubre',17,'15Octubre','Activo'),
+('20Octubre','20Octubre',20,'20Octubre','Inicial'),
 ('21Septiembre2025','21Septiembre2025',4,'21Septiembre2025','Activo'),
 ('21Septiembreq','21Septiembreq',2,'21Septiembreq','Activo'),
 ('24Septiembre','24Septiembre',12,'24Septiembre','Activo'),
@@ -304,28 +314,30 @@ INSERT INTO `DatosAcceso` VALUES
 ('8Octubre','8Octubre',14,'8Octubre','Activo'),
 ('nueveOCT123','9OCTUBRE',15,'nueveOCT123','Activo'),
 ('asdasdasd','asd',8,'asdasdasd','Activo'),
-('abc123','carlos',0,'PEPC000000','Inicial'),
+('abc123','carlos',0,'PEPC000000','Activo'),
 ('asdasdasd','dasdasdasd',122,'asdasdasd','Activo'),
+('actualizada','HOLA',19,'hola','Activo'),
 ('Prueba123','hola123',3,'Prueba123','Activo'),
 ('hola21Septiembre2025','hola21Septiembre2025',6,'hola21Septiembre2025','Activo'),
-('holaMundo','LIIM',1,'LIIM0000','Activo'),
+('holaEjemplo','holaEjemplo',16,'holaEjemplo','Inicial'),
+('hola','LIIM',1,'LIIM0000','Activo'),
 ('REBM111111','MaddieRB',100,'REBM111111','Activo'),
 ('ROJP000000','MisaRJ',10,'ROJP000000','Activo'),
 ('qweqwe','poi',7,'qweqwe','Activo'),
 ('PRUEBA0000','PruebaID',5,'PRUEBA0000','Activo'),
 ('ds','qwew',321312,'ds','Activo'),
 ('ELCP0000','SoyPacoElChato',22,'ELCP0000','Activo');
-/*!40000 ALTER TABLE `DatosAcceso` ENABLE KEYS */;
+/*!40000 ALTER TABLE `datosacceso` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
--- Table structure for table `Domicilio`
+-- Table structure for table `domicilio`
 --
 
-DROP TABLE IF EXISTS `Domicilio`;
+DROP TABLE IF EXISTS `domicilio`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8mb4 */;
-CREATE TABLE `Domicilio` (
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `domicilio` (
   `Paciente_IDPaciente` varchar(20) NOT NULL,
   `Calle` varchar(45) NOT NULL,
   `Numero` varchar(20) NOT NULL,
@@ -336,43 +348,43 @@ CREATE TABLE `Domicilio` (
   `TiempoDeTraslado` int(11) DEFAULT NULL,
   `Telefono` varchar(20) NOT NULL,
   PRIMARY KEY (`Paciente_IDPaciente`),
-  CONSTRAINT `fk_Domicilio_Paciente1` FOREIGN KEY (`Paciente_IDPaciente`) REFERENCES `Paciente` (`idPaciente`) ON DELETE CASCADE ON UPDATE CASCADE
+  CONSTRAINT `fk_Domicilio_Paciente1` FOREIGN KEY (`Paciente_IDPaciente`) REFERENCES `paciente` (`idPaciente`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `Domicilio`
+-- Dumping data for table `domicilio`
 --
 
-LOCK TABLES `Domicilio` WRITE;
-/*!40000 ALTER TABLE `Domicilio` DISABLE KEYS */;
-/*!40000 ALTER TABLE `Domicilio` ENABLE KEYS */;
+LOCK TABLES `domicilio` WRITE;
+/*!40000 ALTER TABLE `domicilio` DISABLE KEYS */;
+/*!40000 ALTER TABLE `domicilio` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
--- Table structure for table `Equipo`
+-- Table structure for table `equipo`
 --
 
-DROP TABLE IF EXISTS `Equipo`;
+DROP TABLE IF EXISTS `equipo`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8mb4 */;
-CREATE TABLE `Equipo` (
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `equipo` (
   `NSerie` varchar(50) NOT NULL,
   `AreaDeServicio_idArea` int(11) NOT NULL,
   `Ubicacion` varchar(60) NOT NULL,
   PRIMARY KEY (`NSerie`),
   KEY `fk_Equipo_AreaDeServicio1_idx` (`AreaDeServicio_idArea`),
-  CONSTRAINT `fk_Equipo_AreaDeServicio1` FOREIGN KEY (`AreaDeServicio_idArea`) REFERENCES `AreaDeServicio` (`idArea`) ON DELETE CASCADE ON UPDATE CASCADE
+  CONSTRAINT `fk_Equipo_AreaDeServicio1` FOREIGN KEY (`AreaDeServicio_idArea`) REFERENCES `areadeservicio` (`idArea`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `Equipo`
+-- Dumping data for table `equipo`
 --
 
-LOCK TABLES `Equipo` WRITE;
-/*!40000 ALTER TABLE `Equipo` DISABLE KEYS */;
-INSERT INTO `Equipo` VALUES
+LOCK TABLES `equipo` WRITE;
+/*!40000 ALTER TABLE `equipo` DISABLE KEYS */;
+INSERT INTO `equipo` VALUES
 ('EQUIPOPRUEBAA1',1,'SALA 1'),
 ('EQUIPOPRUEBAA2',1,'SALA 2'),
 ('EQUIPOPRUEBAA3',1,'SALA 3'),
@@ -384,17 +396,17 @@ INSERT INTO `Equipo` VALUES
 ('EQUIPOPRUEBAD1',4,'SALA 1'),
 ('EQUIPOPRUEBAE1',6,'SALA 1'),
 ('EQUIPOPRUEBAF1',7,'SALA 1');
-/*!40000 ALTER TABLE `Equipo` ENABLE KEYS */;
+/*!40000 ALTER TABLE `equipo` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
--- Table structure for table `EquipoImagenologia`
+-- Table structure for table `equipoimagenologia`
 --
 
-DROP TABLE IF EXISTS `EquipoImagenologia`;
+DROP TABLE IF EXISTS `equipoimagenologia`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8mb4 */;
-CREATE TABLE `EquipoImagenologia` (
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `equipoimagenologia` (
   `NSerie` varchar(50) NOT NULL,
   `AreaDeServicio_idArea` int(11) NOT NULL,
   `Nombre` varchar(40) NOT NULL,
@@ -405,22 +417,22 @@ CREATE TABLE `EquipoImagenologia` (
   `Estado` varchar(25) NOT NULL,
   PRIMARY KEY (`NSerie`),
   KEY `fk_EquipoImagenologia_AreaDeServicio1_idx` (`AreaDeServicio_idArea`),
-  CONSTRAINT `fk_EquipoImagenologia_AreaDeServicio1` FOREIGN KEY (`AreaDeServicio_idArea`) REFERENCES `AreaDeServicio` (`idArea`) ON DELETE CASCADE ON UPDATE CASCADE
+  CONSTRAINT `fk_EquipoImagenologia_AreaDeServicio1` FOREIGN KEY (`AreaDeServicio_idArea`) REFERENCES `areadeservicio` (`idArea`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `EquipoImagenologia`
+-- Dumping data for table `equipoimagenologia`
 --
 
-LOCK TABLES `EquipoImagenologia` WRITE;
-/*!40000 ALTER TABLE `EquipoImagenologia` DISABLE KEYS */;
-INSERT INTO `EquipoImagenologia` VALUES
+LOCK TABLES `equipoimagenologia` WRITE;
+/*!40000 ALTER TABLE `equipoimagenologia` DISABLE KEYS */;
+INSERT INTO `equipoimagenologia` VALUES
 ('\"pruebaPOSTMAN\"',3,'\"PRUEBApostman\"','\"generico01092025\"','editPostman','\"US\"',NULL,'\"Disponible\"'),
 ('12345',3,'Tomógrafo','pruebaEdicion','MODELO0','TC',NULL,'Disponible'),
 ('2',3,'Ultrasonido','Aloca','Alok23','US',NULL,'Bloqueado'),
 ('30Septiembre',3,'30Septiembre','30Septiembre','30Septiembre','TC','2025-09-30','Disponible'),
-('Bc221170',5,'Ultrasonido','DVG','dvg','US','2023-01-30','Disponible'),
+('Bc221170',5,'Ultrasonido','DVG','dvg','US','2023-01-30','Fuera de servicio'),
 ('EQUIPOPRUEBAA1',3,'Densitómetro','Philips','dvg','US',NULL,'Disponible'),
 ('EQUIPOPRUEBAA2',1,'Ultrasonido 4K','Phillips','US221170','OT',NULL,'Mantenimiento Correctivo'),
 ('EQUIPOPRUEBAA3',7,'NOMBRE 3','MARCA 1','MODELO 1','OT',NULL,'Fuera de servicio'),
@@ -432,17 +444,17 @@ INSERT INTO `EquipoImagenologia` VALUES
 ('EQUIPOPRUEBAD1',5,'NOMBRE 9','MARCA 4','MODELO 4','OT',NULL,'Fuera de servicio'),
 ('EQUIPOPRUEBAE1',5,'NOMBRE 10','MARCA 5','MODELO 5','OT',NULL,'Mantenimiento preventivo'),
 ('EQUIPOPRUEBAF1',5,'NOMBRE 11','MARCA 6','MODELO 6','OT',NULL,'Fuera de servicio');
-/*!40000 ALTER TABLE `EquipoImagenologia` ENABLE KEYS */;
+/*!40000 ALTER TABLE `equipoimagenologia` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
--- Table structure for table `Especialidad`
+-- Table structure for table `especialidad`
 --
 
-DROP TABLE IF EXISTS `Especialidad`;
+DROP TABLE IF EXISTS `especialidad`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8mb4 */;
-CREATE TABLE `Especialidad` (
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `especialidad` (
   `idEspecialidad` int(11) NOT NULL,
   `Nombre` varchar(45) NOT NULL,
   `Descripcion` varchar(100) NOT NULL,
@@ -451,26 +463,26 @@ CREATE TABLE `Especialidad` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `Especialidad`
+-- Dumping data for table `especialidad`
 --
 
-LOCK TABLES `Especialidad` WRITE;
-/*!40000 ALTER TABLE `Especialidad` DISABLE KEYS */;
-INSERT INTO `Especialidad` VALUES
+LOCK TABLES `especialidad` WRITE;
+/*!40000 ALTER TABLE `especialidad` DISABLE KEYS */;
+INSERT INTO `especialidad` VALUES
 (1,'Audiología','Audiología'),
 (2,'Ortopedia','Ortopedia'),
 (3,'Medicina de Rehabilitación','Medicina de Rehabilitación');
-/*!40000 ALTER TABLE `Especialidad` ENABLE KEYS */;
+/*!40000 ALTER TABLE `especialidad` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
--- Table structure for table `Especialidad_Medica`
+-- Table structure for table `especialidad_medica`
 --
 
-DROP TABLE IF EXISTS `Especialidad_Medica`;
+DROP TABLE IF EXISTS `especialidad_medica`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8mb4 */;
-CREATE TABLE `Especialidad_Medica` (
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `especialidad_medica` (
   `Especialidad_idEspecialidad` int(11) NOT NULL,
   `Medico_NumEmpleado` int(11) NOT NULL,
   `Medico_CURP` varchar(45) NOT NULL,
@@ -478,45 +490,45 @@ CREATE TABLE `Especialidad_Medica` (
   PRIMARY KEY (`Especialidad_idEspecialidad`,`Medico_NumEmpleado`,`Medico_CURP`),
   KEY `fk_Especialidad_has_Medico_Medico1_idx` (`Medico_NumEmpleado`,`Medico_CURP`),
   KEY `fk_Especialidad_has_Medico_Especialidad1_idx` (`Especialidad_idEspecialidad`),
-  CONSTRAINT `fk_Especialidad_has_Medico_Especialidad1` FOREIGN KEY (`Especialidad_idEspecialidad`) REFERENCES `Especialidad` (`idEspecialidad`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `fk_Especialidad_has_Medico_Medico1` FOREIGN KEY (`Medico_NumEmpleado`, `Medico_CURP`) REFERENCES `Medico` (`NumEmpleado`, `CURP`) ON DELETE CASCADE ON UPDATE CASCADE
+  CONSTRAINT `fk_Especialidad_has_Medico_Especialidad1` FOREIGN KEY (`Especialidad_idEspecialidad`) REFERENCES `especialidad` (`idEspecialidad`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_Especialidad_has_Medico_Medico1` FOREIGN KEY (`Medico_NumEmpleado`, `Medico_CURP`) REFERENCES `medico` (`NumEmpleado`, `CURP`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `Especialidad_Medica`
+-- Dumping data for table `especialidad_medica`
 --
 
-LOCK TABLES `Especialidad_Medica` WRITE;
-/*!40000 ALTER TABLE `Especialidad_Medica` DISABLE KEYS */;
-/*!40000 ALTER TABLE `Especialidad_Medica` ENABLE KEYS */;
+LOCK TABLES `especialidad_medica` WRITE;
+/*!40000 ALTER TABLE `especialidad_medica` DISABLE KEYS */;
+/*!40000 ALTER TABLE `especialidad_medica` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
--- Table structure for table `Estudio`
+-- Table structure for table `estudio`
 --
 
-DROP TABLE IF EXISTS `Estudio`;
+DROP TABLE IF EXISTS `estudio`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8mb4 */;
-CREATE TABLE `Estudio` (
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `estudio` (
   `idEstudio` int(11) NOT NULL,
   `AreaDeServicio_idArea` int(11) NOT NULL,
   `Nombre` varchar(64) NOT NULL,
   `Descripcion` varchar(65) NOT NULL,
   PRIMARY KEY (`idEstudio`),
   KEY `fk_Estudio_AreaDeServicio1_idx` (`AreaDeServicio_idArea`),
-  CONSTRAINT `fk_Estudio_AreaDeServicio1` FOREIGN KEY (`AreaDeServicio_idArea`) REFERENCES `AreaDeServicio` (`idArea`) ON DELETE CASCADE ON UPDATE CASCADE
+  CONSTRAINT `fk_Estudio_AreaDeServicio1` FOREIGN KEY (`AreaDeServicio_idArea`) REFERENCES `areadeservicio` (`idArea`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `Estudio`
+-- Dumping data for table `estudio`
 --
 
-LOCK TABLES `Estudio` WRITE;
-/*!40000 ALTER TABLE `Estudio` DISABLE KEYS */;
-INSERT INTO `Estudio` VALUES
+LOCK TABLES `estudio` WRITE;
+/*!40000 ALTER TABLE `estudio` DISABLE KEYS */;
+INSERT INTO `estudio` VALUES
 (1,1,'prueba','prueba'),
 (2,1,'ABDOMEN','AP EN DECUBITo'),
 (3,1,'ABDOMEN','AP Y LATERAL'),
@@ -574,17 +586,17 @@ INSERT INTO `Estudio` VALUES
 (56,4,'Pie','prueba'),
 (57,7,'prueba','prueba'),
 (58,1,'prueba','prueba');
-/*!40000 ALTER TABLE `Estudio` ENABLE KEYS */;
+/*!40000 ALTER TABLE `estudio` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
--- Table structure for table `Evento`
+-- Table structure for table `evento`
 --
 
-DROP TABLE IF EXISTS `Evento`;
+DROP TABLE IF EXISTS `evento`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8mb4 */;
-CREATE TABLE `Evento` (
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `evento` (
   `idEvento` int(11) NOT NULL,
   `Descripcion` varchar(100) NOT NULL,
   PRIMARY KEY (`idEvento`)
@@ -592,12 +604,12 @@ CREATE TABLE `Evento` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `Evento`
+-- Dumping data for table `evento`
 --
 
-LOCK TABLES `Evento` WRITE;
-/*!40000 ALTER TABLE `Evento` DISABLE KEYS */;
-INSERT INTO `Evento` VALUES
+LOCK TABLES `evento` WRITE;
+/*!40000 ALTER TABLE `evento` DISABLE KEYS */;
+INSERT INTO `evento` VALUES
 (1,'Login Exitoso'),
 (2,'Bloqueo automatico de usuario'),
 (3,'Nuevo equipo agregado exitosamente '),
@@ -620,17 +632,17 @@ INSERT INTO `Evento` VALUES
 (1009,'Alta o Actualizacion de Usuario fallida, Asignacion de Roles inexistentes'),
 (1010,'Alta o Actualizacion de Usuario fallida, Asignacion de AreaDeServicio inexistente'),
 (1011,'Actualizacion de Usuario fallida, UsuarioPK inexistente');
-/*!40000 ALTER TABLE `Evento` ENABLE KEYS */;
+/*!40000 ALTER TABLE `evento` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
--- Table structure for table `Medico`
+-- Table structure for table `medico`
 --
 
-DROP TABLE IF EXISTS `Medico`;
+DROP TABLE IF EXISTS `medico`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8mb4 */;
-CREATE TABLE `Medico` (
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `medico` (
   `NumEmpleado` int(11) NOT NULL,
   `CURP` varchar(45) NOT NULL,
   PRIMARY KEY (`NumEmpleado`,`CURP`)
@@ -638,29 +650,29 @@ CREATE TABLE `Medico` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `Medico`
+-- Dumping data for table `medico`
 --
 
-LOCK TABLES `Medico` WRITE;
-/*!40000 ALTER TABLE `Medico` DISABLE KEYS */;
-INSERT INTO `Medico` VALUES
+LOCK TABLES `medico` WRITE;
+/*!40000 ALTER TABLE `medico` DISABLE KEYS */;
+INSERT INTO `medico` VALUES
 (3,'LMJ12'),
 (4,'LML34'),
 (5,'MMA56'),
 (6,'MMS78'),
 (7,'MMJ90'),
 (8,'MNM11');
-/*!40000 ALTER TABLE `Medico` ENABLE KEYS */;
+/*!40000 ALTER TABLE `medico` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
--- Table structure for table `Paciente`
+-- Table structure for table `paciente`
 --
 
-DROP TABLE IF EXISTS `Paciente`;
+DROP TABLE IF EXISTS `paciente`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8mb4 */;
-CREATE TABLE `Paciente` (
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `paciente` (
   `idPaciente` varchar(20) NOT NULL,
   `Nombre` varchar(45) NOT NULL,
   `ApellidoPaterno` varchar(45) NOT NULL,
@@ -672,12 +684,12 @@ CREATE TABLE `Paciente` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `Paciente`
+-- Dumping data for table `paciente`
 --
 
-LOCK TABLES `Paciente` WRITE;
-/*!40000 ALTER TABLE `Paciente` DISABLE KEYS */;
-INSERT INTO `Paciente` VALUES
+LOCK TABLES `paciente` WRITE;
+/*!40000 ALTER TABLE `paciente` DISABLE KEYS */;
+INSERT INTO `paciente` VALUES
 ('1','THERESA','ACOSTA','DUEÑAS','FEMENINO','1960-01-01'),
 ('10','GIDEON','ARMENDARIZ','FRANCO','MASCULINO','1969-10-10'),
 ('11','CHARLOTTE','ARRIAGA','GALINDO','FEMENINO','1970-11-11'),
@@ -713,17 +725,17 @@ INSERT INTO `Paciente` VALUES
 ('7','CECILY','ALMEDA','FAJARDO','FEMENINO','1966-07-07'),
 ('8','HENRY','ALONSO','FERIA','MASCULINO','1967-08-08'),
 ('9','JESSAMINE','ALVAREZ','FERNANDEZ','FEMENINO','1968-09-09');
-/*!40000 ALTER TABLE `Paciente` ENABLE KEYS */;
+/*!40000 ALTER TABLE `paciente` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
--- Table structure for table `Perfil`
+-- Table structure for table `perfil`
 --
 
-DROP TABLE IF EXISTS `Perfil`;
+DROP TABLE IF EXISTS `perfil`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8mb4 */;
-CREATE TABLE `Perfil` (
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `perfil` (
   `Usuario_NumEmpleado` int(11) NOT NULL,
   `Usuario_CURP` varchar(45) NOT NULL,
   `Rol_idRol` int(11) NOT NULL,
@@ -731,18 +743,18 @@ CREATE TABLE `Perfil` (
   PRIMARY KEY (`Usuario_NumEmpleado`,`Usuario_CURP`,`Rol_idRol`),
   KEY `fk_Usuario_has_Rol_Rol1_idx` (`Rol_idRol`),
   KEY `fk_Usuario_has_Rol_Usuario1_idx` (`Usuario_NumEmpleado`,`Usuario_CURP`),
-  CONSTRAINT `fk_Usuario_has_Rol_Rol1` FOREIGN KEY (`Rol_idRol`) REFERENCES `Rol` (`idRol`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `fk_Usuario_has_Rol_Usuario1` FOREIGN KEY (`Usuario_NumEmpleado`, `Usuario_CURP`) REFERENCES `Usuario` (`NumEmpleado`, `CURP`) ON DELETE CASCADE ON UPDATE CASCADE
+  CONSTRAINT `fk_Usuario_has_Rol_Rol1` FOREIGN KEY (`Rol_idRol`) REFERENCES `rol` (`idRol`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_Usuario_has_Rol_Usuario1` FOREIGN KEY (`Usuario_NumEmpleado`, `Usuario_CURP`) REFERENCES `usuario` (`NumEmpleado`, `CURP`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `Perfil`
+-- Dumping data for table `perfil`
 --
 
-LOCK TABLES `Perfil` WRITE;
-/*!40000 ALTER TABLE `Perfil` DISABLE KEYS */;
-INSERT INTO `Perfil` VALUES
+LOCK TABLES `perfil` WRITE;
+/*!40000 ALTER TABLE `perfil` DISABLE KEYS */;
+INSERT INTO `perfil` VALUES
 (0,'PEPC000000',1,0),
 (0,'PEPC000000',2,0),
 (0,'PEPC000000',3,0),
@@ -783,6 +795,10 @@ INSERT INTO `Perfil` VALUES
 (14,'8Octubre',3,0),
 (15,'nueveOCT123',4,0),
 (15,'nueveOCT123',5,0),
+(16,'holaEjemplo',4,0),
+(17,'15Octubre',4,0),
+(19,'hola',2,0),
+(20,'20Octubre',4,0),
 (22,'ELCP0000',3,0),
 (100,'REBM111111',1,0),
 (122,'asdasdasd',1,0),
@@ -799,44 +815,44 @@ INSERT INTO `Perfil` VALUES
 (321312,'ds',4,0),
 (321312,'ds',5,0),
 (321312,'ds',6,0);
-/*!40000 ALTER TABLE `Perfil` ENABLE KEYS */;
+/*!40000 ALTER TABLE `perfil` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
--- Table structure for table `ProtocoloEstudio`
+-- Table structure for table `protocoloestudio`
 --
 
-DROP TABLE IF EXISTS `ProtocoloEstudio`;
+DROP TABLE IF EXISTS `protocoloestudio`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8mb4 */;
-CREATE TABLE `ProtocoloEstudio` (
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `protocoloestudio` (
   `idProtocolo` int(11) NOT NULL AUTO_INCREMENT,
   `Estudio_idEstudio` int(11) NOT NULL,
   `Nombre` varchar(65) NOT NULL,
   `Descripcion` varchar(65) NOT NULL,
   PRIMARY KEY (`idProtocolo`),
   KEY `fk_ProtocoloEstudio_Estudio1` (`Estudio_idEstudio`),
-  CONSTRAINT `fk_ProtocoloEstudio_Estudio1` FOREIGN KEY (`Estudio_idEstudio`) REFERENCES `Estudio` (`idEstudio`) ON DELETE CASCADE ON UPDATE CASCADE
+  CONSTRAINT `fk_ProtocoloEstudio_Estudio1` FOREIGN KEY (`Estudio_idEstudio`) REFERENCES `estudio` (`idEstudio`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `ProtocoloEstudio`
+-- Dumping data for table `protocoloestudio`
 --
 
-LOCK TABLES `ProtocoloEstudio` WRITE;
-/*!40000 ALTER TABLE `ProtocoloEstudio` DISABLE KEYS */;
-/*!40000 ALTER TABLE `ProtocoloEstudio` ENABLE KEYS */;
+LOCK TABLES `protocoloestudio` WRITE;
+/*!40000 ALTER TABLE `protocoloestudio` DISABLE KEYS */;
+/*!40000 ALTER TABLE `protocoloestudio` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
--- Table structure for table `RegistroEvento`
+-- Table structure for table `registroevento`
 --
 
-DROP TABLE IF EXISTS `RegistroEvento`;
+DROP TABLE IF EXISTS `registroevento`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8mb4 */;
-CREATE TABLE `RegistroEvento` (
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `registroevento` (
   `Evento_idEvento` int(11) NOT NULL,
   `Aplicacion_idAplicacion` int(11) NOT NULL,
   `horaEvento` bigint(20) NOT NULL,
@@ -844,18 +860,18 @@ CREATE TABLE `RegistroEvento` (
   PRIMARY KEY (`Evento_idEvento`,`Aplicacion_idAplicacion`,`horaEvento`),
   KEY `fk_Usuario_has_Evento_Evento1_idx` (`Evento_idEvento`),
   KEY `fk_RegistroEvento_Aplicacion1_idx` (`Aplicacion_idAplicacion`),
-  CONSTRAINT `fk_RegistroEvento_Aplicacion1` FOREIGN KEY (`Aplicacion_idAplicacion`) REFERENCES `Aplicacion` (`idAplicacion`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `fk_Usuario_has_Evento_Evento1` FOREIGN KEY (`Evento_idEvento`) REFERENCES `Evento` (`idEvento`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  CONSTRAINT `fk_RegistroEvento_Aplicacion1` FOREIGN KEY (`Aplicacion_idAplicacion`) REFERENCES `aplicacion` (`idAplicacion`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fk_Usuario_has_Evento_Evento1` FOREIGN KEY (`Evento_idEvento`) REFERENCES `evento` (`idEvento`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `RegistroEvento`
+-- Dumping data for table `registroevento`
 --
 
-LOCK TABLES `RegistroEvento` WRITE;
-/*!40000 ALTER TABLE `RegistroEvento` DISABLE KEYS */;
-INSERT INTO `RegistroEvento` VALUES
+LOCK TABLES `registroevento` WRITE;
+/*!40000 ALTER TABLE `registroevento` DISABLE KEYS */;
+INSERT INTO `registroevento` VALUES
 (1,0,1757557469747,'{\"usuarioId\":\"LIIM\",\"contrasena\":\"holaMundo\",\"ipAddress\":\"127.0.0.1\"}'),
 (1,0,1757557568659,'{\"usuarioId\":\"MisaRJ\",\"contrasena\":\"ROJP000000\",\"ipAddress\":\"127.0.0.1\"}'),
 (1,0,1757557865408,'{\"usuarioId\":\"LIIM\",\"contrasena\":\"holaMundo\",\"ipAddress\":\"127.0.0.1\"}'),
@@ -1361,12 +1377,114 @@ INSERT INTO `RegistroEvento` VALUES
 (1,0,1760069927219,'{\"usuarioId\":\"LIIM\",\"contrasena\":\"holaMundo\",\"ipAddress\":\"127.0.0.1\"}'),
 (1,0,1760070067180,'{\"usuarioId\":\"LIIM\",\"contrasena\":\"holaMundo\",\"ipAddress\":\"127.0.0.1\"}'),
 (1,0,1760070074960,'{\"usuarioId\":\"LIIM\",\"contrasena\":\"holaMundo\",\"ipAddress\":\"127.0.0.1\"}'),
+(1,0,1760222488755,'{\"usuarioId\":\"LIIM\",\"contrasena\":\"holaMundo\",\"ipAddress\":\"0:0:0:0:0:0:0:1\"}'),
+(1,0,1760222616102,'{\"usuarioId\":\"LIIM\",\"contrasena\":\"holaMundo\",\"ipAddress\":\"127.0.0.1\"}'),
+(1,0,1760313355460,'{\"usuarioId\":\"LIIM\",\"contrasena\":\"holaMundo\",\"ipAddress\":\"127.0.0.1\"}'),
+(1,0,1760313575926,'{\"usuarioId\":\"LIIM\",\"contrasena\":\"holaMundo\",\"ipAddress\":\"127.0.0.1\"}'),
+(1,0,1760313971911,'{\"usuarioId\":\"LIIM\",\"contrasena\":\"holaMundo\",\"ipAddress\":\"127.0.0.1\"}'),
+(1,0,1760314696898,'{\"usuarioId\":\"LIIM\",\"contrasena\":\"holaMundo\",\"ipAddress\":\"127.0.0.1\"}'),
+(1,0,1760314770583,'{\"usuarioId\":\"LIIM\",\"contrasena\":\"holaMundo\",\"ipAddress\":\"127.0.0.1\"}'),
+(1,0,1760314815629,'{\"usuarioId\":\"LIIM\",\"contrasena\":\"holaMundo\",\"ipAddress\":\"0:0:0:0:0:0:0:1\"}'),
+(1,0,1760314899363,'{\"usuarioId\":\"LIIM\",\"contrasena\":\"holaMundo\",\"ipAddress\":\"0:0:0:0:0:0:0:1\"}'),
+(1,0,1760314981355,'{\"usuarioId\":\"LIIM\",\"contrasena\":\"holaMundo\",\"ipAddress\":\"0:0:0:0:0:0:0:1\"}'),
+(1,0,1760319226698,'{\"usuarioId\":\"LIIM\",\"contrasena\":\"holaMundo\",\"ipAddress\":\"0:0:0:0:0:0:0:1\"}'),
+(1,0,1760320083029,'{\"usuarioId\":\"LIIM\",\"contrasena\":\"holaMundo\",\"ipAddress\":\"127.0.0.1\"}'),
+(1,0,1760320867762,'{\"usuarioId\":\"LIIM\",\"contrasena\":\"holaMundo\",\"ipAddress\":\"127.0.0.1\"}'),
+(1,0,1760321030025,'{\"usuarioId\":\"LIIM\",\"contrasena\":\"holaMundo\",\"ipAddress\":\"127.0.0.1\"}'),
+(1,0,1760321238733,'{\"usuarioId\":\"LIIM\",\"contrasena\":\"holaMundo\",\"ipAddress\":\"127.0.0.1\"}'),
+(1,0,1760321261169,'{\"usuarioId\":\"LIIM\",\"contrasena\":\"holaMundo\",\"ipAddress\":\"127.0.0.1\"}'),
+(1,0,1760321306094,'{\"usuarioId\":\"LIIM\",\"contrasena\":\"holaMundo\",\"ipAddress\":\"127.0.0.1\"}'),
+(1,0,1760325145070,'{\"usuarioId\":\"LIIM\",\"contrasena\":\"holaMundo\",\"ipAddress\":\"127.0.0.1\"}'),
+(1,0,1760326927159,'{\"usuarioId\":\"LIIM\",\"contrasena\":\"holaMundo\",\"ipAddress\":\"127.0.0.1\"}'),
+(1,0,1760327149251,'{\"usuarioId\":\"LIIM\",\"contrasena\":\"holaMundo\",\"ipAddress\":\"127.0.0.1\"}'),
+(1,0,1760327199409,'{\"usuarioId\":\"LIIM\",\"contrasena\":\"holaMundo\",\"ipAddress\":\"127.0.0.1\"}'),
+(1,0,1760327244927,'{\"usuarioId\":\"LIIM\",\"contrasena\":\"holaMundo\",\"ipAddress\":\"127.0.0.1\"}'),
+(1,0,1760327264943,'{\"usuarioId\":\"LIIM\",\"contrasena\":\"holaMundo\",\"ipAddress\":\"127.0.0.1\"}'),
+(1,0,1760327410749,'{\"usuarioId\":\"LIIM\",\"contrasena\":\"holaMundo\",\"ipAddress\":\"127.0.0.1\"}'),
+(1,0,1760327874126,'{\"usuarioId\":\"LIIM\",\"contrasena\":\"holaMundo\",\"ipAddress\":\"127.0.0.1\"}'),
+(1,0,1760327962732,'{\"usuarioId\":\"LIIM\",\"contrasena\":\"holaMundo\",\"ipAddress\":\"127.0.0.1\"}'),
+(1,0,1760328146891,'{\"usuarioId\":\"LIIM\",\"contrasena\":\"holaMundo\",\"ipAddress\":\"127.0.0.1\"}'),
+(1,0,1760328282719,'{\"usuarioId\":\"LIIM\",\"contrasena\":\"holaMundo\",\"ipAddress\":\"127.0.0.1\"}'),
+(1,0,1760328727716,'{\"usuarioId\":\"LIIM\",\"contrasena\":\"holaMundo\",\"ipAddress\":\"127.0.0.1\"}'),
+(1,0,1760329089599,'{\"usuarioId\":\"LIIM\",\"contrasena\":\"holaMundo\",\"ipAddress\":\"127.0.0.1\"}'),
+(1,0,1760329268778,'{\"usuarioId\":\"LIIM\",\"contrasena\":\"holaMundo\",\"ipAddress\":\"127.0.0.1\"}'),
+(1,0,1760329318111,'{\"usuarioId\":\"LIIM\",\"contrasena\":\"holaMundo\",\"ipAddress\":\"127.0.0.1\"}'),
+(1,0,1760329444898,'{\"usuarioId\":\"LIIM\",\"contrasena\":\"holaMundo\",\"ipAddress\":\"127.0.0.1\"}'),
+(1,0,1760329504478,'{\"usuarioId\":\"LIIM\",\"contrasena\":\"holaMundo\",\"ipAddress\":\"127.0.0.1\"}'),
+(1,0,1760386390972,'{\"usuarioId\":\"LIIM\",\"contrasena\":\"holaMundo\",\"ipAddress\":\"127.0.0.1\"}'),
+(1,0,1760386993743,'{\"usuarioId\":\"LIIM\",\"contrasena\":\"holaMundo\",\"ipAddress\":\"127.0.0.1\"}'),
+(1,0,1760387016160,'{\"usuarioId\":\"LIIM\",\"contrasena\":\"holaMundo\",\"ipAddress\":\"127.0.0.1\"}'),
+(1,0,1760388339917,'{\"usuarioId\":\"LIIM\",\"contrasena\":\"holaMundo\",\"ipAddress\":\"127.0.0.1\"}'),
+(1,0,1760388356304,'{\"usuarioId\":\"LIIM\",\"contrasena\":\"holaMundo\",\"ipAddress\":\"127.0.0.1\"}'),
+(1,0,1760489656872,'{\"usuarioId\":\"LIIM\",\"contrasena\":\"holaMundo\",\"ipAddress\":\"0:0:0:0:0:0:0:1\"}'),
+(1,0,1760489884561,'{\"usuarioId\":\"LIIM\",\"contrasena\":\"Postman123\",\"ipAddress\":\"0:0:0:0:0:0:0:1\"}'),
+(1,0,1760490063788,'{\"usuarioId\":\"LIIM\",\"contrasena\":\"Postman123\",\"ipAddress\":\"0:0:0:0:0:0:0:1\"}'),
+(1,0,1760491451564,'{\"usuarioId\":\"LIIM\",\"contrasena\":\"holaMundo\",\"ipAddress\":\"0:0:0:0:0:0:0:1\"}'),
+(1,0,1760491815532,'{\"usuarioId\":\"LIIM\",\"contrasena\":\"holaMundo\",\"ipAddress\":\"0:0:0:0:0:0:0:1\"}'),
+(1,0,1760558946260,'{\"usuarioId\":\"LIIM\",\"contrasena\":\"holaMundo\",\"ipAddress\":\"127.0.0.1\"}'),
+(1,0,1760559371111,'{\"usuarioId\":\"LIIM\",\"contrasena\":\"holaMundo\",\"ipAddress\":\"127.0.0.1\"}'),
+(1,0,1760559400211,'{\"usuarioId\":\"LIIM\",\"contrasena\":\"holaMundo\",\"ipAddress\":\"127.0.0.1\"}'),
+(1,0,1760624423635,'{\"usuarioId\":\"LIIM\",\"contrasena\":\"holaMundo\",\"ipAddress\":\"0:0:0:0:0:0:0:1\"}'),
+(1,0,1760625121869,'{\"usuarioId\":\"LIIM\",\"contrasena\":\"holaMundo\",\"ipAddress\":\"127.0.0.1\"}'),
+(1,0,1760625198602,'{\"usuarioId\":\"LIIM\",\"contrasena\":\"holaMundo\",\"ipAddress\":\"0:0:0:0:0:0:0:1\"}'),
+(1,0,1760625770545,'{\"usuarioId\":\"LIIM\",\"contrasena\":\"holaMundo\",\"ipAddress\":\"0:0:0:0:0:0:0:1\"}'),
+(1,0,1760625808603,'{\"usuarioId\":\"LIIM\",\"contrasena\":\"holaMundo\",\"ipAddress\":\"0:0:0:0:0:0:0:1\"}'),
+(1,0,1760625898088,'{\"usuarioId\":\"LIIM\",\"contrasena\":\"holaMundo\",\"ipAddress\":\"0:0:0:0:0:0:0:1\"}'),
+(1,0,1760625952277,'{\"usuarioId\":\"LIIM\",\"contrasena\":\"holaMundo\",\"ipAddress\":\"0:0:0:0:0:0:0:1\"}'),
+(1,0,1760626035393,'{\"usuarioId\":\"carlos\",\"contrasena\":\"abc123\",\"ipAddress\":\"0:0:0:0:0:0:0:1\"}'),
+(1,0,1760626180738,'{\"usuarioId\":\"LIIM\",\"contrasena\":\"holaMundo\",\"ipAddress\":\"127.0.0.1\"}'),
+(1,0,1760626191100,'{\"usuarioId\":\"carlos\",\"contrasena\":\"abc123\",\"ipAddress\":\"127.0.0.1\"}'),
+(1,0,1760643542856,'{\"usuarioId\":\"carlos\",\"contrasena\":\"abc123\",\"ipAddress\":\"127.0.0.1\"}'),
+(1,0,1760643580185,'{\"usuarioId\":\"LIIM\",\"contrasena\":\"holaMundo\",\"ipAddress\":\"127.0.0.1\"}'),
+(1,0,1760643719666,'{\"usuarioId\":\"15Octubre\",\"contrasena\":\"15Octubre\",\"ipAddress\":\"127.0.0.1\"}'),
+(1,0,1760643951926,'{\"usuarioId\":\"LIIM\",\"contrasena\":\"holaMundo\",\"ipAddress\":\"127.0.0.1\"}'),
+(1,0,1760644229299,'{\"usuarioId\":\"LIIM\",\"contrasena\":\"holaMundo\",\"ipAddress\":\"127.0.0.1\"}'),
+(1,0,1760644312705,'{\"usuarioId\":\"holaEjemplo\",\"contrasena\":\"holaEjemplo\",\"ipAddress\":\"127.0.0.1\"}'),
+(1,0,1760645047941,'{\"usuarioId\":\"LIIM\",\"contrasena\":\"holaMundo\",\"ipAddress\":\"0:0:0:0:0:0:0:1\"}'),
+(1,0,1760645190247,'{\"usuarioId\":\"LIIM\",\"contrasena\":\"16Octubre\",\"ipAddress\":\"0:0:0:0:0:0:0:1\"}'),
+(1,0,1760645716425,'{\"usuarioId\":\"LIIM\",\"contrasena\":\"16Octubre\",\"ipAddress\":\"127.0.0.1\"}'),
+(1,0,1760645843190,'{\"usuarioId\":\"20Octubre\",\"contrasena\":\"20Octubre\",\"ipAddress\":\"127.0.0.1\"}'),
+(1,0,1760645962307,'{\"usuarioId\":\"LIIM\",\"contrasena\":\"16Octubre\",\"ipAddress\":\"127.0.0.1\"}'),
+(1,0,1760707641898,'{\"usuarioId\":\"LIIM\",\"contrasena\":\"16Octubre\",\"ipAddress\":\"127.0.0.1\"}'),
+(1,0,1760707794468,'{\"usuarioId\":\"LIIM\",\"contrasena\":\"16Octubre\",\"ipAddress\":\"127.0.0.1\"}'),
+(1,0,1760708128962,'{\"usuarioId\":\"LIIM\",\"contrasena\":\"16Octubre\",\"ipAddress\":\"127.0.0.1\"}'),
+(1,0,1760709028926,'{\"usuarioId\":\"LIIM\",\"contrasena\":\"16Octubre\",\"ipAddress\":\"127.0.0.1\"}'),
+(1,0,1760709449408,'{\"usuarioId\":\"LIIM\",\"contrasena\":\"16Octubre\",\"ipAddress\":\"127.0.0.1\"}'),
+(1,0,1760712220828,'{\"usuarioId\":\"LIIM\",\"contrasena\":\"16Octubre\",\"ipAddress\":\"127.0.0.1\"}'),
+(1,0,1760712905974,'{\"usuarioId\":\"LIIM\",\"contrasena\":\"16Octubre\",\"ipAddress\":\"127.0.0.1\"}'),
+(1,0,1760723271060,'{\"usuarioId\":\"LIIM\",\"contrasena\":\"16Octubre\",\"ipAddress\":\"127.0.0.1\"}'),
+(1,0,1760723368044,'{\"usuarioId\":\"LIIM\",\"contrasena\":\"16Octubre\",\"ipAddress\":\"127.0.0.1\"}'),
+(1,0,1760724631823,'{\"usuarioId\":\"LIIM\",\"contrasena\":\"16Octubre\",\"ipAddress\":\"127.0.0.1\"}'),
+(1,0,1760724670563,'{\"usuarioId\":\"carlos\",\"contrasena\":\"abc123\",\"ipAddress\":\"127.0.0.1\"}'),
+(1,0,1760724752627,'{\"usuarioId\":\"carlos\",\"contrasena\":\"abc123\",\"ipAddress\":\"127.0.0.1\"}'),
+(1,0,1760724851925,'{\"usuarioId\":\"carlos\",\"contrasena\":\"abc123\",\"ipAddress\":\"127.0.0.1\"}'),
+(1,0,1760728253482,'{\"usuarioId\":\"LIIM\",\"contrasena\":\"16Octubre\",\"ipAddress\":\"127.0.0.1\"}'),
+(1,0,1760728365251,'{\"usuarioId\":\"LIIM\",\"contrasena\":\"16Octubre\",\"ipAddress\":\"127.0.0.1\"}'),
+(1,0,1760728624024,'{\"usuarioId\":\"LIIM\",\"contrasena\":\"16Octubre\",\"ipAddress\":\"127.0.0.1\"}'),
+(1,0,1760728859539,'{\"usuarioId\":\"LIIM\",\"contrasena\":\"16Octubre\",\"ipAddress\":\"127.0.0.1\"}'),
+(1,0,1760729090312,'{\"usuarioId\":\"LIIM\",\"contrasena\":\"16Octubre\",\"ipAddress\":\"127.0.0.1\"}'),
+(1,0,1760729594114,'{\"usuarioId\":\"LIIM\",\"contrasena\":\"16Octubre\",\"ipAddress\":\"127.0.0.1\"}'),
+(1,0,1760729807597,'{\"usuarioId\":\"LIIM\",\"contrasena\":\"16Octubre\",\"ipAddress\":\"127.0.0.1\"}'),
+(1,0,1760729840572,'{\"usuarioId\":\"carlos\",\"contrasena\":\"abc123\",\"ipAddress\":\"127.0.0.1\"}'),
+(1,0,1760730073627,'{\"usuarioId\":\"15Octubre\",\"contrasena\":\"15Octubre\",\"ipAddress\":\"127.0.0.1\"}'),
+(1,0,1760730088673,'{\"usuarioId\":\"carlos\",\"contrasena\":\"abc123\",\"ipAddress\":\"127.0.0.1\"}'),
+(1,0,1760730141996,'{\"usuarioId\":\"carlos\",\"contrasena\":\"holaCarlos\",\"ipAddress\":\"127.0.0.1\"}'),
+(1,0,1760731444129,'{\"usuarioId\":\"LIIM\",\"contrasena\":\"holaMundo\",\"ipAddress\":\"127.0.0.1\"}'),
+(1,0,1760731677096,'{\"usuarioId\":\"LIIM\",\"contrasena\":\"hola\",\"ipAddress\":\"127.0.0.1\"}'),
+(1,0,1760732234228,'{\"usuarioId\":\"HOLA\",\"contrasena\":\"hola\",\"ipAddress\":\"127.0.0.1\"}'),
+(1,0,1760732331884,'{\"usuarioId\":\"HOLA\",\"contrasena\":\"hola\",\"ipAddress\":\"127.0.0.1\"}'),
+(1,0,1760732427698,'{\"usuarioId\":\"HOLA\",\"contrasena\":\"actualizada\",\"ipAddress\":\"127.0.0.1\"}'),
+(1,0,1760732765706,'{\"usuarioId\":\"carlos\",\"contrasena\":\"holaCarlos\",\"ipAddress\":\"127.0.0.1\"}'),
+(1,0,1760972130692,'{\"usuarioId\":\"LIIM\",\"contrasena\":\"hola\",\"ipAddress\":\"0:0:0:0:0:0:0:1\"}'),
+(1,0,1761021036737,'{\"usuarioId\":\"LIIM\",\"contrasena\":\"hola\",\"ipAddress\":\"0:0:0:0:0:0:0:1\"}'),
+(1,0,1761021085351,'{\"usuarioId\":\"LIIM\",\"contrasena\":\"hola\",\"ipAddress\":\"0:0:0:0:0:0:0:1\"}'),
 (2,0,1757556218008,'{\"usuarioId\":\"LIIM\",\"contrasena\":\"holaMundo\",\"ipAddress\":\"127.0.0.1\"}'),
 (2,0,1757556656818,'{\"usuarioId\":\"MisaRJ\",\"contrasena\":\"ROJP000000\",\"ipAddress\":\"127.0.0.1\"}'),
 (3,0,1757556068972,'{\"usuarioId\":\"MisaRJ\",\"contrasena\":\"jsoajsa\",\"ipAddress\":\"127.0.0.1\"}'),
 (3,3,1759248191343,'{\"nSerie\":\"30Septiembre\",\"nombreEquipo\":\"30Septiembre\",\"marca\":\"30Septiembre\",\"modelo\":\"30Septiembre\",\"modalidad\":\"TC\",\"idArea\":3,\"estado\":\"Disponible\"}'),
 (4,2,1759984700798,'{\"nSerie\":\"Bc221170\",\"nombreEquipo\":\"Ultrasonido\",\"marca\":\"DVG\",\"modelo\":\"dvg\",\"modalidad\":\"US\",\"idArea\":5,\"estado\":\"Fuera de servicio\"}'),
 (4,2,1760021218690,'{\"nSerie\":\"Bc221170\",\"nombreEquipo\":\"Ultrasonido\",\"marca\":\"DVG\",\"modelo\":\"dvg\",\"modalidad\":\"US\",\"idArea\":5,\"estado\":\"Disponible\"}'),
+(4,2,1760559015986,'{\"nSerie\":\"Bc221170\",\"nombreEquipo\":\"Ultrasonido\",\"marca\":\"DVG\",\"modelo\":\"dvg\",\"modalidad\":\"US\",\"idArea\":5,\"estado\":\"Fuera de servicio\"}'),
 (5,1,1758083947960,'{}'),
 (5,1,1758496351124,'{}'),
 (5,1,1758496503988,'{}'),
@@ -1479,6 +1597,23 @@ INSERT INTO `RegistroEvento` VALUES
 (5,1,1760021717106,'{\"Area\":\"Desarrollo Tecnológico\",\"NumEmpleado\":1,\"CURP\":\"LIIM0000\"}'),
 (5,1,1760021740525,'{\"Area\":\"Desarrollo Tecnológico\",\"NumEmpleado\":1,\"CURP\":\"LIIM0000\"}'),
 (5,1,1760021924767,'{\"Area\":\"Desarrollo Tecnológico\",\"NumEmpleado\":1,\"CURP\":\"LIIM0000\"}'),
+(5,1,1760222495679,'{\"Area\":\"Desarrollo Tecnológico\",\"NumEmpleado\":1,\"CURP\":\"LIIM0000\"}'),
+(5,1,1760222624083,'{\"Area\":\"Desarrollo Tecnológico\",\"NumEmpleado\":1,\"CURP\":\"LIIM0000\"}'),
+(5,1,1760222629879,'{\"Area\":\"Desarrollo Tecnológico\",\"NumEmpleado\":1,\"CURP\":\"LIIM0000\"}'),
+(5,1,1760222637247,'{\"Area\":\"Desarrollo Tecnológico\",\"NumEmpleado\":1,\"CURP\":\"LIIM0000\"}'),
+(5,1,1760314994419,'{\"Area\":\"Desarrollo Tecnológico\",\"NumEmpleado\":1,\"CURP\":\"LIIM0000\"}'),
+(5,1,1760314996553,'{\"Area\":\"Desarrollo Tecnológico\",\"NumEmpleado\":1,\"CURP\":\"LIIM0000\"}'),
+(5,1,1760387002089,'{\"Area\":\"Desarrollo Tecnológico\",\"NumEmpleado\":1,\"CURP\":\"LIIM0000\"}'),
+(5,1,1760387004768,'{\"Area\":\"Desarrollo Tecnológico\",\"NumEmpleado\":1,\"CURP\":\"LIIM0000\"}'),
+(5,1,1760388341888,'{\"Area\":\"Desarrollo Tecnológico\",\"NumEmpleado\":1,\"CURP\":\"LIIM0000\"}'),
+(5,1,1760388343625,'{\"Area\":\"Desarrollo Tecnológico\",\"NumEmpleado\":1,\"CURP\":\"LIIM0000\"}'),
+(5,1,1760388357723,'{\"Area\":\"Desarrollo Tecnológico\",\"NumEmpleado\":1,\"CURP\":\"LIIM0000\"}'),
+(5,1,1760558961229,'{\"Area\":\"Desarrollo Tecnológico\",\"NumEmpleado\":1,\"CURP\":\"LIIM0000\"}'),
+(5,1,1760558985305,'{\"Area\":\"Desarrollo Tecnológico\",\"NumEmpleado\":1,\"CURP\":\"LIIM0000\"}'),
+(5,1,1760559020296,'{\"Area\":\"Desarrollo Tecnológico\",\"NumEmpleado\":1,\"CURP\":\"LIIM0000\"}'),
+(5,1,1760559424413,'{\"Area\":\"Desarrollo Tecnológico\",\"NumEmpleado\":1,\"CURP\":\"LIIM0000\"}'),
+(5,1,1760559750685,'{\"Area\":\"Desarrollo Tecnológico\",\"NumEmpleado\":1,\"CURP\":\"LIIM0000\"}'),
+(5,1,1760643586258,'{\"Area\":\"Desarrollo Tecnológico\",\"NumEmpleado\":1,\"CURP\":\"LIIM0000\"}'),
 (6,6,1758299785452,'{\"Usuario\":{\"nombre\":\"Prueba19Septiembre\",\"apellidoPaterno\":\"Prueba19Septiembre\",\"apellidoMaterno\":\"Prueba19Septiembre\",\"curp\":\"Prueba19Septiembre000\",\"numEmpleado\":12,\"area\":2,\"roles\":[2,3],\"estado\":\"Inicial\",\"usuarioID\":\"19Septiembre\",\"correoElectronico\":\"pruea@gmail.com\"},\"SesionActiva\":{\"horaInicio\":1758299596687,\"usuarioCURP\":\"PEPC000000\",\"usuarioNumEmpleado\":0,\"aplicacionID\":0}}'),
 (6,6,1758299810824,'{\"Usuario\":{\"nombre\":\"Prueba19Septiembre\",\"apellidoPaterno\":\"Prueba19Septiembre\",\"apellidoMaterno\":\"Prueba19Septiembre\",\"curp\":\"Prueba19Septiembre000\",\"numEmpleado\":12,\"area\":1,\"roles\":[4,5],\"estado\":\"Inicial\",\"usuarioID\":\"19Septiembre\",\"correoElectronico\":\"pruea@gmail.com\"},\"SesionActiva\":{\"horaInicio\":1758299596687,\"usuarioCURP\":\"PEPC000000\",\"usuarioNumEmpleado\":0,\"aplicacionID\":0}}'),
 (6,6,1758338030059,'{\"Usuario\":{\"nombre\":\"asdasdasdas\",\"apellidoPaterno\":\"dasdasdas\",\"apellidoMaterno\":\"dasdasdas\",\"curp\":\"asdasdasd\",\"numEmpleado\":122,\"area\":4,\"roles\":[1,2],\"estado\":\"Inicial\",\"correoElectronico\":\"asdasdasd\",\"usuarioID\":\"dasdasdasd\"},\"SesionActiva\":{\"horaInicio\":1758338005895,\"usuarioCURP\":\"PEPC000000\",\"usuarioNumEmpleado\":0,\"aplicacionID\":0}}'),
@@ -1499,6 +1634,10 @@ INSERT INTO `RegistroEvento` VALUES
 (6,6,1759807029543,'{\"Usuario\":{\"nombre\":\"6Octubre\",\"apellidoPaterno\":\"6Octubre\",\"apellidoMaterno\":\"6Octubre\",\"curp\":\"6Octubre\",\"numEmpleado\":1000,\"area\":8,\"roles\":[1,2,3,4,5,6],\"estado\":\"Inicial\",\"usuarioID\":\"6Octubre\",\"correoElectronico\":\"6Octubre@gmail.com\"},\"SesionActiva\":{\"horaInicio\":1759806827546,\"usuarioCURP\":\"LIIM0000\",\"usuarioNumEmpleado\":1,\"aplicacionID\":0}}'),
 (6,6,1759993406393,'{\"Usuario\":{\"nombre\":\"8Octubre\",\"apellidoPaterno\":\"8Octubre\",\"apellidoMaterno\":\"8Octubre\",\"curp\":\"8Octubre\",\"numEmpleado\":14,\"area\":5,\"roles\":[2,3],\"estado\":\"Inicial\",\"usuarioID\":\"8Octubre\",\"correoElectronico\":\"8Octubre@gmail.com\"},\"SesionActiva\":{\"horaInicio\":1759993282307,\"usuarioCURP\":\"LIIM0000\",\"usuarioNumEmpleado\":1,\"aplicacionID\":0}}'),
 (6,6,1760069196978,'{\"Usuario\":{\"nombre\":\"9oCTUBRE\",\"apellidoPaterno\":\"9Octubre\",\"apellidoMaterno\":\"NueveOct\",\"curp\":\"nueveOCT123\",\"numEmpleado\":15,\"area\":2,\"roles\":[4,5],\"estado\":\"Inicial\",\"usuarioID\":\"9OCTUBRE\",\"correoElectronico\":\"9oct@gmail.com\"},\"SesionActiva\":{\"horaInicio\":1760069081311,\"usuarioCURP\":\"LIIM0000\",\"usuarioNumEmpleado\":1,\"aplicacionID\":0}}'),
+(6,6,1760643684112,'{\"Usuario\":{\"nombre\":\"15Octubre\",\"apellidoPaterno\":\"15Octubre\",\"apellidoMaterno\":\"15Octubre\",\"curp\":\"15Octubre\",\"numEmpleado\":17,\"area\":2,\"roles\":[4],\"correoElectronico\":\"15Octubre@gmail.com\",\"usuarioID\":\"15Octubre\",\"estado\":\"Inicial\"},\"SesionActiva\":{\"horaInicio\":1760643580185,\"usuarioCURP\":\"LIIM0000\",\"usuarioNumEmpleado\":1,\"aplicacionID\":0}}'),
+(6,6,1760644295909,'{\"Usuario\":{\"nombre\":\"Octubre\",\"apellidoPaterno\":\"Octubre\",\"apellidoMaterno\":\"Octubre\",\"curp\":\"holaEjemplo\",\"numEmpleado\":16,\"area\":6,\"roles\":[4],\"estado\":\"Inicial\",\"usuarioID\":\"holaEjemplo\",\"correoElectronico\":\"holaEjemplo@gmail.com\"},\"SesionActiva\":{\"horaInicio\":1760644229299,\"usuarioCURP\":\"LIIM0000\",\"usuarioNumEmpleado\":1,\"aplicacionID\":0}}'),
+(6,6,1760645815068,'{\"Usuario\":{\"nombre\":\"20Octubre\",\"apellidoPaterno\":\"20Octubre\",\"apellidoMaterno\":\"20Octubre\",\"curp\":\"20Octubre\",\"numEmpleado\":20,\"area\":2,\"roles\":[4],\"estado\":\"Inicial\",\"usuarioID\":\"20Octubre\",\"correoElectronico\":\"20Octubre@gmail.com\"},\"SesionActiva\":{\"horaInicio\":1760645716425,\"usuarioCURP\":\"LIIM0000\",\"usuarioNumEmpleado\":1,\"aplicacionID\":0}}'),
+(6,6,1760732217772,'{\"Usuario\":{\"nombre\":\"hola\",\"apellidoPaterno\":\"hola\",\"apellidoMaterno\":\"hola\",\"curp\":\"hola\",\"numEmpleado\":19,\"area\":7,\"roles\":[2],\"correoElectronico\":\"hola@gmail.com\",\"usuarioID\":\"HOLA\",\"estado\":\"Inicial\"},\"SesionActiva\":{\"horaInicio\":1760731677096,\"usuarioCURP\":\"LIIM0000\",\"usuarioNumEmpleado\":1,\"aplicacionID\":0}}'),
 (7,5,1757556252234,'{\"Actualizacion\":{\"curp\":\"ROJP000000\",\"numEmpleado\":10,\"nombre\":\"Pedro Misael\",\"apellidoPaterno\":\"Rodríguez\",\"apellidoMaterno\":\"Jiménez\",\"estado\":\"Inicial\",\"area\":5,\"roles\":[1],\"correoElectronico\":\"p.misaelrj@gmail.com\"},\"SesionActiva\":{\"horaInicio\":1757556218008,\"usuarioCURP\":\"LIIM0000\",\"usuarioNumEmpleado\":1,\"aplicacionID\":0}}'),
 (7,5,1757556683245,'{\"Actualizacion\":{\"curp\":\"ROJP000000\",\"numEmpleado\":10,\"nombre\":\"Pedro Misael\",\"apellidoPaterno\":\"Rodríguez\",\"apellidoMaterno\":\"Jiménez\",\"estado\":\"Bloqueado\",\"area\":5,\"roles\":[1],\"correoElectronico\":\"p.misaelrj@gmail.com\"},\"SesionActiva\":{\"horaInicio\":1757556656818,\"usuarioCURP\":\"ROJP000000\",\"usuarioNumEmpleado\":10,\"aplicacionID\":0}}'),
 (7,5,1757557489660,'{\"Actualizacion\":{\"curp\":\"ROJP000000\",\"numEmpleado\":10,\"nombre\":\"Pedro Misael\",\"apellidoPaterno\":\"Rodríguez\",\"apellidoMaterno\":\"Jiménez\",\"estado\":\"Activo\",\"area\":5,\"roles\":[1],\"correoElectronico\":\"p.misaelrj@gmail.com\"},\"SesionActiva\":{\"horaInicio\":1757557469747,\"usuarioCURP\":\"LIIM0000\",\"usuarioNumEmpleado\":1,\"aplicacionID\":0}}'),
@@ -1523,6 +1662,7 @@ INSERT INTO `RegistroEvento` VALUES
 (10,5,1757559700758,'{\"Actualizacion\":{\"curp\":\"ROJP000000\",\"numEmpleado\":10,\"nombre\":\"Pedro Misael\",\"apellidoPaterno\":\"Rodríguez\",\"apellidoMaterno\":\"Jiménez\",\"estado\":\"Bloqueado\",\"area\":5,\"roles\":[1],\"correoElectronico\":\"p.misaelrj@gmail.com\"},\"SesionActiva\":{\"horaInicio\":1757559643869,\"usuarioCURP\":\"LIIM0000\",\"usuarioNumEmpleado\":1,\"aplicacionID\":0}}'),
 (11,2,1759984700798,'{\"estadoActual\":\"Fuera de servicio\",\"estadoAnterior\":\"Disponible\"}'),
 (11,2,1760021218690,'{\"estadoActual\":\"Disponible\",\"estadoAnterior\":\"Fuera de servicio\"}'),
+(11,2,1760559015986,'{\"estadoActual\":\"Fuera de servicio\",\"estadoAnterior\":\"Disponible\"}'),
 (1001,0,1757555983427,'{\"usuarioId\":\"MisaRJ\",\"contrasena\":\"jdlskañd\",\"ipAddress\":\"127.0.0.1\"}'),
 (1001,0,1757555989415,'{\"usuarioId\":\"MisaRJ\",\"contrasena\":\"holaaaa\",\"ipAddress\":\"127.0.0.1\"}'),
 (1001,0,1757555995022,'{\"usuarioId\":\"LIIM\",\"contrasena\":\"mlkdsamda\",\"ipAddress\":\"127.0.0.1\"}'),
@@ -1546,8 +1686,25 @@ INSERT INTO `RegistroEvento` VALUES
 (1001,0,1759728036947,'{\"usuarioId\":\"LIIM\",\"contrasena\":\"holaMundp\",\"ipAddress\":\"127.0.0.1\"}'),
 (1001,0,1759802261459,'{\"usuarioId\":\"LIIM\",\"contrasena\":\"holaNundo\",\"ipAddress\":\"127.0.0.1\"}'),
 (1001,0,1759894291082,'{\"usuarioId\":\"LIIM\",\"contrasena\":\"holasMundo\",\"ipAddress\":\"127.0.0.1\"}'),
+(1001,0,1760489872475,'{\"usuarioId\":\"LIIM\",\"contrasena\":\"holaMundo\",\"ipAddress\":\"0:0:0:0:0:0:0:1\"}'),
+(1001,0,1760490050781,'{\"usuarioId\":\"LIIM\",\"contrasena\":\"holaMundo\",\"ipAddress\":\"0:0:0:0:0:0:0:1\"}'),
+(1001,0,1760491398627,'{\"usuarioId\":\"LIIM\",\"contrasena\":\"Postman123\",\"ipAddress\":\"0:0:0:0:0:0:0:1\"}'),
+(1001,0,1760645171384,'{\"usuarioId\":\"LIIM\",\"contrasena\":\"holaMundo\",\"ipAddress\":\"0:0:0:0:0:0:0:1\"}'),
+(1001,0,1760645695103,'{\"usuarioId\":\"LIIM\",\"contrasena\":\"holaMundo\",\"ipAddress\":\"127.0.0.1\"}'),
+(1001,0,1760645951993,'{\"usuarioId\":\"LIIM\",\"contrasena\":\"holaMundo\",\"ipAddress\":\"127.0.0.1\"}'),
+(1001,0,1760707624316,'{\"usuarioId\":\"LIIM\",\"contrasena\":\"holaMundo\",\"ipAddress\":\"127.0.0.1\"}'),
+(1001,0,1760730126272,'{\"usuarioId\":\"carlos\",\"contrasena\":\"abc123\",\"ipAddress\":\"127.0.0.1\"}'),
+(1001,0,1760730133676,'{\"usuarioId\":\"carlos\",\"contrasena\":\"holaCArlos\",\"ipAddress\":\"127.0.0.1\"}'),
+(1001,0,1760731663219,'{\"usuarioId\":\"LIIM\",\"contrasena\":\"holaMundo\",\"ipAddress\":\"127.0.0.1\"}'),
+(1001,0,1760732656350,'{\"usuarioId\":\"carlos\",\"contrasena\":\"abc123\",\"ipAddress\":\"127.0.0.1\"}'),
+(1001,0,1760732742642,'{\"usuarioId\":\"carlos\",\"contrasena\":\"holaCarlod\",\"ipAddress\":\"127.0.0.1\"}'),
+(1001,0,1760972034977,'{\"usuarioId\":\"LIIM\",\"contrasena\":\"holaMundo\",\"ipAddress\":\"0:0:0:0:0:0:0:1\"}'),
+(1001,0,1760972042852,'{\"usuarioId\":\"LIIM\",\"contrasena\":\"holaMundo\",\"ipAddress\":\"0:0:0:0:0:0:0:1\"}'),
+(1001,0,1760972052385,'{\"usuarioId\":\"LIIM\",\"contrasena\":\"16Octubre\",\"ipAddress\":\"0:0:0:0:0:0:0:1\"}'),
+(1001,0,1761021028108,'{\"usuarioId\":\"LIIM\",\"contrasena\":\"holaMundo\",\"ipAddress\":\"0:0:0:0:0:0:0:1\"}'),
 (1002,0,1757556060621,'{\"usuarioId\":\"MisaRJww\",\"contrasena\":\"dksld\",\"ipAddress\":\"127.0.0.1\"}'),
 (1002,0,1759815084199,'{\"usuarioId\":\"LIM\",\"contrasena\":\"holaMundo\",\"ipAddress\":\"127.0.0.1\"}'),
+(1002,0,1760730063350,'{\"usuarioId\":\"16Octubre\",\"contrasena\":\"16Octubre\",\"ipAddress\":\"127.0.0.1\"}'),
 (1003,0,1757556173525,'{\"usuarioId\":\"MisaRJ\",\"contrasena\":\"ROJP00qqq\",\"ipAddress\":\"127.0.0.1\"}'),
 (1003,0,1757556182597,'{\"usuarioId\":\"MisaRJ\",\"contrasena\":\"ROJP\",\"ipAddress\":\"127.0.0.1\"}'),
 (1003,0,1757557421736,'{\"usuarioId\":\"MisaRJ\",\"contrasena\":\"ROJP0000\",\"ipAddress\":\"127.0.0.1\"}'),
@@ -1561,17 +1718,17 @@ INSERT INTO `RegistroEvento` VALUES
 (1008,6,1758338114624,'{\"Usuario\":{\"nombre\":\"asdasdasdas\",\"apellidoPaterno\":\"dasdasdas\",\"apellidoMaterno\":\"dasdasdas\",\"curp\":\"ds\",\"numEmpleado\":321312,\"area\":4,\"roles\":[1,2,3,4,5,6],\"estado\":\"Inicial\",\"correoElectronico\":\"asdasdasd\",\"usuarioID\":\"qew\"},\"SesionActiva\":{\"horaInicio\":1758338005895,\"usuarioCURP\":\"PEPC000000\",\"usuarioNumEmpleado\":0,\"aplicacionID\":0}}'),
 (1008,6,1758338134465,'{\"Usuario\":{\"nombre\":\"asdasdasdas\",\"apellidoPaterno\":\"dasdasdas\",\"apellidoMaterno\":\"dasdasdas\",\"curp\":\"ds\",\"numEmpleado\":321312,\"area\":4,\"roles\":[],\"estado\":\"Inicial\",\"correoElectronico\":\"asdasdasd\",\"usuarioID\":\"qwew\"},\"SesionActiva\":{\"horaInicio\":1758338005895,\"usuarioCURP\":\"PEPC000000\",\"usuarioNumEmpleado\":0,\"aplicacionID\":0}}'),
 (1008,6,1758338178102,'{\"Usuario\":{\"nombre\":\"asdasdasdas\",\"apellidoPaterno\":\"dasdasdas\",\"apellidoMaterno\":\"dasdasdas\",\"curp\":\"ds\",\"numEmpleado\":321312,\"area\":4,\"roles\":[1,2,3,4,5,6],\"estado\":\"Inicial\",\"correoElectronico\":\"asdasdasd\",\"usuarioID\":\"qwew\"},\"SesionActiva\":{\"horaInicio\":1758338005895,\"usuarioCURP\":\"PEPC000000\",\"usuarioNumEmpleado\":0,\"aplicacionID\":0}}');
-/*!40000 ALTER TABLE `RegistroEvento` ENABLE KEYS */;
+/*!40000 ALTER TABLE `registroevento` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
--- Table structure for table `Rol`
+-- Table structure for table `rol`
 --
 
-DROP TABLE IF EXISTS `Rol`;
+DROP TABLE IF EXISTS `rol`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8mb4 */;
-CREATE TABLE `Rol` (
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `rol` (
   `idRol` int(11) NOT NULL,
   `Nombre` varchar(30) NOT NULL,
   `Descripcion` varchar(100) NOT NULL,
@@ -1580,55 +1737,55 @@ CREATE TABLE `Rol` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `Rol`
+-- Dumping data for table `rol`
 --
 
-LOCK TABLES `Rol` WRITE;
-/*!40000 ALTER TABLE `Rol` DISABLE KEYS */;
-INSERT INTO `Rol` VALUES
+LOCK TABLES `rol` WRITE;
+/*!40000 ALTER TABLE `rol` DISABLE KEYS */;
+INSERT INTO `rol` VALUES
 (1,'Admin','Administrador RIS-INR'),
 (2,'Recepcionista','Contol de citas'),
 (3,'Radiólogo','Área de diagnóstico'),
 (4,'JefedelServicio','Prueba'),
 (5,'SubdirectordeServicios','Subdirector de Servicios Auxiliares'),
 (6,'CoordinadordelServicio','Coordinador del Servicio');
-/*!40000 ALTER TABLE `Rol` ENABLE KEYS */;
+/*!40000 ALTER TABLE `rol` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
--- Table structure for table `RolAplicacion`
+-- Table structure for table `rolaplicacion`
 --
 
-DROP TABLE IF EXISTS `RolAplicacion`;
+DROP TABLE IF EXISTS `rolaplicacion`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8mb4 */;
-CREATE TABLE `RolAplicacion` (
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `rolaplicacion` (
   `Aplicacion_idAplicacion` int(11) NOT NULL,
   `Rol_idRol` int(11) NOT NULL,
   PRIMARY KEY (`Aplicacion_idAplicacion`,`Rol_idRol`),
   KEY `fk_RolAplicacion_Rol1_idx` (`Rol_idRol`),
-  CONSTRAINT `fk_RolAplicacion_Aplicacion1` FOREIGN KEY (`Aplicacion_idAplicacion`) REFERENCES `Aplicacion` (`idAplicacion`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `fk_RolAplicacion_Rol1` FOREIGN KEY (`Rol_idRol`) REFERENCES `Rol` (`idRol`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  CONSTRAINT `fk_RolAplicacion_Aplicacion1` FOREIGN KEY (`Aplicacion_idAplicacion`) REFERENCES `aplicacion` (`idAplicacion`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fk_RolAplicacion_Rol1` FOREIGN KEY (`Rol_idRol`) REFERENCES `rol` (`idRol`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `RolAplicacion`
+-- Dumping data for table `rolaplicacion`
 --
 
-LOCK TABLES `RolAplicacion` WRITE;
-/*!40000 ALTER TABLE `RolAplicacion` DISABLE KEYS */;
-/*!40000 ALTER TABLE `RolAplicacion` ENABLE KEYS */;
+LOCK TABLES `rolaplicacion` WRITE;
+/*!40000 ALTER TABLE `rolaplicacion` DISABLE KEYS */;
+/*!40000 ALTER TABLE `rolaplicacion` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
--- Table structure for table `Sesion`
+-- Table structure for table `sesion`
 --
 
-DROP TABLE IF EXISTS `Sesion`;
+DROP TABLE IF EXISTS `sesion`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8mb4 */;
-CREATE TABLE `Sesion` (
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `sesion` (
   `horaInicio` bigint(20) NOT NULL,
   `horaFin` bigint(20) DEFAULT NULL,
   `IPDispositivo` varchar(15) NOT NULL,
@@ -1641,18 +1798,18 @@ CREATE TABLE `Sesion` (
   PRIMARY KEY (`horaInicio`,`Usuario_NumEmpleado`,`Usuario_CURP`,`Aplicacion_idAplicacion`),
   KEY `fk_Sesion_Usuario1_idx` (`Usuario_NumEmpleado`,`Usuario_CURP`),
   KEY `fk_Sesion_Aplicacion1_idx` (`Aplicacion_idAplicacion`),
-  CONSTRAINT `fk_Sesion_Aplicacion1` FOREIGN KEY (`Aplicacion_idAplicacion`) REFERENCES `Aplicacion` (`idAplicacion`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `fk_Sesion_Usuario1` FOREIGN KEY (`Usuario_NumEmpleado`, `Usuario_CURP`) REFERENCES `Usuario` (`NumEmpleado`, `CURP`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  CONSTRAINT `fk_Sesion_Aplicacion1` FOREIGN KEY (`Aplicacion_idAplicacion`) REFERENCES `aplicacion` (`idAplicacion`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fk_Sesion_Usuario1` FOREIGN KEY (`Usuario_NumEmpleado`, `Usuario_CURP`) REFERENCES `usuario` (`NumEmpleado`, `CURP`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `Sesion`
+-- Dumping data for table `sesion`
 --
 
-LOCK TABLES `Sesion` WRITE;
-/*!40000 ALTER TABLE `Sesion` DISABLE KEYS */;
-INSERT INTO `Sesion` VALUES
+LOCK TABLES `sesion` WRITE;
+/*!40000 ALTER TABLE `sesion` DISABLE KEYS */;
+INSERT INTO `sesion` VALUES
 (1757048667398,1757048681434,'127.0.0.1','Normal',0,'PEPC000000',0,'Admin','carlos'),
 (1757048711385,1757048811284,'0:0:0:0:0:0:0:1','NormalPostman',0,'PEPC000000',0,'Admin','carlos'),
 (1757049489936,1757049640480,'0:0:0:0:0:0:0:1','NormalPostman',1,'LIIM0000',0,'Admin','LIIM'),
@@ -2271,18 +2428,119 @@ INSERT INTO `Sesion` VALUES
 (1760069219797,1760069919017,'127.0.0.1','Inactividad',1,'LIIM0000',0,'JefedelServicio','LIIM'),
 (1760069927219,1760070051972,'127.0.0.1','Normal',1,'LIIM0000',0,'Admin','LIIM'),
 (1760070067180,1760070069056,'127.0.0.1','Normal',1,'LIIM0000',0,'Admin','LIIM'),
-(1760070074960,1760070104336,'127.0.0.1','Normal',1,'LIIM0000',0,'JefedelServicio','LIIM');
-/*!40000 ALTER TABLE `Sesion` ENABLE KEYS */;
+(1760070074960,1760070104336,'127.0.0.1','Normal',1,'LIIM0000',0,'JefedelServicio','LIIM'),
+(1760222488755,NULL,'0:0:0:0:0:0:0:1',NULL,1,'LIIM0000',0,'JefedelServicio','LIIM'),
+(1760222616102,NULL,'127.0.0.1',NULL,1,'LIIM0000',0,'Admin','LIIM'),
+(1760313355460,1760313369659,'127.0.0.1','Normal',1,'LIIM0000',0,'Admin','LIIM'),
+(1760313575926,1760313606105,'127.0.0.1','Normal',1,'LIIM0000',0,'Admin','LIIM'),
+(1760313971911,1760314572050,'127.0.0.1','Inactividad',1,'LIIM0000',0,'Admin','LIIM'),
+(1760314696898,1760314749207,'127.0.0.1','Normal',1,'LIIM0000',0,'Admin','LIIM'),
+(1760314770583,1760314798078,'127.0.0.1','Normal',1,'LIIM0000',0,'Admin','LIIM'),
+(1760314815629,1760314868571,'0:0:0:0:0:0:0:1','Normal',1,'LIIM0000',0,'Admin','LIIM'),
+(1760314899363,1760314906217,'0:0:0:0:0:0:0:1','Normal',1,'LIIM0000',0,'Admin','LIIM'),
+(1760314981355,1760315002823,'0:0:0:0:0:0:0:1','Normal',1,'LIIM0000',0,'Admin','LIIM'),
+(1760319226698,1760319234712,'0:0:0:0:0:0:0:1','Normal',1,'LIIM0000',0,'Admin','LIIM'),
+(1760320083029,1760320683017,'127.0.0.1','Inactividad',1,'LIIM0000',0,'Admin','LIIM'),
+(1760320867762,1760321014716,'127.0.0.1','Normal',1,'LIIM0000',0,'Admin','LIIM'),
+(1760321030025,NULL,'127.0.0.1',NULL,1,'LIIM0000',0,'Admin','LIIM'),
+(1760321238733,1760321256015,'127.0.0.1','Normal',1,'LIIM0000',0,'Admin','LIIM'),
+(1760321261169,1760321290030,'127.0.0.1','Normal',1,'LIIM0000',0,'Admin','LIIM'),
+(1760321306094,NULL,'127.0.0.1',NULL,1,'LIIM0000',0,'Admin','LIIM'),
+(1760325145070,1760325169338,'127.0.0.1','Normal',1,'LIIM0000',0,'Admin','LIIM'),
+(1760326927159,1760327123661,'127.0.0.1','Normal',1,'LIIM0000',0,'Admin','LIIM'),
+(1760327149251,1760327165000,'127.0.0.1','Normal',1,'LIIM0000',0,'Admin','LIIM'),
+(1760327199409,1760327203653,'127.0.0.1','Normal',1,'LIIM0000',0,'Admin','LIIM'),
+(1760327244927,1760327256744,'127.0.0.1','Normal',1,'LIIM0000',0,'Admin','LIIM'),
+(1760327264943,1760327396344,'127.0.0.1','Normal',1,'LIIM0000',0,'Admin','LIIM'),
+(1760327410749,1760327412866,'127.0.0.1','Normal',1,'LIIM0000',0,'Admin','LIIM'),
+(1760327874126,1760327882236,'127.0.0.1','Normal',1,'LIIM0000',0,'Admin','LIIM'),
+(1760327962732,NULL,'127.0.0.1',NULL,1,'LIIM0000',0,'Admin','LIIM'),
+(1760328146891,1760328265079,'127.0.0.1','Normal',1,'LIIM0000',0,'Admin','LIIM'),
+(1760328282719,1760328455931,'127.0.0.1','Normal',1,'LIIM0000',0,'Admin','LIIM'),
+(1760328727716,1760328844108,'127.0.0.1','Normal',1,'LIIM0000',0,'Admin','LIIM'),
+(1760329089599,1760329251404,'127.0.0.1','Normal',1,'LIIM0000',0,'Admin','LIIM'),
+(1760329268778,1760329280326,'127.0.0.1','Normal',1,'LIIM0000',0,'Recepcionista','LIIM'),
+(1760329318111,1760329325953,'127.0.0.1','Normal',1,'LIIM0000',0,'Admin','LIIM'),
+(1760329444898,1760329458479,'127.0.0.1','Normal',1,'LIIM0000',0,'Recepcionista','LIIM'),
+(1760329504478,1760329519602,'127.0.0.1','Normal',1,'LIIM0000',0,'Admin','LIIM'),
+(1760386390972,1760386981955,'127.0.0.1','Normal',1,'LIIM0000',0,'Recepcionista','LIIM'),
+(1760386993743,1760387012455,'127.0.0.1','Normal',1,'LIIM0000',0,'JefedelServicio','LIIM'),
+(1760387016160,1760387055648,'127.0.0.1','Normal',1,'LIIM0000',0,'Admin','LIIM'),
+(1760388339917,1760388352579,'127.0.0.1','Normal',1,'LIIM0000',0,'Admin','LIIM'),
+(1760388356304,1760389529918,'127.0.0.1','Inactividad',1,'LIIM0000',0,'JefedelServicio','LIIM'),
+(1760489656872,1760489852880,'0:0:0:0:0:0:0:1','NormalPostman',1,'LIIM0000',0,'Admin','LIIM'),
+(1760489884561,1760489887995,'0:0:0:0:0:0:0:1','Normal',1,'LIIM0000',0,'Admin','LIIM'),
+(1760490063788,NULL,'0:0:0:0:0:0:0:1',NULL,1,'LIIM0000',0,'Admin','LIIM'),
+(1760491451564,1760491635672,'0:0:0:0:0:0:0:1','NormalPostman',1,'LIIM0000',0,'Admin','LIIM'),
+(1760491815532,NULL,'0:0:0:0:0:0:0:1',NULL,1,'LIIM0000',0,'Admin','LIIM'),
+(1760558946260,1760559365855,'127.0.0.1','Normal',1,'LIIM0000',0,'JefedelServicio','LIIM'),
+(1760559371111,1760559394253,'127.0.0.1','Normal',1,'LIIM0000',0,'Recepcionista','LIIM'),
+(1760559400211,1760560478098,'127.0.0.1','Normal',1,'LIIM0000',0,'Admin','LIIM'),
+(1760624423635,NULL,'0:0:0:0:0:0:0:1',NULL,1,'LIIM0000',0,'Admin','LIIM'),
+(1760625121869,1760625182761,'127.0.0.1','Normal',1,'LIIM0000',0,'Admin','LIIM'),
+(1760625198602,1760625748830,'0:0:0:0:0:0:0:1','Normal',1,'LIIM0000',0,'Admin','LIIM'),
+(1760625770545,1760625793466,'0:0:0:0:0:0:0:1','Normal',1,'LIIM0000',0,'Admin','LIIM'),
+(1760625808603,NULL,'0:0:0:0:0:0:0:1',NULL,1,'LIIM0000',0,'Recepcionista','LIIM'),
+(1760625898088,1760625908898,'0:0:0:0:0:0:0:1','Normal',1,'LIIM0000',0,'Recepcionista','LIIM'),
+(1760625952277,1760625958339,'0:0:0:0:0:0:0:1','Normal',1,'LIIM0000',0,'Radiólogo','LIIM'),
+(1760626035393,1760626119554,'0:0:0:0:0:0:0:1','Normal',0,'PEPC000000',0,'Radiólogo','carlos'),
+(1760626180738,1760626183328,'127.0.0.1','Normal',1,'LIIM0000',0,'Recepcionista','LIIM'),
+(1760626191100,1760626195897,'127.0.0.1','Normal',0,'PEPC000000',0,'Radiólogo','carlos'),
+(1760643542856,NULL,'127.0.0.1',NULL,0,'PEPC000000',0,'Admin','carlos'),
+(1760643580185,1760643704248,'127.0.0.1','Normal',1,'LIIM0000',0,'Admin','LIIM'),
+(1760643719666,1760643730428,'127.0.0.1','Normal',17,'15Octubre',0,'JefedelServicio','15Octubre'),
+(1760643951926,1760644205320,'127.0.0.1','Normal',1,'LIIM0000',0,'Admin','LIIM'),
+(1760644229299,1760644304731,'127.0.0.1','Normal',1,'LIIM0000',0,'Admin','LIIM'),
+(1760644312705,1760644334847,'127.0.0.1','Normal',16,'holaEjemplo',0,'JefedelServicio','holaEjemplo'),
+(1760645047941,1760645158259,'0:0:0:0:0:0:0:1','NormalPostman',1,'LIIM0000',0,'Admin','LIIM'),
+(1760645190247,NULL,'0:0:0:0:0:0:0:1',NULL,1,'LIIM0000',0,'Admin','LIIM'),
+(1760645716425,1760645834378,'127.0.0.1','Normal',1,'LIIM0000',0,'Admin','LIIM'),
+(1760645843190,1760645949888,'127.0.0.1','Normal',20,'20Octubre',0,'JefedelServicio','20Octubre'),
+(1760645962307,NULL,'127.0.0.1',NULL,1,'LIIM0000',0,'Admin','LIIM'),
+(1760707641898,1760707666821,'127.0.0.1','Normal',1,'LIIM0000',0,'Admin','LIIM'),
+(1760707794468,NULL,'127.0.0.1',NULL,1,'LIIM0000',0,'Admin','LIIM'),
+(1760708128962,1760708729029,'127.0.0.1','Inactividad',1,'LIIM0000',0,'Admin','LIIM'),
+(1760709028926,1760709430753,'127.0.0.1','Normal',1,'LIIM0000',0,'Admin','LIIM'),
+(1760709449408,1760709504447,'127.0.0.1','Normal',1,'LIIM0000',0,'Admin','LIIM'),
+(1760712220828,1760712389076,'127.0.0.1','Normal',1,'LIIM0000',0,'Admin','LIIM'),
+(1760712905974,1760713007391,'127.0.0.1','Normal',1,'LIIM0000',0,'Admin','LIIM'),
+(1760723271060,NULL,'127.0.0.1',NULL,1,'LIIM0000',0,'Admin','LIIM'),
+(1760723368044,1760723973040,'127.0.0.1','Inactividad',1,'LIIM0000',0,'Admin','LIIM'),
+(1760724631823,1760724661773,'127.0.0.1','Normal',1,'LIIM0000',0,'Admin','LIIM'),
+(1760724670563,1760724733527,'127.0.0.1','Normal',0,'PEPC000000',0,'Admin','carlos'),
+(1760724752627,NULL,'127.0.0.1',NULL,0,'PEPC000000',0,'Admin','carlos'),
+(1760724851925,1760725583662,'127.0.0.1','Inactividad',0,'PEPC000000',0,'Admin','carlos'),
+(1760728253482,1760728338834,'127.0.0.1','Normal',1,'LIIM0000',0,'Admin','LIIM'),
+(1760728365251,1760728593832,'127.0.0.1','Normal',1,'LIIM0000',0,'Admin','LIIM'),
+(1760728624024,1760728841573,'127.0.0.1','Normal',1,'LIIM0000',0,'Admin','LIIM'),
+(1760728859539,1760729041302,'127.0.0.1','Normal',1,'LIIM0000',0,'SubdirectordeServicios','LIIM'),
+(1760729090312,1760729567194,'127.0.0.1','Normal',1,'LIIM0000',0,'Admin','LIIM'),
+(1760729594114,1760729781101,'127.0.0.1','Normal',1,'LIIM0000',0,'Admin','LIIM'),
+(1760729807597,1760729823072,'127.0.0.1','Normal',1,'LIIM0000',0,'Admin','LIIM'),
+(1760729840572,1760729844113,'127.0.0.1','Normal',0,'PEPC000000',0,'Admin','carlos'),
+(1760730073627,1760730082419,'127.0.0.1','Normal',17,'15Octubre',0,'JefedelServicio','15Octubre'),
+(1760730088673,1760730111067,'127.0.0.1','Normal',0,'PEPC000000',0,'Admin','carlos'),
+(1760730141996,1760730147982,'127.0.0.1','Normal',0,'PEPC000000',0,'Admin','carlos'),
+(1760731444129,1760731651786,'127.0.0.1','Normal',1,'LIIM0000',0,'Admin','LIIM'),
+(1760731677096,1760732224509,'127.0.0.1','Normal',1,'LIIM0000',0,'Admin','LIIM'),
+(1760732234228,1760732322858,'127.0.0.1','Normal',19,'hola',0,'Recepcionista','HOLA'),
+(1760732331884,1760732366586,'127.0.0.1','Normal',19,'hola',0,'Recepcionista','HOLA'),
+(1760732427698,1760732640626,'127.0.0.1','Normal',19,'hola',0,'Recepcionista','HOLA'),
+(1760732765706,1760732788166,'127.0.0.1','Normal',0,'PEPC000000',0,'Admin','carlos'),
+(1760972130692,1760972503453,'0:0:0:0:0:0:0:1','Normal',1,'LIIM0000',0,'Admin','LIIM'),
+(1761021036737,1761021074218,'0:0:0:0:0:0:0:1','Normal',1,'LIIM0000',0,'Admin','LIIM'),
+(1761021085351,1761021119066,'0:0:0:0:0:0:0:1','Normal',1,'LIIM0000',0,'JefedelServicio','LIIM');
+/*!40000 ALTER TABLE `sesion` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
--- Table structure for table `SolicitudDeEstudio`
+-- Table structure for table `solicituddeestudio`
 --
 
-DROP TABLE IF EXISTS `SolicitudDeEstudio`;
+DROP TABLE IF EXISTS `solicituddeestudio`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8mb4 */;
-CREATE TABLE `SolicitudDeEstudio` (
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `solicituddeestudio` (
   `Paciente_idPaciente` varchar(20) NOT NULL,
   `Medico_NumEmpleado` int(11) NOT NULL,
   `Medico_CURP` varchar(45) NOT NULL,
@@ -2296,18 +2554,18 @@ CREATE TABLE `SolicitudDeEstudio` (
   PRIMARY KEY (`Paciente_idPaciente`,`Medico_NumEmpleado`,`Medico_CURP`,`FechaSolicitudPk`),
   KEY `fk_SolicitudDeEstudio_Paciente1_idx` (`Paciente_idPaciente`),
   KEY `fk_SolicitudDeEstudio_Medico1_idx` (`Medico_NumEmpleado`,`Medico_CURP`),
-  CONSTRAINT `fk_SolicitudDeEstudio_Medico1` FOREIGN KEY (`Medico_NumEmpleado`, `Medico_CURP`) REFERENCES `Medico` (`NumEmpleado`, `CURP`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `fk_SolicitudDeEstudio_Paciente1` FOREIGN KEY (`Paciente_idPaciente`) REFERENCES `Paciente` (`idPaciente`) ON DELETE CASCADE ON UPDATE CASCADE
+  CONSTRAINT `fk_SolicitudDeEstudio_Medico1` FOREIGN KEY (`Medico_NumEmpleado`, `Medico_CURP`) REFERENCES `medico` (`NumEmpleado`, `CURP`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_SolicitudDeEstudio_Paciente1` FOREIGN KEY (`Paciente_idPaciente`) REFERENCES `paciente` (`idPaciente`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `SolicitudDeEstudio`
+-- Dumping data for table `solicituddeestudio`
 --
 
-LOCK TABLES `SolicitudDeEstudio` WRITE;
-/*!40000 ALTER TABLE `SolicitudDeEstudio` DISABLE KEYS */;
-INSERT INTO `SolicitudDeEstudio` VALUES
+LOCK TABLES `solicituddeestudio` WRITE;
+/*!40000 ALTER TABLE `solicituddeestudio` DISABLE KEYS */;
+INSERT INTO `solicituddeestudio` VALUES
 ('1',3,'LMJ12',1636749000000,'2022-09-19 21:35:34','URGENCIAS','2022-09-29 14:00:00','RX','NA','Solicitado'),
 ('10',3,'LMJ12',1636754400000,'2021-11-10 22:40:29','URGENCIAS','2021-11-16 15:15:00','RX','NA','Programado'),
 ('10',3,'LMJ12',1659469543148,'2022-08-02 19:45:43','URGENCIAS','2021-11-16 15:15:00','RX','fin','Cancelado'),
@@ -2358,17 +2616,17 @@ INSERT INTO `SolicitudDeEstudio` VALUES
 ('9',3,'LMJ12',1636756200000,'2021-10-16 14:45:00','URGENCIAS','2021-11-16 15:00:00','RX','NA','Programado'),
 ('9',3,'LMJ12',1663186985762,'2022-09-14 20:23:05','URGENCIAS','2021-11-16 15:00:00','RX','No puede el paciente','Cancelado'),
 ('9',3,'LMJ12',1663186991510,'2022-09-14 20:23:11','URGENCIAS','2021-11-16 15:00:00','RX','No puede el paciente','Cancelado');
-/*!40000 ALTER TABLE `SolicitudDeEstudio` ENABLE KEYS */;
+/*!40000 ALTER TABLE `solicituddeestudio` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
--- Table structure for table `Usuario`
+-- Table structure for table `usuario`
 --
 
-DROP TABLE IF EXISTS `Usuario`;
+DROP TABLE IF EXISTS `usuario`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8mb4 */;
-CREATE TABLE `Usuario` (
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `usuario` (
   `NumEmpleado` int(11) NOT NULL,
   `CURP` varchar(45) NOT NULL,
   `Area_idArea` int(11) NOT NULL,
@@ -2379,19 +2637,19 @@ CREATE TABLE `Usuario` (
   PRIMARY KEY (`NumEmpleado`,`CURP`),
   UNIQUE KEY `CorreoElectronico` (`CorreoElectronico`),
   KEY `fk_Usuario_Area1_idx` (`Area_idArea`),
-  CONSTRAINT `fk_Usuario_Area1` FOREIGN KEY (`Area_idArea`) REFERENCES `AreaDeServicio` (`idArea`)
+  CONSTRAINT `fk_Usuario_Area1` FOREIGN KEY (`Area_idArea`) REFERENCES `areadeservicio` (`idArea`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `Usuario`
+-- Dumping data for table `usuario`
 --
 
-LOCK TABLES `Usuario` WRITE;
-/*!40000 ALTER TABLE `Usuario` DISABLE KEYS */;
-INSERT INTO `Usuario` VALUES
+LOCK TABLES `usuario` WRITE;
+/*!40000 ALTER TABLE `usuario` DISABLE KEYS */;
+INSERT INTO `usuario` VALUES
 (0,'PEPC000000',5,'Carlos Alberto','Pérez','Pérez','carlos@gmail.com'),
-(1,'LIIM0000',5,'Laboratorio de Investigacion','Informatica','Medica','LIIM.UAMI@gmail.com'),
+(1,'LIIM0000',5,'Laboratorio de Investigacion','Informatica','Medica','LIIM@gmail.com'),
 (2,'21Septiembreq',1,'21Septiembre','21Septiembreq','21Septiembreq','21Septiembreq@gmail.com'),
 (3,'Prueba123',1,'hola','soy','una','holapruebajeje@gmail.com'),
 (4,'21Septiembre2025',1,'21Septiembre2025','21Septiembre2025','21Septiembre2025','21Septiembre2025@gmail.com'),
@@ -2406,12 +2664,16 @@ INSERT INTO `Usuario` VALUES
 (13,'29Septiembre2025',4,'29Septiembre','29Septiembre','29Septiembre','29Septiembre@gmail.com'),
 (14,'8Octubre',5,'Edicion','Desde','JefeDeServicio','edicion.js@gmail.com'),
 (15,'nueveOCT123',2,'9oCTUBRE','9Octubre','NueveOct','9oct@gmail.com'),
+(16,'holaEjemplo',6,'Octubre','Octubre','Octubre','holaEjemplo@gmail.com'),
+(17,'15Octubre',2,'15Octubre','15Octubre','15Octubre','15Octubre@gmail.com'),
+(19,'hola',7,'hola','hola','hola','hola@gmail.com'),
+(20,'20Octubre',2,'20Octubre','20Octubre','20Octubre','20Octubre@gmail.com'),
 (22,'ELCP0000',4,'Paco','El','Chato','pacoelchato@gmail.com'),
 (100,'REBM111111',5,'Maddie','Rebolledo','Bustillo','maddie.rb@gmail.com'),
 (122,'asdasdasd',4,'asdasdasdas','dasdasdas','dasdasdas','asdasdasd'),
 (1000,'6Octubre',8,'6Octubre','6Octubre','6Octubre','6Octubre@gmail.com'),
 (321312,'ds',4,'asdasdasdas','dasdasdas','dasdasdas','rew');
-/*!40000 ALTER TABLE `Usuario` ENABLE KEYS */;
+/*!40000 ALTER TABLE `usuario` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -2421,6 +2683,6 @@ UNLOCK TABLES;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
-/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+/*M!100616 SET NOTE_VERBOSITY=@OLD_NOTE_VERBOSITY */;
 
--- Dump completed on 2025-10-11 14:49:58
+-- Dump completed on 2025-10-20 22:37:22
