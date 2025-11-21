@@ -453,7 +453,8 @@ async function CrudUSR(e){
                     } finally{
                         cambiaEstadoModal(".modalUSUARIOS", false);
                         document.getElementById("USUARIOS").reset(); //Borra datos del formulario
-                        await ConsultaCatalogoUSRS();;
+                        html_HideElement("btnEdtUsrtbl");
+                        await ConsultaCatalogoUSRS();
                     }
                 } else {
                     alert("Seleccione un registro de la tabla");

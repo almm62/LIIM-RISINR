@@ -12,6 +12,8 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.UAM.RISINR.model.DatosAcceso;
 import com.UAM.RISINR.model.DatosAccesoPK;
+import com.UAM.RISINR.model.Medico;
+import com.UAM.RISINR.model.MedicoPK;
 import com.UAM.RISINR.model.Perfil;
 import com.UAM.RISINR.model.PerfilPK;
 import com.UAM.RISINR.model.SesionPK;
@@ -24,6 +26,7 @@ import com.UAM.RISINR.model.dto.userManager.CrearUsuarioDTO;
 import com.UAM.RISINR.model.dto.userManager.UsuarioResumenDTO;
 import com.UAM.RISINR.repository.AreaDeServicioRepository;
 import com.UAM.RISINR.repository.DatosAccesoRepository;
+import com.UAM.RISINR.repository.MedicoRepository;
 import com.UAM.RISINR.repository.PerfilRepository;
 import com.UAM.RISINR.repository.RolRepository;
 import com.UAM.RISINR.repository.SesionRepository;
@@ -42,6 +45,7 @@ public class UserServiceImpl implements UserService{
     private final PerfilRepository perfilRepo;
     private final RolRepository rolRepo;
     private final SesionRepository sesionRepo;
+    private final MedicoRepository medicoRepo;
     private final ObjectMapper objectMapper;
     
     private static final int USER_CREATE_SUCCESS=6;
@@ -61,7 +65,7 @@ public class UserServiceImpl implements UserService{
     
     
 public UserServiceImpl(RegistroEventoService registroEvento, UsuarioRepository usuarioRepo, DatosAccesoRepository datosAccesoRepo, 
-                        AreaDeServicioRepository areaDeServicioRepo, PerfilRepository perfilRepo, RolRepository rolRepo, 
+                        AreaDeServicioRepository areaDeServicioRepo, PerfilRepository perfilRepo, RolRepository rolRepo, MedicoRepository medicoRepo,
                         ObjectMapper objectMapper, SesionRepository sesionRepo){
     this.registroEvento=registroEvento;
     this.areaDeServicioRepo=areaDeServicioRepo;
@@ -69,6 +73,7 @@ public UserServiceImpl(RegistroEventoService registroEvento, UsuarioRepository u
     this.datosAccesoRepo=datosAccesoRepo;
     this.perfilRepo=perfilRepo;
     this.rolRepo= rolRepo;
+    this.medicoRepo=medicoRepo;
     this.objectMapper=objectMapper;
     this.sesionRepo = sesionRepo;
     }
@@ -173,6 +178,13 @@ public UserServiceImpl(RegistroEventoService registroEvento, UsuarioRepository u
             if(matchRol.isEmpty()){
                 registroEvento.log(INVALID_ROLE, APLICACION_ALTA_USUARIOS, hora, datos);
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Rol no existe");
+            }
+            if(matchRol.get().getIdRol()==3){ // Si se asigna rol de Radiologo, crear registro en Medico
+                MedicoPK medicoPK = new MedicoPK(dto.getNumEmpleado(), dto.getCurp());
+                if (!medicoRepo.findById(medicoPK).isPresent()) {
+                    Medico medico = new Medico(medicoPK);
+                    medicoRepo.save(medico);
+                }
             }
             perfiles.add(matchRol.get().getNombre());
             var perfPK = new PerfilPK(dto.getNumEmpleado(), dto.getCurp(), matchRol.get().getIdRol());

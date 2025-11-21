@@ -21,10 +21,11 @@ public class EquipoImagenologiaRequest {
         private String modelo;
         private String modalidad;
         private Integer idArea;
-        private String estado; 
+        private String estado;
+        private String ubicacion; 
        
 
-    public EquipoImagenologiaRequest(String nSerie, String nombreEquipo, String marca, String modelo, String modalidad, Integer idArea,String estado) {
+    public EquipoImagenologiaRequest(String nSerie, String nombreEquipo, String marca, String modelo, String modalidad, Integer idArea,String estado, String ubicacion) {
         this.nSerie = nSerie;
         this.nombreEquipo = nombreEquipo;
         this.marca = marca;
@@ -32,6 +33,7 @@ public class EquipoImagenologiaRequest {
         this.modalidad = modalidad;
         this.idArea = idArea;
         this.estado = estado;
+        this.ubicacion=ubicacion;
         
     }
     
@@ -93,6 +95,14 @@ public class EquipoImagenologiaRequest {
 
     public void setIdArea(Integer idArea) {
         this.idArea = idArea;
+    }
+
+    public String getUbicacion() {
+        return ubicacion;
+    }
+
+    public void setUbicacion(String ubicacion) {
+        this.ubicacion = ubicacion;
     }
     
 }
