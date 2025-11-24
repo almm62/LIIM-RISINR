@@ -15,7 +15,9 @@ import com.UAM.RISINR.model.ControlEstudios;
 import com.UAM.RISINR.model.ControlEstudiosPK;
 import com.UAM.RISINR.model.Domicilio;
 import com.UAM.RISINR.model.Equipo;
+import com.UAM.RISINR.model.EquipoImagenologia;
 import com.UAM.RISINR.model.Estudio;
+import com.UAM.RISINR.model.Medico;
 import com.UAM.RISINR.model.MedicoPK;
 import com.UAM.RISINR.model.Paciente;
 import com.UAM.RISINR.model.SolicitudDeEstudio;
@@ -163,15 +165,67 @@ public class CitasServiceImpl implements CitasService{
             
         }
         AreaDeServicio area = us.getAreaidArea();
-        var es = estudioRepo.findById(dto.getIdestudio());
         
+        /* ----------- Validaciones ------------*/ 
+        // Estudio existe
+        var es = estudioRepo.findById(dto.getIdestudio());
         if(es.isEmpty()){
+            System.out.println("1");
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Estudio no existe");
         }
+        
+        // Estudio no pertenece al area del usuario
         if(!es.get().getAreaDeServicioidArea().getIdArea().equals(area.getIdArea())){
+            System.out.println("2");
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Area no compatible");
         }
 
+        // AsignacionEstudio existente
+        AsignacionEstudioPK aePK = new AsignacionEstudioPK(dto.getEqNoSerie(), dto.getIdestudio(), dto.getFechacontrolpk());
+        var ae  = aeRepo.findById(aePK);
+        if(ae.isEmpty()){
+            System.out.println("3");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "AsignacionEstudio no existente");
+        }
+        // EquipoImagenologia existe
+        var eqImag = eqpImagRepo.findById(dto.getEqNoSerie());
+        if(eqImag.isEmpty()){
+            System.out.println("4");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "EquipoImagenología no existe");
+        }
+
+        // EquipoImagenologia está disponible
+        if(!eqImag.get().getEstado().equals("Disponible")){
+            System.out.println("5");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "EquipoImagenología no disponible");
+        }
+
+        if(!ae.get().getEstado().equals("Activo")){
+            System.out.println("5.1");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "AsignacionEstudio no activa");
+        }
+
+        // EquipoImagenologia pertenece al area del usuario
+        if(!eqImag.get().getAreaDeServicioidArea().getIdArea().equals(area.getIdArea())){
+            System.out.println("6");
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Area no compatible");
+        }
+
+        // Disponibilidad del EquipoImagenologia en la fecha y hora solicitada
+        if(!ae.get().getEstado().equals("Activo")){
+            System.out.println("7");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "EquipoImagenología no disponible en la fecha y hora solicitada");
+        }
+
+        // SolicitudDeEstudio existe
+        SolicitudDeEstudioPK sePk = new SolicitudDeEstudioPK(dto.getIdpaciente(), dto.getMedNumEmpleado(), dto.getMedCurp(), dto.getFechacontrolpk());
+        var se = seRepo.findById(sePk);
+        if(se.isEmpty()){
+            System.out.println("8");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "SolicitudDeEstudio no existe");
+        }
+
+        // Paciente existe
         var pa = paRepo.findById(dto.getIdpaciente());
         if(pa.isEmpty()){
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Paciente no se encontró");
@@ -188,11 +242,16 @@ public class CitasServiceImpl implements CitasService{
 
         ControlEstudios ce = new ControlEstudios(cePk, dto.getFechacontrol(), dto.getEstado(),
                                                  dto.getCerrado(), dto.getObservaciones());
+                                                
+        Medico med = new Medico(new MedicoPK(dto.getMedNumEmpleado(), dto.getMedCurp()));
+        ce.setMedico(med);
         ce.setEstudio(es.get());
         ce.setPaciente(pa.get());
         ce.setUsuario(us);
         controlEstudiosRepo.save(ce);
 
+        SolicitudDeEstudio solicitudDeEstudio = se.get();
+        solicitudDeEstudio.setEstado("Programado");
         CitaDTO ceDto = citaToDto(ce);
         return ceDto;
     }
@@ -379,32 +438,37 @@ public class CitasServiceImpl implements CitasService{
         
         Usuario ce_usr = ce.getUsuario();
         Paciente paciente = ce.getPaciente();
-        List<AsignacionEstudio> ae = aeRepo.findByEstudioAndAsignacionEstudioPK_FechaPk(ce.getEstudio(), ce.getControlEstudiosPK().getFechaControlPk());
+        Medico medico = ce.getMedico();
+        Estudio estudio = ce.getEstudio();
+        Equipo eq = equipoRepo.findById(ce.getControlEstudiosPK().getEquipoImagenologiaNSerie()).get();
 
-        List<SolicitudDeEstudio> se = seRepo.findBySolicitudDeEstudioPK_fechaSolicitudPkAndPaciente(ce.getControlEstudiosPK().getFechaControlPk(), ce.getPaciente());
-        Usuario med = usuarioRepo.findById(new UsuarioPK(se.get(0).getMedico().getMedicoPK().getNumEmpleado(),se.get(0).getMedico().getMedicoPK().getCurp())).get();
-                
-        Equipo eq = equipoRepo.findById(ae.get(0).getEquipoImagenologia().getnSerie()).get();
-        
+        AsignacionEstudio ae = aeRepo.findById(new AsignacionEstudioPK(eq.getNSerie(),
+                                                                       estudio.getIdEstudio(),
+                                                                       ce.getControlEstudiosPK().getFechaControlPk())).get();
+
+        SolicitudDeEstudio se = seRepo.findById(new SolicitudDeEstudioPK(paciente.getIdPaciente(), 
+                                                                         medico.getMedicoPK().getNumEmpleado(),
+                                                                         medico.getMedicoPK().getCurp(),
+                                                                         ce.getControlEstudiosPK().getFechaControlPk())).get();
 
         dto.setCe_Estado(ce.getEstado());
         dto.setCe_usr_curp(ce_usr.getUsuarioPK().getCurp());
         dto.setFechaAsignPk(ce.getControlEstudiosPK().getFechaControlPk());
         dto.setEq_NoSerie(eq.getNSerie());
         dto.setEq_Ubicacion(eq.getUbicacion());
-        dto.setFechaProxima(se.get(0).getFechaProximaCita().toString());
+        dto.setFechaProxima(se.getFechaProximaCita().toString());
         dto.setMedico(ce_usr.getApellidoPaterno()+" "+ce_usr.getApellidoMaterno()+" "+ce_usr.getNombre());
         dto.setPaciente(paciente.getApellidoMaterno()+" "+ paciente.getApellidoMaterno()+" "+ paciente.getNombre());
         dto.setIdPaciente(paciente.getIdPaciente());
-        dto.setNoEmpleado(med.getUsuarioPK().getNumEmpleado());
-        dto.setSe_Curp(med.getUsuarioPK().getCurp());
+        dto.setNoEmpleado(medico.getMedicoPK().getNumEmpleado());
+        dto.setSe_Curp(medico.getMedicoPK().getCurp());
         dto.setNombreArea(ce_usr.getAreaidArea().getNombre());
         dto.setIdArea(ce_usr.getAreaidArea().getIdArea());
-        dto.setFechaSolicitud(se.get(0).getFechaSolicitud().toString());
-        dto.setAreaProcedencia(se.get(0).getAreaProcedencia());
-        dto.setDiagnostico(se.get(0).getDiagnostico());
-        dto.setObservaciones(se.get(0).getObservaciones());
-        dto.setIdEstudio(ae.get(0).getEstudio().getIdEstudio());
+        dto.setFechaSolicitud(se.getFechaSolicitud().toString());
+        dto.setAreaProcedencia(se.getAreaProcedencia());
+        dto.setDiagnostico(se.getDiagnostico());
+        dto.setObservaciones(se.getObservaciones());
+        dto.setIdEstudio(ae.getEstudio().getIdEstudio());
         
         Domicilio domicilio = paciente.getDomicilio();
         dto.setDomicilio(domicilio.getCalle()+", "+
@@ -413,6 +477,7 @@ public class CitasServiceImpl implements CitasService{
                          domicilio.getCp()+", "+
                          domicilio.getAlcaldiaMunicipio()+", "+
                          domicilio.getEstado());
+        String[] fechaSeparada = ce.getFechaControl().toString().split(" ");
         dto.setFechaCita(ce.getFechaControl().toString().split(" ")[0]);
         dto.setHoraCita(ce.getFechaControl().toString().split(" ")[1]);
         dto.setNoEmpleadoUsuario(ce_usr.getUsuarioPK().getNumEmpleado());

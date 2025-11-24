@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.UAM.RISINR.model.AsignacionEstudio;
 import com.UAM.RISINR.model.dto.citas.AgendaCitaDTO;
 import com.UAM.RISINR.model.dto.citas.AsignacionEstudioDTO;
 import com.UAM.RISINR.model.dto.citas.CancelaCitaDTO;
