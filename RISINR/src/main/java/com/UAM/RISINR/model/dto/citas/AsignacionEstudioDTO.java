@@ -13,6 +13,9 @@ public class AsignacionEstudioDTO{
 	private Integer idestudio;
 	private Long fechacontrolpk;
 	private Date fechacontrol;
+	private String idPaciente;
+	private Integer medNumEmpleado;
+	private String medCurp;
 
     // Formato de fecha y hora
     private static final DateTimeFormatter formato = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
@@ -21,19 +24,25 @@ public class AsignacionEstudioDTO{
 	public AsignacionEstudioDTO() {}
     
 	public AsignacionEstudioDTO(String eqNoSerie, Integer idestudio, Long fechacontrolpk, 
-	String fechacontrol) {
+	String fechacontrol, String idPaciente, Integer medNumEmpleado, String medCurp) {
 		this.eqNoSerie = eqNoSerie;
 		this.idestudio = idestudio;
 		this.fechacontrolpk = fechacontrolpk;
 		this.fechacontrol = parseFecha(fechacontrol);
+		this.idPaciente = idPaciente;
+		this.medNumEmpleado = medNumEmpleado;
+		this.medCurp = medCurp;
 	}
     
 	public AsignacionEstudioDTO(String eqNoSerie, Integer idestudio, Long fechacontrolpk, 
-	Date fechacontrol) {
+	Date fechacontrol, String idPaciente, Integer medNumEmpleado, String medCurp) {
 		this.eqNoSerie = eqNoSerie;
 		this.idestudio = idestudio;
 		this.fechacontrolpk = fechacontrolpk;
 		this.fechacontrol = fechacontrol;
+		this.idPaciente = idPaciente;
+		this.medNumEmpleado = medNumEmpleado;
+		this.medCurp = medCurp;
 	}
     
     private Date parseFecha(String s) {
@@ -59,4 +68,13 @@ public class AsignacionEstudioDTO{
 
 	public Date getFechacontrol() { return fechacontrol; }
 	public void setFechacontrol(String fechacontrol) { this.fechacontrol = parseFecha(fechacontrol); }
+
+	public String getIdPaciente() { return idPaciente; }
+	public void setIdPaciente(String idPaciente) { this.idPaciente = idPaciente; }
+
+	public Integer getMedNumEmpleado() { return medNumEmpleado; }
+	public void setMedNumEmpleado(Integer medNumEmpleado) { this.medNumEmpleado = medNumEmpleado; }
+
+	public String getMedCurp() { return medCurp; }
+	public void setMedCurp(String medCurp) { this.medCurp = medCurp; }
 }

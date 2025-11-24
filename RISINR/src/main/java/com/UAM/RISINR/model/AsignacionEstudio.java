@@ -15,6 +15,8 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
+import jakarta.validation.constraints.NotNull;
+
 import java.io.Serializable;
 import java.util.Date;
 
@@ -33,6 +35,10 @@ public class AsignacionEstudio implements Serializable {
     @Column(name = "Fecha")
     @Temporal(TemporalType.TIMESTAMP)
     private Date fecha;
+    @Basic(optional = false)
+    @NotNull
+    @Column(name = "Estado")
+    private String estado;
     
     @JoinColumn(name = "EquipoImagenologia_NSerie", referencedColumnName = "NSerie", insertable = false, updatable = false)
     @ManyToOne(optional = false)
@@ -49,9 +55,10 @@ public class AsignacionEstudio implements Serializable {
         this.asignacionEstudioPK = asignacionEstudioPK;
     }
 
-    public AsignacionEstudio(AsignacionEstudioPK asignacionEstudioPK, Date fecha) {
+    public AsignacionEstudio(AsignacionEstudioPK asignacionEstudioPK, Date fecha, String estado) {
         this.asignacionEstudioPK = asignacionEstudioPK;
         this.fecha = fecha;
+        this.estado = estado;
     }
 
     public AsignacionEstudio(String equipoImagenologiaNSerie, int estudioidEstudio, long fechaPk) {
@@ -72,6 +79,13 @@ public class AsignacionEstudio implements Serializable {
 
     public void setFecha(Date fecha) {
         this.fecha = fecha;
+    }
+
+    public String getEstado() {
+        return estado;
+    }
+    public void setEstado(String estado) {
+        this.estado = estado;
     }
 
     public EquipoImagenologia getEquipoImagenologia() {

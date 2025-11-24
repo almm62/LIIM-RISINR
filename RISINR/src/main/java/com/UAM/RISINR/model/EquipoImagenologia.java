@@ -6,11 +6,13 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 import jakarta.validation.constraints.Size;
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.Date;
 
 //import org.antlr.v4.runtime.misc.NotNull;
@@ -76,6 +78,9 @@ public class EquipoImagenologia implements Serializable {
     @ManyToOne(optional = false)
     private AreaDeServicio areaDeServicioidArea;
     
+
+    @OneToMany(mappedBy = "equipoImagenologia")
+    private Collection<ControlEstudios> controlEstudiosCollection;
 
    
 
@@ -169,6 +174,13 @@ public class EquipoImagenologia implements Serializable {
 
     public void setAreaDeServicioidArea(AreaDeServicio areaDeServicioidArea) {
         this.areaDeServicioidArea = areaDeServicioidArea;
+    }
+
+    public Collection<ControlEstudios> getControlEstudiosCollection() {
+        return controlEstudiosCollection;
+    }
+    public void setControlEstudiosCollection(Collection<ControlEstudios> controlEstudiosCollection) {
+        this.controlEstudiosCollection = controlEstudiosCollection;
     }
 
 /*

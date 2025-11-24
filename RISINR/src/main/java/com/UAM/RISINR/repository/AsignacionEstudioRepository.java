@@ -14,4 +14,5 @@ public interface AsignacionEstudioRepository extends JpaRepository<AsignacionEst
     List<AsignacionEstudio> findByEquipoImagenologiaInAndEstudioIn(List<EquipoImagenologia> equipoImagenologia, List<Estudio> estudios);
     List<AsignacionEstudio> findByEstudioAndAsignacionEstudioPK_FechaPk(Estudio es, long fechapk);
     List<AsignacionEstudio> findByEstudioIn(List<Estudio> estudios);
+    List<AsignacionEstudio> findByEquipoImagenologiaAndAsignacionEstudioPK_FechaPkAndEstado(EquipoImagenologia equipoImagenologia,long fechaPk, String estado);
 }

@@ -181,7 +181,11 @@ public class CitasServiceImpl implements CitasService{
                                                        us.getUsuarioPK().getCurp(), 
                                                        dto.getIdpaciente(),
                                                        dto.getIdestudio(), 
-                                                       dto.getFechacontrolpk());
+                                                       dto.getFechacontrolpk(),
+                                                       dto.getEqNoSerie(),
+                                                       dto.getMedNumEmpleado(),
+                                                       dto.getMedCurp());
+
         ControlEstudios ce = new ControlEstudios(cePk, dto.getFechacontrol(), dto.getEstado(),
                                                  dto.getCerrado(), dto.getObservaciones());
         ce.setEstudio(es.get());
@@ -209,33 +213,72 @@ public class CitasServiceImpl implements CitasService{
             
         }
         AreaDeServicio area = us.getAreaidArea();
+        /* ----------- Validaciones ------------*/ 
+
+        // Estudio existe
         var es = estudioRepo.findById(dto.getIdestudio());
-
-        AsignacionEstudioPK aePK = new AsignacionEstudioPK(dto.getEqNoSerie(), dto.getIdestudio(), dto.getFechacontrolpk());
-        var ae  = aeRepo.findById(aePK);
-
         if(es.isEmpty()){
+            System.out.println("1");
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Estudio no existe");
         }
+        
+        // Estudio no pertenece al area del usuario
+        if(!es.get().getAreaDeServicioidArea().getIdArea().equals(area.getIdArea())){
+            System.out.println("2");
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Area no compatible");
+        }
+
+        // AsignacionEstudio no existente
+        AsignacionEstudioPK aePK = new AsignacionEstudioPK(dto.getEqNoSerie(), dto.getIdestudio(), dto.getFechacontrolpk());
+        var ae  = aeRepo.findById(aePK);
         if(ae.isPresent()){
+            System.out.println("3");
             throw new ResponseStatusException(HttpStatus.CONFLICT, "AsignacionEstudio existente");
         }
-        if(!es.get().getAreaDeServicioidArea().getIdArea().equals(area.getIdArea())){
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Area no compatible");
-        }
 
-        var eq = eqpImagRepo.findById(dto.getEqNoSerie());
-        if(eq.isEmpty()){
+        // EquipoImagenologia existe
+        var eqImag = eqpImagRepo.findById(dto.getEqNoSerie());
+        if(eqImag.isEmpty()){
+            System.out.println("4");
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "EquipoImagenología no existe");
         }
-        if(!eq.get().getAreaDeServicioidArea().getIdArea().equals(area.getIdArea())){
+
+        // EquipoImagenologia está disponible
+        if(!eqImag.get().getEstado().equals("Disponible")){
+            System.out.println("5");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "EquipoImagenología no disponible");
+        }
+        // EquipoImagenologia pertenece al area del usuario
+        if(!eqImag.get().getAreaDeServicioidArea().getIdArea().equals(area.getIdArea())){
+            System.out.println("6");
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Area no compatible");
         }
 
-        AsignacionEstudio asignacionEstudio = new AsignacionEstudio(aePK, dto.getFechacontrol());
-        asignacionEstudio.setEquipoImagenologia(eq.get());
+        // Disponibilidad del EquipoImagenologia en la fecha y hora solicitada
+        if(!aeRepo.findByEquipoImagenologiaAndAsignacionEstudioPK_FechaPkAndEstado(eqImag.get(), dto.getFechacontrolpk(), "Activo").isEmpty()){
+            System.out.println("7");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "EquipoImagenología no disponible en la fecha y hora solicitada");
+        }
+
+        // SolicitudDeEstudio existe
+        SolicitudDeEstudioPK sePk = new SolicitudDeEstudioPK(dto.getIdPaciente(), dto.getMedNumEmpleado(), dto.getMedCurp(), dto.getFechacontrolpk());
+        var se = seRepo.findById(sePk);
+        if(se.isEmpty()){
+            System.out.println("8");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "SolicitudDeEstudio no existe");
+        }
+
+
+        /* ---------------Crear AsignacionEstudio--------------- */
+        AsignacionEstudio asignacionEstudio = new AsignacionEstudio(aePK, dto.getFechacontrol(), "Activo");
+        asignacionEstudio.setEquipoImagenologia(eqImag.get());
         asignacionEstudio.setEstudio(es.get());
         aeRepo.save(asignacionEstudio);
+
+        /* -------------- Actualizar estado de SolicitudDeEstudio --------------*/
+        SolicitudDeEstudio solicitudDeEstudio = se.get();
+        solicitudDeEstudio.setEstado("Equipo Asignado");
+        seRepo.save(solicitudDeEstudio);
 
         return dto;
     }
@@ -273,7 +316,10 @@ public class CitasServiceImpl implements CitasService{
         AsignacionEstudioDTO asignacion = new AsignacionEstudioDTO(ae.getEquipoImagenologia().getnSerie(), 
                                                                    dto.getIdestudio(), 
                                                                    dto.getFechacontrolpk_nueva(),
-                                                                   dto.getFechacontrol_nueva());
+                                                                   dto.getFechacontrol_nueva(),
+                                                                   dto.getIdpaciente(),
+                                                                   dto.getMedNumEmpleado(),
+                                                                   dto.getMedCurp());
         
         AgendaCitaDTO agenda = new AgendaCitaDTO(dto.getIdpaciente(),
                                                  dto.getIdestudio(), 
@@ -304,19 +350,22 @@ public class CitasServiceImpl implements CitasService{
                                                        dto.getCurp(), 
                                                        dto.getIdpaciente(),
                                                        dto.getIdestudio(), 
-                                                       dto.getFechacontrolpk());
+                                                       dto.getFechacontrolpk(),
+                                                       dto.getNoSerie(),
+                                                       dto.getMedNumEmpleado(),
+                                                       dto.getMedCurp());
         var _ce = controlEstudiosRepo.findById(cePk);
         if(_ce.isEmpty()){
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "ControlEstudio no existe");
         }
         ControlEstudios ce = _ce.get();
         
-        //Cerrar la cita actual
+        //Cerrar Control de Estudio actual
         ce.setCerrado(true);
         ce.setEstado("Cerrado");
         controlEstudiosRepo.save(ce);
 
-        //Eliminar la Solicitud de estudio
+        //Cancelar la Solicitud de estudio
         SolicitudDeEstudioPK sePk = new SolicitudDeEstudioPK(dto.getIdpaciente(), 
                                             dto.getMedNumEmpleado(), 
                                             dto.getMedCurp(),

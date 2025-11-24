@@ -58,6 +58,15 @@ public class ControlEstudios implements Serializable {
     @ManyToOne(optional = false)
     private Usuario usuario;
 
+    @JoinColumn(name = "EquipoImagenologia_NSerie", referencedColumnName = "NSerie", insertable = false, updatable = false)
+    @ManyToOne(optional = false)
+    private EquipoImagenologia equipoImagenologia;
+    @JoinColumns({
+        @JoinColumn(name = "Medico_NumEmpleado", referencedColumnName = "NumEmpleado", insertable = false, updatable = false),
+        @JoinColumn(name = "Medico_CURP", referencedColumnName = "CURP", insertable = false, updatable = false)})
+    @ManyToOne(optional = false)
+    private Medico medico;
+
     public ControlEstudios() {
     }
 
@@ -73,8 +82,8 @@ public class ControlEstudios implements Serializable {
         this.observaciones = observaciones;
     }
 
-    public ControlEstudios(int usuarioNumEmpleado, String usuarioCURP, String pacienteIDPaciente, int estudioidEstudio, long fechaControlPk) {
-        this.controlEstudiosPK = new ControlEstudiosPK(usuarioNumEmpleado, usuarioCURP, pacienteIDPaciente, estudioidEstudio, fechaControlPk);
+    public ControlEstudios(int usuarioNumEmpleado, String usuarioCURP, String pacienteIDPaciente, int estudioidEstudio, long fechaControlPk, String equipoImagenologiaNSerie, Integer medicoNumEmpleado, String medicoCURP) {
+        this.controlEstudiosPK = new ControlEstudiosPK(usuarioNumEmpleado, usuarioCURP, pacienteIDPaciente, estudioidEstudio, fechaControlPk, equipoImagenologiaNSerie, medicoNumEmpleado, medicoCURP);
     }
 
     public ControlEstudiosPK getControlEstudiosPK() {
@@ -139,6 +148,20 @@ public class ControlEstudios implements Serializable {
 
     public void setUsuario(Usuario usuario) {
         this.usuario = usuario;
+    }
+
+    public EquipoImagenologia getEquipoImagenologia() {
+        return equipoImagenologia;
+    }
+    public void setEquipoImagenologia(EquipoImagenologia equipoImagenologia) {
+        this.equipoImagenologia = equipoImagenologia;
+    }
+
+    public Medico getMedico() {
+        return medico;
+    }
+    public void setMedico(Medico medico) {
+        this.medico = medico;
     }
 
     @Override

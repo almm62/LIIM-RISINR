@@ -9,6 +9,7 @@ import java.io.Serializable;
 import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
+import jakarta.persistence.criteria.CriteriaBuilder.In;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
@@ -42,15 +43,32 @@ public class ControlEstudiosPK implements Serializable {
     @Column(name = "FechaControlPk")
     private long fechaControlPk;
 
+    
+    @Basic(optional = false)
+    @NotNull
+    @Column(name = "EquipoImagenologia_NSerie")
+    private String equipoImagenologiaNSerie;
+    @Basic(optional = false)
+    @NotNull
+    @Column(name = "Medico_NumEmpleado")
+    private Integer medicoNumEmpleado;
+    @Basic(optional = false)
+    @NotNull
+    @Column(name = "Medico_CURP")
+    private String medicoCURP;
+
     public ControlEstudiosPK() {
     }
 
-    public ControlEstudiosPK(int usuarioNumEmpleado, String usuarioCURP, String pacienteIDPaciente, int estudioidEstudio, long fechaControlPk) {
+    public ControlEstudiosPK(int usuarioNumEmpleado, String usuarioCURP, String pacienteIDPaciente, int estudioidEstudio, long fechaControlPk, String equipoImagenologiaNSerie, Integer medicoNumEmpleado, String medicoCURP) {
         this.usuarioNumEmpleado = usuarioNumEmpleado;
         this.usuarioCURP = usuarioCURP;
         this.pacienteIDPaciente = pacienteIDPaciente;
         this.estudioidEstudio = estudioidEstudio;
         this.fechaControlPk = fechaControlPk;
+        this.equipoImagenologiaNSerie = equipoImagenologiaNSerie;
+        this.medicoNumEmpleado = medicoNumEmpleado;
+        this.medicoCURP = medicoCURP;
     }
 
     public int getUsuarioNumEmpleado() {
@@ -93,6 +111,27 @@ public class ControlEstudiosPK implements Serializable {
         this.fechaControlPk = fechaControlPk;
     }
 
+    public String getEquipoImagenologiaNSerie() {
+        return equipoImagenologiaNSerie;
+    }
+    public void setEquipoImagenologiaNSerie(String equipoImagenologiaNSerie) {
+        this.equipoImagenologiaNSerie = equipoImagenologiaNSerie;
+    }
+
+    public Integer getMedicoNumEmpleado() {
+        return medicoNumEmpleado;
+    }
+    public void setMedicoNumEmpleado(Integer medicoNumEmpleado) {
+        this.medicoNumEmpleado = medicoNumEmpleado;
+    }
+
+    public String getMedicoCURP() {
+        return medicoCURP;
+    }
+    public void setMedicoCURP(String medicoCURP) {
+        this.medicoCURP = medicoCURP;
+    }
+
     @Override
     public int hashCode() {
         int hash = 0;
@@ -101,6 +140,9 @@ public class ControlEstudiosPK implements Serializable {
         hash += (pacienteIDPaciente != null ? pacienteIDPaciente.hashCode() : 0);
         hash += (int) estudioidEstudio;
         hash += (int) fechaControlPk;
+        hash += (equipoImagenologiaNSerie != null ? equipoImagenologiaNSerie.hashCode() : 0);
+        hash += (medicoNumEmpleado != null ? medicoNumEmpleado.hashCode() : 0);
+        hash += (medicoCURP != null ? medicoCURP.hashCode() : 0);
         return hash;
     }
 
@@ -126,12 +168,21 @@ public class ControlEstudiosPK implements Serializable {
         if (this.fechaControlPk != other.fechaControlPk) {
             return false;
         }
+        if ((this.equipoImagenologiaNSerie == null && other.equipoImagenologiaNSerie != null) || (this.equipoImagenologiaNSerie != null && !this.equipoImagenologiaNSerie.equals(other.equipoImagenologiaNSerie))) {
+            return false;
+        }
+        if ((this.medicoNumEmpleado == null && other.medicoNumEmpleado != null) || (this.medicoNumEmpleado != null && !this.medicoNumEmpleado.equals(other.medicoNumEmpleado))) {
+            return false;
+        }
+        if ((this.medicoCURP == null && other.medicoCURP != null) || (this.medicoCURP != null && !this.medicoCURP.equals(other.medicoCURP))) {
+            return false;
+        }
         return true;
     }
 
     @Override
     public String toString() {
-        return "com.RIS.MVC.model.JPA.entities.ControlEstudiosPK[ usuarioNumEmpleado=" + usuarioNumEmpleado + ", usuarioCURP=" + usuarioCURP + ", pacienteIDPaciente=" + pacienteIDPaciente + ", estudioidEstudio=" + estudioidEstudio + ", fechaControlPk=" + fechaControlPk + " ]";
+        return "com.RIS.MVC.model.JPA.entities.ControlEstudiosPK[ usuarioNumEmpleado=" + usuarioNumEmpleado + ", usuarioCURP=" + usuarioCURP + ", pacienteIDPaciente=" + pacienteIDPaciente + ", estudioidEstudio=" + estudioidEstudio + ", fechaControlPk=" + fechaControlPk + ", equipoImagenologiaNSerie=" + equipoImagenologiaNSerie + ", medicoNumEmpleado=" + medicoNumEmpleado + ", medicoCURP=" + medicoCURP + " ]";
     }
     
 }
