@@ -3,6 +3,7 @@ package com.UAM.RISINR.service.citas.implementations;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.checkerframework.checker.units.qual.m;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,6 +37,7 @@ import com.UAM.RISINR.repository.ControlEstudiosRepository;
 import com.UAM.RISINR.repository.EquipoImagenologiaRepository;
 import com.UAM.RISINR.repository.EquipoRepository;
 import com.UAM.RISINR.repository.EstudioRepository;
+import com.UAM.RISINR.repository.MedicoRepository;
 import com.UAM.RISINR.repository.PacienteRepository;
 import com.UAM.RISINR.repository.SolicitudDeEstudioRepository;
 import com.UAM.RISINR.repository.UsuarioRepository;
@@ -55,12 +57,13 @@ public class CitasServiceImpl implements CitasService{
     private final AsignacionEstudioRepository aeRepo;
     private final SolicitudDeEstudioRepository seRepo;
     private final PacienteRepository paRepo;
+    private final MedicoRepository medicoRepo;
     private final ObjectMapper objectMapper;
 
     public CitasServiceImpl(RegistroEventoService registroEvento, UsuarioRepository usuarioRepo, EquipoImagenologiaRepository eqpImagRepo,
                             EstudioRepository estudioRepo, SolicitudDeEstudioRepository seRepo,
                             EquipoRepository equipoRepo, AsignacionEstudioRepository aeRepo, ControlEstudiosRepository controlEstudiosRepo, 
-                            PacienteRepository paRepo, ObjectMapper objectMapper){
+                            PacienteRepository paRepo, MedicoRepository medicoRepo, ObjectMapper objectMapper){
         this.registroEvento=registroEvento;
         this.usuarioRepo=usuarioRepo;
         this.eqpImagRepo=eqpImagRepo;
@@ -71,6 +74,7 @@ public class CitasServiceImpl implements CitasService{
         this.controlEstudiosRepo=controlEstudiosRepo;
         this.paRepo = paRepo;
         this.objectMapper = objectMapper;
+        this.medicoRepo = medicoRepo;
     }
     
 
@@ -118,6 +122,7 @@ public class CitasServiceImpl implements CitasService{
                                         String ubicacion = "Sala " + e.getUbicacion();
                                         return new SalaDTO(ubicacion,sala);
                                      })
+                                     .distinct()
                                      .collect(Collectors.toList());
         return salas;
     }
@@ -228,9 +233,18 @@ public class CitasServiceImpl implements CitasService{
         // Paciente existe
         var pa = paRepo.findById(dto.getIdpaciente());
         if(pa.isEmpty()){
+            System.out.println("9");
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Paciente no se encontró");
         }
+        //Medico existe
+        MedicoPK medPk = new MedicoPK(dto.getMedNumEmpleado(), dto.getMedCurp());
+        var med = medicoRepo.findById(medPk);
+        if(med.isEmpty()){
+            System.out.println("10");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Médico no se encontró");
+        }
 
+        // Control de Estudio no existente
         ControlEstudiosPK cePk = new ControlEstudiosPK(us.getUsuarioPK().getNumEmpleado(), 
                                                        us.getUsuarioPK().getCurp(), 
                                                        dto.getIdpaciente(),
@@ -239,12 +253,16 @@ public class CitasServiceImpl implements CitasService{
                                                        dto.getEqNoSerie(),
                                                        dto.getMedNumEmpleado(),
                                                        dto.getMedCurp());
-
+        var _ce = controlEstudiosRepo.findById(cePk);
+        if(_ce.isPresent()){
+            System.out.println("11");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "ControlEstudio existente");
+        }
+        
         ControlEstudios ce = new ControlEstudios(cePk, dto.getFechacontrol(), dto.getEstado(),
                                                  dto.getCerrado(), dto.getObservaciones());
                                                 
-        Medico med = new Medico(new MedicoPK(dto.getMedNumEmpleado(), dto.getMedCurp()));
-        ce.setMedico(med);
+        ce.setMedico(med.get());
         ce.setEstudio(es.get());
         ce.setPaciente(pa.get());
         ce.setUsuario(us);
@@ -254,9 +272,7 @@ public class CitasServiceImpl implements CitasService{
         solicitudDeEstudio.setEstado("Programado");
         CitaDTO ceDto = citaToDto(ce);
         return ceDto;
-    }
-
-    
+    }    
     
     @Override
     @Transactional
@@ -327,6 +343,11 @@ public class CitasServiceImpl implements CitasService{
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "SolicitudDeEstudio no existe");
         }
 
+        //Validar que SolicitudDeEstudio == SOLICITADO
+        if(!se.get().getEstado().equals("SOLICITADO")){
+            System.out.println("9");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "SolicitudDeEstudio ya ha sido programado, reprogramado o cancelado 'Solicitado'");
+        }
 
         /* ---------------Crear AsignacionEstudio--------------- */
         AsignacionEstudio asignacionEstudio = new AsignacionEstudio(aePK, dto.getFechacontrol(), "Activo");
@@ -341,21 +362,11 @@ public class CitasServiceImpl implements CitasService{
 
         return dto;
     }
-
-
     
     
     @Override
     public CitaDTO UpdateStudyControl (String token, ReagendaCitaDTO dto){
-        Usuario us= null;
-
-        try{
-            //Extaemos datos del token
-            JwtSessionInfo info= objectMapper.readValue(token, JwtSessionInfo.class);
-            us = usuarioRepo.findById(new UsuarioPK(info.getNumEmpleado(), info.getCurp())).get();
-        }catch (Exception e){
-            
-        }
+        
         CancelaCitaDTO cancela = new CancelaCitaDTO(dto.getUserNumEmpleado(), 
                                                     dto.getUserCurp(),
                                                     dto.getIdestudio(),
@@ -364,15 +375,13 @@ public class CitasServiceImpl implements CitasService{
                                                     dto.getMotivo(),
                                                     dto.getNoSerie(),
                                                     dto.getMedNumEmpleado(),
-                                                    dto.getMedCurp());
+                                                    dto.getMedCurp(),
+                                                    "Reprogramado");
 
         CancelStudyControl(cancela);
-        
-        AsignacionEstudioPK aePk = new AsignacionEstudioPK(dto.getNoSerie(), dto.getIdestudio(), dto.getFechacontrolpk_ant());
-        AsignacionEstudio ae = aeRepo.findById(aePk).get();
 
 
-        AsignacionEstudioDTO asignacion = new AsignacionEstudioDTO(ae.getEquipoImagenologia().getnSerie(), 
+        AsignacionEstudioDTO asignacion = new AsignacionEstudioDTO(dto.getNoSerie(), 
                                                                    dto.getIdestudio(), 
                                                                    dto.getFechacontrolpk_nueva(),
                                                                    dto.getFechacontrol_nueva(),
@@ -391,20 +400,26 @@ public class CitasServiceImpl implements CitasService{
                                                  dto.getMedNumEmpleado(),
                                                  dto.getMedCurp());
                                                                                   
-        SolicitudDeEstudio se = seRepo.findBySolicitudDeEstudioPK_fechaSolicitudPkAndPaciente(dto.getFechacontrolpk_ant(), 
-                                                                                              paRepo.findById(dto.getIdpaciente()).get())
-                                                                                              .get(0);
-        createStudyRequest(se, dto.getFechacontrolpk_nueva());
+        var se = seRepo.findById(new SolicitudDeEstudioPK(dto.getIdpaciente(), 
+                                                                      dto.getMedNumEmpleado(),
+                                                                        dto.getMedCurp(),
+                                                                        dto.getFechacontrolpk_nueva()));
+        if(se.isEmpty()){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "SolicitudDeEstudio no existe");
+        }
+        
+        createStudyRequest(se.get(), dto.getFechacontrolpk_nueva());
         CreateStudyAssignment(token, asignacion);
 
-        CitaDTO ceDto = CreateStudyControl(token, agenda);
-        return ceDto;
+        CitaDTO resp = CreateStudyControl(token, agenda);
+        return resp;
     }
 
     
     @Override
     public void CancelStudyControl (CancelaCitaDTO dto){
 
+        // Validar existencia de ControlEstudio
         ControlEstudiosPK cePk = new ControlEstudiosPK(dto.getNumEmpleado(), 
                                                        dto.getCurp(), 
                                                        dto.getIdpaciente(),
@@ -417,18 +432,36 @@ public class CitasServiceImpl implements CitasService{
         if(_ce.isEmpty()){
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "ControlEstudio no existe");
         }
+
         ControlEstudios ce = _ce.get();
         
         //Cerrar Control de Estudio actual
         ce.setCerrado(true);
-        ce.setEstado("Cerrado");
+        ce.setEstado(dto.getEstado());
         controlEstudiosRepo.save(ce);
 
-        //Cancelar la Solicitud de estudio
+        /* Cancelar la Solicitud de estudio */
         SolicitudDeEstudioPK sePk = new SolicitudDeEstudioPK(dto.getIdpaciente(), 
                                             dto.getMedNumEmpleado(), 
                                             dto.getMedCurp(),
                                             dto.getFechacontrolpk());
+        var _se = seRepo.findById(sePk);
+        if(_se.isEmpty()){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "SolicitudDeEstudio no existe");
+        }
+        SolicitudDeEstudio se = _se.get();
+        se.setEstado("Cancelado");
+        seRepo.save(se);
+
+        /* Cancelar Asignacion de Estudio */
+        AsignacionEstudioPK aePk = new AsignacionEstudioPK(dto.getNoSerie(), dto.getIdestudio(), dto.getFechacontrolpk());
+        var _ae = aeRepo.findById(aePk);
+        if(_ae.isEmpty()){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "AsignacionEstudio no existe");
+        }
+        AsignacionEstudio ae = _ae.get();
+        ae.setEstado("Cancelado");
+        aeRepo.save(ae);
     }
 
 
@@ -477,9 +510,6 @@ public class CitasServiceImpl implements CitasService{
                          domicilio.getCp()+", "+
                          domicilio.getAlcaldiaMunicipio()+", "+
                          domicilio.getEstado());
-        String[] fechaSeparada = ce.getFechaControl().toString().split(" ");
-        dto.setFechaCita(ce.getFechaControl().toString().split(" ")[0]);
-        dto.setHoraCita(ce.getFechaControl().toString().split(" ")[1]);
         dto.setNoEmpleadoUsuario(ce_usr.getUsuarioPK().getNumEmpleado());
         dto.setEstudio(ce.getEstudio().getIdEstudio());
 
@@ -496,11 +526,11 @@ public class CitasServiceImpl implements CitasService{
                                                                 fechaPK);
 
         SolicitudDeEstudio se = new SolicitudDeEstudio(sePK,
-         solEs.getFechaSolicitud(), 
-         solEs.getFechaProximaCita(), 
-         solEs.getDiagnostico(), 
-         solEs.getObservaciones(), 
-         solEs.getEstado());
+                                                       solEs.getFechaSolicitud(), 
+                                                       solEs.getFechaProximaCita(), 
+                                                       solEs.getDiagnostico(), 
+                                                       solEs.getObservaciones(), 
+                                                       solEs.getEstado());
 
         se.setAreaProcedencia(solEs.getAreaProcedencia());
         se.setMedico(solEs.getMedico());

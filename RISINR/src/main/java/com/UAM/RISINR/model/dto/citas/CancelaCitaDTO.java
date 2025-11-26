@@ -10,13 +10,15 @@ public class CancelaCitaDTO {
     private String NoSerie;
     private Integer medNumEmpleado;
     private String medCurp;
+    private String estado;
 
     public CancelaCitaDTO() {
     }
 
     public CancelaCitaDTO(Integer NumEmpleado, String curp, Integer idestudio, 
                           String idpaciente, Long fechacontrolpk, String motivo,
-                          String NoSerie, Integer medNumEmpleado, String medCurp) {
+                          String NoSerie, Integer medNumEmpleado, String medCurp,
+                          String estado) {
         this.NumEmpleado = NumEmpleado;
         this.curp = curp;
         this.idestudio = idestudio;
@@ -26,6 +28,7 @@ public class CancelaCitaDTO {
         this.NoSerie = NoSerie;
         this.medNumEmpleado = medNumEmpleado;
         this.medCurp = medCurp;
+        this.estado = estado;
     }
 
     public Integer getNumEmpleado() {
@@ -95,5 +98,12 @@ public class CancelaCitaDTO {
     }
     public void setMedCurp(String medCurp) {
         this.medCurp = medCurp;
+    }
+
+    public String getEstado() {
+        return estado;
+    }
+    public void setEstado(String estado) {
+        this.estado = estado;
     }
 }

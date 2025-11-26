@@ -12,7 +12,6 @@ public class CitaDTO {
     private String turno;
 
     private String idPaciente;
-    private String horaCita;          // "HH:mm:ss.S"
     private String domicilio;
 
     private Integer noEmpleado;
@@ -26,7 +25,6 @@ public class CitaDTO {
     private String se_curp;
     private Integer noEmpleadoUsuario;
 
-    private String fechaCita;         // "YYYY-MM-DD"
     private Integer idEstudio;
     private Integer idArea;
 
@@ -37,10 +35,10 @@ public class CitaDTO {
     public CitaDTO() {}
     public CitaDTO(String ce_usr_curp, String eq_NoSerie, String eq_Ubicacion, String ce_estado,
                    Long fechaAsignPk, String fechaProxima, String turno, String idPaciente,
-                   String horaCita, String domicilio, Integer noEmpleado,
+                   String domicilio, Integer noEmpleado,
                    String fechaSolicitud, String nombreArea, String paciente, Integer estudio,
                    String areaProcedencia, String se_curp,
-                   Integer noEmpleadoUsuario, String fechaCita, Integer idEstudio,
+                   Integer noEmpleadoUsuario, Integer idEstudio,
                    Integer idArea, String diagnostico, String medico, String observaciones) {
         this.ce_usr_curp = ce_usr_curp;
         this.eq_NoSerie = eq_NoSerie;
@@ -50,7 +48,6 @@ public class CitaDTO {
         this.fechaProxima = fechaProxima;
         this.turno = turno;
         this.idPaciente = idPaciente;
-        this.horaCita = horaCita;
         this.domicilio = domicilio;
         this.noEmpleado = noEmpleado;
         this.fechaSolicitud = fechaSolicitud;
@@ -60,7 +57,6 @@ public class CitaDTO {
         this.areaProcedencia = areaProcedencia;
         this.se_curp = se_curp;
         this.noEmpleadoUsuario = noEmpleadoUsuario;
-        this.fechaCita = fechaCita;
         this.idEstudio = idEstudio;
         this.idArea = idArea;
         this.diagnostico = diagnostico;
@@ -92,9 +88,6 @@ public class CitaDTO {
     public String getIdPaciente() { return idPaciente; }
     public void setIdPaciente(String idPaciente) { this.idPaciente = idPaciente; }
 
-    public String getHoraCita() { return horaCita; }
-    public void setHoraCita(String horaCita) { this.horaCita = horaCita; }
-
     public String getDomicilio() { return domicilio; }
     public void setDomicilio(String domicilio) { this.domicilio = domicilio; }
 
@@ -121,9 +114,6 @@ public class CitaDTO {
 
     public Integer getNoEmpleadoUsuario() { return noEmpleadoUsuario; }
     public void setNoEmpleadoUsuario(Integer noEmpleadoUsuario) { this.noEmpleadoUsuario = noEmpleadoUsuario; }
-
-    public String getFechaCita() { return fechaCita; }
-    public void setFechaCita(String fechaCita) { this.fechaCita = fechaCita; }
 
     public Integer getIdEstudio() { return idEstudio; }
     public void setIdEstudio(Integer idEstudio) { this.idEstudio = idEstudio; }

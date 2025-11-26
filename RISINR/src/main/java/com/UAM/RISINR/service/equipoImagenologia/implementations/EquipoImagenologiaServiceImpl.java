@@ -148,7 +148,7 @@ public class EquipoImagenologiaServiceImpl implements EquipoImagenologiaService{
         } else{
             equipos = repository.findAll();
         }
-        List<EquipoImagenologiaDTO> equiposDTO = new ArrayList();
+        List<EquipoImagenologiaDTO> equiposDTO = new ArrayList<>();
         
         for (EquipoImagenologia eqp: equipos){
             EquipoImagenologiaDTO equipoDTO = convertirDTO(eqp);
