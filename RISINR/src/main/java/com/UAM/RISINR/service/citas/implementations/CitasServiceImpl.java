@@ -1,9 +1,9 @@
 package com.UAM.RISINR.service.citas.implementations;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.checkerframework.checker.units.qual.m;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,11 +16,11 @@ import com.UAM.RISINR.model.ControlEstudios;
 import com.UAM.RISINR.model.ControlEstudiosPK;
 import com.UAM.RISINR.model.Domicilio;
 import com.UAM.RISINR.model.Equipo;
-import com.UAM.RISINR.model.EquipoImagenologia;
 import com.UAM.RISINR.model.Estudio;
 import com.UAM.RISINR.model.Medico;
 import com.UAM.RISINR.model.MedicoPK;
 import com.UAM.RISINR.model.Paciente;
+import com.UAM.RISINR.model.SesionPK;
 import com.UAM.RISINR.model.SolicitudDeEstudio;
 import com.UAM.RISINR.model.SolicitudDeEstudioPK;
 import com.UAM.RISINR.model.Usuario;
@@ -60,6 +60,26 @@ public class CitasServiceImpl implements CitasService{
     private final MedicoRepository medicoRepo;
     private final ObjectMapper objectMapper;
 
+    // APLICACIONES
+    private static final int APLICACION_CONSULTA=7;
+    private static final int APLICACION_AGENDA=8;
+    private static final int APLICACION_REAGENDA=9;
+    private static final int APLICACION_CANCELA=10;
+
+
+    // EVENTOS Exitosos
+    private static final int CONSULTA_CORRECTA=12;
+    private static final int ASIGNACION_CORRECTA=13;
+    private static final int AGENDA_CORRECTA=14;
+    private static final int REAGENDA_CORRECTA=15;
+    private static final int CANCELA_CORRECTA=16;
+    // EVENTOS No Exitosos
+    private static final int AGENDA_INCORRECTA=1014;
+    private static final int ASIGNACION_INCORRECTA=1015;
+    private static final int REAGENDA_INCORRECTA=1016;
+    private static final int CANCELA_INCORRECTA=1017;
+    
+    
     public CitasServiceImpl(RegistroEventoService registroEvento, UsuarioRepository usuarioRepo, EquipoImagenologiaRepository eqpImagRepo,
                             EstudioRepository estudioRepo, SolicitudDeEstudioRepository seRepo,
                             EquipoRepository equipoRepo, AsignacionEstudioRepository aeRepo, ControlEstudiosRepository controlEstudiosRepo, 
@@ -129,13 +149,18 @@ public class CitasServiceImpl implements CitasService{
 
     @Override
     public List<CitaDTO> getAll(String token) {
-        
+        long hora= System.currentTimeMillis();
+        String datos="";
+        //Clase donde guardaremos los DatosJSON
+        record EventoDatos(SesionPK SesionActiva) {}
         Usuario us= null;
 
         try{
             //Extaemos datos del token
             JwtSessionInfo info= objectMapper.readValue(token, JwtSessionInfo.class);
             us = usuarioRepo.findById(new UsuarioPK(info.getNumEmpleado(), info.getCurp())).get();
+            var datosObj =new EventoDatos(new SesionPK(info.getHoraInicio(),info.getNumEmpleado(), info.getCurp(), info.getAplicacionId()));
+            datos=objectMapper.writeValueAsString(datosObj); 
         }catch (Exception e){
             
         }
@@ -153,19 +178,26 @@ public class CitasServiceImpl implements CitasService{
                                         return dto;
                                     })
                                     .collect(Collectors.toList());
-
+        registroEvento.log(CONSULTA_CORRECTA, APLICACION_CONSULTA, hora, datos);
         return citadto;
     }
     
     @Override
     @Transactional
     public CitaDTO CreateStudyControl (String token, AgendaCitaDTO dto){
+        long hora= System.currentTimeMillis();
+        String datos="";
+        //Clase donde guardaremos los DatosJSON
+        record EventoDatos(AgendaCitaDTO dto, SesionPK SesionActiva) {}
+
         Usuario us= null;
 
         try{
             //Extaemos datos del token
             JwtSessionInfo info= objectMapper.readValue(token, JwtSessionInfo.class);
             us = usuarioRepo.findById(new UsuarioPK(info.getNumEmpleado(), info.getCurp())).get();
+            var datosObj =new EventoDatos(dto, new SesionPK(info.getHoraInicio(),info.getNumEmpleado(), info.getCurp(), info.getAplicacionId()));
+            datos=objectMapper.writeValueAsString(datosObj); 
         }catch (Exception e){
             
         }
@@ -176,12 +208,14 @@ public class CitasServiceImpl implements CitasService{
         var es = estudioRepo.findById(dto.getIdestudio());
         if(es.isEmpty()){
             System.out.println("1");
+            registroEvento.log(AGENDA_INCORRECTA, APLICACION_AGENDA, hora, datos);
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Estudio no existe");
         }
         
         // Estudio no pertenece al area del usuario
         if(!es.get().getAreaDeServicioidArea().getIdArea().equals(area.getIdArea())){
             System.out.println("2");
+            registroEvento.log(AGENDA_INCORRECTA, APLICACION_AGENDA, hora, datos);
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Area no compatible");
         }
 
@@ -190,35 +224,41 @@ public class CitasServiceImpl implements CitasService{
         var ae  = aeRepo.findById(aePK);
         if(ae.isEmpty()){
             System.out.println("3");
+            registroEvento.log(AGENDA_INCORRECTA, APLICACION_AGENDA, hora, datos);
             throw new ResponseStatusException(HttpStatus.CONFLICT, "AsignacionEstudio no existente");
         }
         // EquipoImagenologia existe
         var eqImag = eqpImagRepo.findById(dto.getEqNoSerie());
         if(eqImag.isEmpty()){
             System.out.println("4");
+            registroEvento.log(AGENDA_INCORRECTA, APLICACION_AGENDA, hora, datos);
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "EquipoImagenología no existe");
         }
 
         // EquipoImagenologia está disponible
         if(!eqImag.get().getEstado().equals("Disponible")){
             System.out.println("5");
+            registroEvento.log(AGENDA_INCORRECTA, APLICACION_AGENDA, hora, datos);
             throw new ResponseStatusException(HttpStatus.CONFLICT, "EquipoImagenología no disponible");
         }
 
         if(!ae.get().getEstado().equals("Activo")){
             System.out.println("5.1");
+            registroEvento.log(AGENDA_INCORRECTA, APLICACION_AGENDA, hora, datos);
             throw new ResponseStatusException(HttpStatus.CONFLICT, "AsignacionEstudio no activa");
         }
 
         // EquipoImagenologia pertenece al area del usuario
         if(!eqImag.get().getAreaDeServicioidArea().getIdArea().equals(area.getIdArea())){
             System.out.println("6");
+            registroEvento.log(AGENDA_INCORRECTA, APLICACION_AGENDA, hora, datos);
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Area no compatible");
         }
 
         // Disponibilidad del EquipoImagenologia en la fecha y hora solicitada
         if(!ae.get().getEstado().equals("Activo")){
             System.out.println("7");
+            registroEvento.log(AGENDA_INCORRECTA, APLICACION_AGENDA, hora, datos);
             throw new ResponseStatusException(HttpStatus.CONFLICT, "EquipoImagenología no disponible en la fecha y hora solicitada");
         }
 
@@ -227,6 +267,7 @@ public class CitasServiceImpl implements CitasService{
         var se = seRepo.findById(sePk);
         if(se.isEmpty()){
             System.out.println("8");
+            registroEvento.log(AGENDA_INCORRECTA, APLICACION_AGENDA, hora, datos);
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "SolicitudDeEstudio no existe");
         }
 
@@ -234,6 +275,7 @@ public class CitasServiceImpl implements CitasService{
         var pa = paRepo.findById(dto.getIdpaciente());
         if(pa.isEmpty()){
             System.out.println("9");
+            registroEvento.log(AGENDA_INCORRECTA, APLICACION_AGENDA, hora, datos);
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Paciente no se encontró");
         }
         //Medico existe
@@ -241,6 +283,7 @@ public class CitasServiceImpl implements CitasService{
         var med = medicoRepo.findById(medPk);
         if(med.isEmpty()){
             System.out.println("10");
+            registroEvento.log(AGENDA_INCORRECTA, APLICACION_AGENDA, hora, datos);
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Médico no se encontró");
         }
 
@@ -256,6 +299,7 @@ public class CitasServiceImpl implements CitasService{
         var _ce = controlEstudiosRepo.findById(cePk);
         if(_ce.isPresent()){
             System.out.println("11");
+            registroEvento.log(AGENDA_INCORRECTA, APLICACION_AGENDA, hora, datos);
             throw new ResponseStatusException(HttpStatus.CONFLICT, "ControlEstudio existente");
         }
         
@@ -271,12 +315,17 @@ public class CitasServiceImpl implements CitasService{
         SolicitudDeEstudio solicitudDeEstudio = se.get();
         solicitudDeEstudio.setEstado("Programado");
         CitaDTO ceDto = citaToDto(ce);
+        registroEvento.log(AGENDA_CORRECTA, APLICACION_AGENDA, hora, datos);
         return ceDto;
     }    
     
     @Override
     @Transactional
     public AsignacionEstudioDTO CreateStudyAssignment (String token, AsignacionEstudioDTO dto){
+        long hora= System.currentTimeMillis();
+        String datos="";
+        //Clase donde guardaremos los DatosJSON
+        record EventoDatos(AsignacionEstudioDTO dto, SesionPK SesionActiva) {}
 
         Usuario us= null;
 
@@ -284,6 +333,8 @@ public class CitasServiceImpl implements CitasService{
             //Extaemos datos del token
             JwtSessionInfo info= objectMapper.readValue(token, JwtSessionInfo.class);
             us = usuarioRepo.findById(new UsuarioPK(info.getNumEmpleado(), info.getCurp())).get();
+            var datosObj =new EventoDatos(dto, new SesionPK(info.getHoraInicio(),info.getNumEmpleado(), info.getCurp(), info.getAplicacionId()));
+            datos=objectMapper.writeValueAsString(datosObj);
         }catch (Exception e){
             
         }
@@ -294,12 +345,14 @@ public class CitasServiceImpl implements CitasService{
         var es = estudioRepo.findById(dto.getIdestudio());
         if(es.isEmpty()){
             System.out.println("1");
+            registroEvento.log(ASIGNACION_INCORRECTA, APLICACION_AGENDA, hora, datos);
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Estudio no existe");
         }
         
         // Estudio no pertenece al area del usuario
         if(!es.get().getAreaDeServicioidArea().getIdArea().equals(area.getIdArea())){
             System.out.println("2");
+            registroEvento.log(ASIGNACION_INCORRECTA, APLICACION_AGENDA, hora, datos);
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Area no compatible");
         }
 
@@ -308,6 +361,7 @@ public class CitasServiceImpl implements CitasService{
         var ae  = aeRepo.findById(aePK);
         if(ae.isPresent()){
             System.out.println("3");
+            registroEvento.log(ASIGNACION_INCORRECTA, APLICACION_AGENDA, hora, datos);
             throw new ResponseStatusException(HttpStatus.CONFLICT, "AsignacionEstudio existente");
         }
 
@@ -315,23 +369,27 @@ public class CitasServiceImpl implements CitasService{
         var eqImag = eqpImagRepo.findById(dto.getEqNoSerie());
         if(eqImag.isEmpty()){
             System.out.println("4");
+            registroEvento.log(ASIGNACION_INCORRECTA, APLICACION_AGENDA, hora, datos);
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "EquipoImagenología no existe");
         }
 
         // EquipoImagenologia está disponible
         if(!eqImag.get().getEstado().equals("Disponible")){
             System.out.println("5");
+            registroEvento.log(ASIGNACION_INCORRECTA, APLICACION_AGENDA, hora, datos);
             throw new ResponseStatusException(HttpStatus.CONFLICT, "EquipoImagenología no disponible");
         }
         // EquipoImagenologia pertenece al area del usuario
         if(!eqImag.get().getAreaDeServicioidArea().getIdArea().equals(area.getIdArea())){
             System.out.println("6");
+            registroEvento.log(ASIGNACION_INCORRECTA, APLICACION_AGENDA, hora, datos);
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Area no compatible");
         }
 
         // Disponibilidad del EquipoImagenologia en la fecha y hora solicitada
         if(!aeRepo.findByEquipoImagenologiaAndAsignacionEstudioPK_FechaPkAndEstado(eqImag.get(), dto.getFechacontrolpk(), "Activo").isEmpty()){
             System.out.println("7");
+            registroEvento.log(ASIGNACION_INCORRECTA, APLICACION_AGENDA, hora, datos);
             throw new ResponseStatusException(HttpStatus.CONFLICT, "EquipoImagenología no disponible en la fecha y hora solicitada");
         }
 
@@ -340,12 +398,14 @@ public class CitasServiceImpl implements CitasService{
         var se = seRepo.findById(sePk);
         if(se.isEmpty()){
             System.out.println("8");
+            registroEvento.log(ASIGNACION_INCORRECTA, APLICACION_AGENDA, hora, datos);
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "SolicitudDeEstudio no existe");
         }
 
         //Validar que SolicitudDeEstudio == SOLICITADO
         if(!se.get().getEstado().equals("SOLICITADO")){
             System.out.println("9");
+            registroEvento.log(ASIGNACION_INCORRECTA, APLICACION_AGENDA, hora, datos);
             throw new ResponseStatusException(HttpStatus.CONFLICT, "SolicitudDeEstudio ya ha sido programado, reprogramado o cancelado 'Solicitado'");
         }
 
@@ -360,12 +420,26 @@ public class CitasServiceImpl implements CitasService{
         solicitudDeEstudio.setEstado("Equipo Asignado");
         seRepo.save(solicitudDeEstudio);
 
+        registroEvento.log(ASIGNACION_CORRECTA, APLICACION_AGENDA, hora, datos);
+
         return dto;
     }
     
     
     @Override
     public CitaDTO UpdateStudyControl (String token, ReagendaCitaDTO dto){
+        long hora= System.currentTimeMillis();
+        String datos="";
+        //Clase donde guardaremos los DatosJSON
+        record EventoDatos(ReagendaCitaDTO dto, SesionPK SesionActiva) {}
+        try{
+            //Extaemos datos del token
+            JwtSessionInfo info= objectMapper.readValue(token, JwtSessionInfo.class);
+            var datosObj =new EventoDatos(dto, new SesionPK(info.getHoraInicio(),info.getNumEmpleado(), info.getCurp(), info.getAplicacionId()));
+            datos=objectMapper.writeValueAsString(datosObj);
+        }catch (Exception e){
+            
+        }
         
         CancelaCitaDTO cancela = new CancelaCitaDTO(dto.getUserNumEmpleado(), 
                                                     dto.getUserCurp(),
@@ -378,7 +452,7 @@ public class CitasServiceImpl implements CitasService{
                                                     dto.getMedCurp(),
                                                     "Reprogramado");
 
-        CancelStudyControl(cancela);
+        CancelStudyControl(token, cancela);
 
 
         AsignacionEstudioDTO asignacion = new AsignacionEstudioDTO(dto.getNoSerie(), 
@@ -405,6 +479,7 @@ public class CitasServiceImpl implements CitasService{
                                                                         dto.getMedCurp(),
                                                                         dto.getFechacontrolpk_nueva()));
         if(se.isEmpty()){
+            registroEvento.log(REAGENDA_INCORRECTA, APLICACION_REAGENDA, hora, datos);
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "SolicitudDeEstudio no existe");
         }
         
@@ -412,12 +487,25 @@ public class CitasServiceImpl implements CitasService{
         CreateStudyAssignment(token, asignacion);
 
         CitaDTO resp = CreateStudyControl(token, agenda);
+        registroEvento.log(REAGENDA_CORRECTA, APLICACION_REAGENDA, hora, datos);
         return resp;
     }
 
     
     @Override
-    public void CancelStudyControl (CancelaCitaDTO dto){
+    public void CancelStudyControl (String token, CancelaCitaDTO dto){
+        long hora= System.currentTimeMillis();
+        String datos="";
+        //Clase donde guardaremos los DatosJSON
+        record EventoDatos(CancelaCitaDTO dto, SesionPK SesionActiva) {}
+        try{
+            //Extaemos datos del token
+            JwtSessionInfo info= objectMapper.readValue(token, JwtSessionInfo.class);
+            var datosObj =new EventoDatos(dto, new SesionPK(info.getHoraInicio(),info.getNumEmpleado(), info.getCurp(), info.getAplicacionId()));
+            datos=objectMapper.writeValueAsString(datosObj);
+        }catch (Exception e){
+            
+        }
 
         // Validar existencia de ControlEstudio
         ControlEstudiosPK cePk = new ControlEstudiosPK(dto.getNumEmpleado(), 
@@ -430,6 +518,7 @@ public class CitasServiceImpl implements CitasService{
                                                        dto.getMedCurp());
         var _ce = controlEstudiosRepo.findById(cePk);
         if(_ce.isEmpty()){
+            registroEvento.log(CANCELA_INCORRECTA, APLICACION_CANCELA, hora, datos);
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "ControlEstudio no existe");
         }
 
@@ -447,6 +536,7 @@ public class CitasServiceImpl implements CitasService{
                                             dto.getFechacontrolpk());
         var _se = seRepo.findById(sePk);
         if(_se.isEmpty()){
+            registroEvento.log(CANCELA_INCORRECTA, APLICACION_CANCELA, hora, datos);
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "SolicitudDeEstudio no existe");
         }
         SolicitudDeEstudio se = _se.get();
@@ -457,11 +547,13 @@ public class CitasServiceImpl implements CitasService{
         AsignacionEstudioPK aePk = new AsignacionEstudioPK(dto.getNoSerie(), dto.getIdestudio(), dto.getFechacontrolpk());
         var _ae = aeRepo.findById(aePk);
         if(_ae.isEmpty()){
+            registroEvento.log(CANCELA_INCORRECTA, APLICACION_CANCELA, hora, datos);
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "AsignacionEstudio no existe");
         }
         AsignacionEstudio ae = _ae.get();
         ae.setEstado("Cancelado");
         aeRepo.save(ae);
+        registroEvento.log(CANCELA_CORRECTA, APLICACION_CANCELA, hora, datos);
     }
 
 
@@ -538,4 +630,57 @@ public class CitasServiceImpl implements CitasService{
          
         seRepo.save(se);
     }
+
+    @Transactional
+    public void Consultorio(String token){
+        long hora= System.currentTimeMillis();
+        String datos="";
+        //Clase donde guardaremos los DatosJSON
+        record EventoDatos(List<ControlEstudiosPK> citas,SesionPK SesionActiva) {}
+        //inicializamos lista de citas canceladas
+        List<ControlEstudiosPK> citasCanceladas = new ArrayList<>();
+
+        /* Encontramos estudios cancelados en SolicitudEstudio filtrando por Estudio y Estado */
+        List<SolicitudDeEstudio> se = seRepo.findByEstado("Cancelado consultorio");
+        if(se.size()==0){
+            return;
+        }
+        for(SolicitudDeEstudio solicitud : se){
+            SolicitudDeEstudioPK sePk = solicitud.getSolicitudDeEstudioPK();
+            /* Cancelamos los controles de estudio asociados a la solicitud de estudio */
+            List<ControlEstudios> controles = controlEstudiosRepo.findByControlEstudiosPK_FechaControlPkAndMedicoAndPacienteAndEstadoNot(
+                                                                    sePk.getFechaSolicitudPk(), 
+                                                                    solicitud.getMedico(),
+                                                                    solicitud.getPaciente(),
+                                                                    "Cancelado");
+            if(controles.size()==0){
+                continue;
+            }
+            for(ControlEstudios ce : controles){
+                ControlEstudiosPK cePk = ce.getControlEstudiosPK();
+                
+                CancelaCitaDTO cancela = new CancelaCitaDTO(cePk.getUsuarioNumEmpleado(),
+                                                    cePk.getUsuarioCURP(),
+                                                    cePk.getEstudioidEstudio(),
+                                                    cePk.getPacienteIDPaciente(),
+                                                    cePk.getFechaControlPk(),
+                                                    "Cancelado por consultorio",
+                                                    cePk.getEquipoImagenologiaNSerie(),
+                                                    cePk.getMedicoNumEmpleado(),
+                                                    cePk.getMedicoCURP(),
+                                                    "Cancelado");
+                CancelStudyControl(token, cancela);
+                //Agregamos a la lista de citas canceladas
+                citasCanceladas.add(cePk);
+            }
+        }
+        try{
+            //Extaemos datos del token
+            JwtSessionInfo info= objectMapper.readValue(token, JwtSessionInfo.class);
+            var datosObj =new EventoDatos(citasCanceladas, new SesionPK(info.getHoraInicio(),info.getNumEmpleado(), info.getCurp(), info.getAplicacionId()));
+            datos=objectMapper.writeValueAsString(datosObj);
+        }catch (Exception e){
+        }
+        registroEvento.log(CANCELA_CORRECTA, APLICACION_CANCELA, hora, datos);
+    }       
 }

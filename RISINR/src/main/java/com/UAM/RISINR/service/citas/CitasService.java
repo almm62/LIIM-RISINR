@@ -17,5 +17,6 @@ public interface CitasService {
     CitaDTO CreateStudyControl (String token, AgendaCitaDTO dto);
     AsignacionEstudioDTO CreateStudyAssignment(String token, AsignacionEstudioDTO dto);
     CitaDTO UpdateStudyControl(String token, ReagendaCitaDTO dto);
-    void CancelStudyControl (CancelaCitaDTO dto);
+    void CancelStudyControl (String token, CancelaCitaDTO dto);
+    void Consultorio(String token);
 }

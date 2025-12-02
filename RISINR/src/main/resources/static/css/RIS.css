@@ -377,7 +377,6 @@ h2{
 
 .flex-container {
     display: flex;
-    justify-content: flex-end;
     background-color: rgba(255,255,255,.5);
     align-items: center;
     gap: 10px;
@@ -389,6 +388,10 @@ h2{
     text-align: center;
     line-height: 20px;
     font-size: 20px;
+}
+
+.flex-container-end {
+    justify-content: flex-end;
 }
 
 .flex-container button{
@@ -525,16 +528,79 @@ button {
 }
 
 
+/* ------------- CITAS -------------- */
+.contenedor-formulario {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 8px;  
+}
+
+.contenedor-formulario label {
+    margin-bottom: 3px;  
+    font-weight: 500;
+}
+
+.contenedor-formulario input,
+.contenedor-formulario select {
+    padding: 6px 8px;  
+}
 
 
+.contenedor-formulario input[type="text"] {
+    width: 110%;
+    padding: 3px 10px;
+    margin: 2px 0;
+    display: inline-block;
+    border: 1px solid #cccccc;
+    border-radius: 2px;   
+    box-sizing: border-box;
+}
 
+.contenedor-formulario input[type="date"] {
+    width: 35%;
+    margin: 2px 0;
+    display: inline-block;
+    border: 1px solid #cccccc;
+    border-radius: 2px;   
+    box-sizing: border-box;
+}
 
+.contenedor {
+    max-width: 500px;    
+    justify-content: flex-start;
+    padding-left: 20px;
+}
 
+#filtro_fecha {
+    display: flex;
+    flex-direction: row !important;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: nowrap;  /* Evitar que se rompa en múltiples líneas */
+}
 
+#filtro_fecha .label_registro:first-child {
+    min-width: auto;  /* Para el label "Fecha:" */
+    margin-right: 5px;
+}
 
+#filtro_fecha input {
+    flex: 1;
+    max-width: 150px;  /* Limitar el ancho de cada input */
+}
 
+#filtro_fecha .label_registro:not(:first-child) {
+    margin: 0 5px;  /* Para el guion "-" */
+}
 
-
+.custom-select{
+    width: 50%;
+    padding: 3px 10px;
+    display: inline-block;
+    border: 1px solid #cccccc;
+    border-radius: 2px;   
+    box-sizing: border-box;
+}
 
 
 

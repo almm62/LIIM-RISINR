@@ -107,7 +107,6 @@ public class CitasController {
         
         CitaDTO cita = citasService.UpdateStudyControl(subjectJson, dto);
 
-        //Cambio en cita existente (Fecha, sala, etc)
         return ResponseEntity.ok(cita);
     }
 
@@ -120,8 +119,19 @@ public class CitasController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         String subjectJson = (String) auth.getPrincipal();
-        
-        // Creacion de registro con estado:CANCELADO de cita existente, NO ALTERAR REGISTRO EXISTENTE
+
+        citasService.CancelStudyControl(subjectJson,dto);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/consultorio")
+    public ResponseEntity<Void> consultorio(HttpServletRequest httpReq) {     
+        var auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || auth.getPrincipal() == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        String subjectJson = (String) auth.getPrincipal();   
+        citasService.Consultorio(subjectJson);
         return ResponseEntity.ok().build();
     }
 
