@@ -10,10 +10,15 @@ import org.springframework.data.jpa.repository.JpaRepository;
  * Proporciona métodos para consultar y administrar información de perfiles de usuario
  * en el sistema, incluyendo búsquedas por número de empleado y CURP.
  * Extiende JpaRepository para heredar operaciones CRUD básicas.
- * 
  * @author Pedro Misael Rodríguez Jiménez
  */
 public interface PerfilRepository extends JpaRepository<Perfil, PerfilPK> {
+    /**
+     * Busca los perfiles asignados a un usuario identificado por número de empleado y CURP.
+     * @param usuarioNumEmpleado Número de empleado del usuario
+     * @param usuarioCurp CURP del usuario
+     * @return Lista de Perfil asignados al usuario indicado
+     */
     List<Perfil> findByPerfilPKUsuarioNumEmpleadoAndPerfilPKUsuarioCURP(
         int usuarioNumEmpleado,
         String usuarioCurp

@@ -13,13 +13,16 @@ import org.springframework.stereotype.Repository;
  * Proporciona métodos para consultar y administrar los datos de acceso de usuarios
  * al sistema, incluyendo credenciales y tokens de autenticación.
  * Extiende JpaRepository para heredar operaciones CRUD básicas.
- * 
  * @author Pedro Misael Rodríguez Jiménez
- * @version 1.0
  */
 @Repository
 public interface DatosAccesoRepository extends JpaRepository <DatosAcceso, DatosAccesoPK>{
     @Override
     List <DatosAcceso> findAll();
+    /**
+     * Busca las credenciales de acceso por identificador de usuario.
+     * @param usuarioID Identificador único de acceso del usuario
+     * @return Optional con los DatosAcceso si el identificador existe
+     */
     Optional<DatosAcceso> findByIdUsuarioID(String usuarioID);
 }

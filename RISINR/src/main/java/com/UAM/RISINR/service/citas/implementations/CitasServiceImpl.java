@@ -48,6 +48,14 @@ import com.UAM.RISINR.service.model.JwtSessionInfo;
 import com.UAM.RISINR.service.shared.RegistroEventoService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+/**
+ * Implementación del servicio de gestión de citas. Contiene la lógica de negocio
+ * para agendar, reagendar y cancelar controles de estudio, así como para crear
+ * asignaciones de equipos de imagenología. Valida disponibilidad de recursos,
+ * pertenencia al área del usuario y sincronización con solicitudes del consultorio.
+ * Registra en bitácora cada operación exitosa o fallida.
+ * @author Pedro Misael Rodríguez Jiménez
+ */
 @Service
 public class CitasServiceImpl implements CitasService{
     private final RegistroEventoService registroEvento;
@@ -82,9 +90,23 @@ public class CitasServiceImpl implements CitasService{
     private static final int CANCELA_INCORRECTA=1017;
     
     
+    /**
+     * Constructor con inyección de todos los repositorios y servicios necesarios para la gestión de citas.
+     * @param registroEvento Servicio de bitácora de eventos
+     * @param usuarioRepo Repositorio de usuarios
+     * @param eqpImagRepo Repositorio de equipos de imagenología
+     * @param estudioRepo Repositorio de estudios
+     * @param seRepo Repositorio de solicitudes de estudio
+     * @param equipoRepo Repositorio de equipos
+     * @param aeRepo Repositorio de asignaciones de estudio
+     * @param controlEstudiosRepo Repositorio de controles de estudio
+     * @param paRepo Repositorio de pacientes
+     * @param medicoRepo Repositorio de médicos
+     * @param objectMapper Mapper para serialización JSON
+     */
     public CitasServiceImpl(RegistroEventoService registroEvento, UsuarioRepository usuarioRepo, EquipoImagenologiaRepository eqpImagRepo,
                             EstudioRepository estudioRepo, SolicitudDeEstudioRepository seRepo,
-                            EquipoRepository equipoRepo, AsignacionEstudioRepository aeRepo, ControlEstudiosRepository controlEstudiosRepo, 
+                            EquipoRepository equipoRepo, AsignacionEstudioRepository aeRepo, ControlEstudiosRepository controlEstudiosRepo,
                             PacienteRepository paRepo, MedicoRepository medicoRepo, ObjectMapper objectMapper){
         this.registroEvento=registroEvento;
         this.usuarioRepo=usuarioRepo;
@@ -100,6 +122,11 @@ public class CitasServiceImpl implements CitasService{
     }
     
 
+    /**
+     * Retorna la lista de estudios disponibles en el área del usuario autenticado.
+     * @param token JSON del subject JWT con datos de la sesión activa
+     * @return Lista de EstudioDTO con los estudios del área
+     */
     @Override
     @Transactional
     public List<EstudioDTO> getStudies(String token) {
@@ -125,6 +152,11 @@ public class CitasServiceImpl implements CitasService{
         return estudiosDto;
     }
 
+    /**
+     * Retorna la lista de salas disponibles en el área del usuario autenticado.
+     * @param token JSON del subject JWT con datos de la sesión activa
+     * @return Lista de SalaDTO con las ubicaciones de equipos del área
+     */
     @Override
     public List<SalaDTO> getSalas(String token) {
         Usuario sesionUsr= null;
@@ -151,6 +183,12 @@ public class CitasServiceImpl implements CitasService{
         return salasDto;
     }
 
+    /**
+     * Retorna todas las citas activas del área aplicando los filtros indicados.
+     * @param token JSON del subject JWT con datos de la sesión activa
+     * @param filtro Filtros de búsqueda (nombre y/o apellido del paciente)
+     * @return Lista de CitaDTO con los controles de estudio que coinciden con los filtros
+     */
     @Override
     public List<CitaDTO> getAll(String token, FiltroDTO filtro) {
         long hora= System.currentTimeMillis();
@@ -199,6 +237,12 @@ public class CitasServiceImpl implements CitasService{
         return citadto;
     }
     
+    /**
+     * Agenda una nueva cita creando un registro de ControlEstudio.
+     * @param token JSON del subject JWT con datos de la sesión activa
+     * @param dto Datos de la cita a agendar
+     * @return CitaDTO con la información del control de estudio creado
+     */
     @Override
     @Transactional
     public CitaDTO CreateStudyControl (String token, AgendaCitaDTO dto){
@@ -324,6 +368,12 @@ public class CitasServiceImpl implements CitasService{
         return ceDto;
     }    
     
+    /**
+     * Crea una asignación de estudio vinculando un equipo de imagenología a un estudio y fecha.
+     * @param token JSON del subject JWT con datos de la sesión activa
+     * @param dto Datos de la asignación a crear
+     * @return AsignacionEstudioDTO con los datos de la asignación registrada
+     */
     @Override
     @Transactional
     public AsignacionEstudioDTO CreateStudyAssignment (String token, AsignacionEstudioDTO dto){
@@ -422,6 +472,12 @@ public class CitasServiceImpl implements CitasService{
     }
     
     
+    /**
+     * Reagenda una cita existente cancelando la anterior y creando una nueva.
+     * @param token JSON del subject JWT con datos de la sesión activa
+     * @param dto Datos de la cita original y los nuevos datos de reagendación
+     * @return CitaDTO con la información del nuevo control de estudio
+     */
     @Override
     public CitaDTO UpdateStudyControl (String token, ReagendaCitaDTO dto){
         long hora= System.currentTimeMillis();
@@ -488,6 +544,11 @@ public class CitasServiceImpl implements CitasService{
     }
 
     
+    /**
+     * Cancela una cita marcando el ControlEstudio, la SolicitudDeEstudio y la AsignacionEstudio como cancelados.
+     * @param token JSON del subject JWT con datos de la sesión activa
+     * @param dto Datos del control de estudio a cancelar
+     */
     @Override
     public void CancelStudyControl (String token, CancelaCitaDTO dto){
         long hora= System.currentTimeMillis();
@@ -627,6 +688,10 @@ public class CitasServiceImpl implements CitasService{
         seRepo.save(se);
     }
 
+    /**
+     * Cancela en el RIS las citas que fueron canceladas desde el consultorio del médico.
+     * @param token JSON del subject JWT con datos de la sesión activa
+     */
     @Transactional
     public void Consultorio(String token){
         long hora= System.currentTimeMillis();
@@ -680,6 +745,12 @@ public class CitasServiceImpl implements CitasService{
         registroEvento.log(CANCELA_CORRECTA, APLICACION_CANCELA, hora, datos);
     }
 
+    /**
+     * Retorna las solicitudes de estudio pendientes de programación aplicando los filtros indicados.
+     * @param token JSON del subject JWT con datos de la sesión activa
+     * @param filtro Filtros de búsqueda (nombre y/o apellido del paciente)
+     * @return Lista de SolicitudDeEstudioDTO con las solicitudes en estado "SOLICITADO"
+     */
     @Transactional
     public List<SolicitudDeEstudioDTO> getStudyOrders (String token, FiltroDTO filtro){
         Usuario sesionUsr= null;

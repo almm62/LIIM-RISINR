@@ -10,11 +10,11 @@ import com.UAM.RISINR.model.dto.equipoImagenologia.EquipoImagenologiaRequest;
 import java.util.List;
 
 /**
- *
  * Interfaz que permite aislar la implementación de la lógica de negocio
  * del servicio de equipos. Declara los métodos CRUD para el servicio.
  * 
- * Spring se encarga de encontrar la clase que implemente la interfaz. 
+ * Spring se encarga de encontrar la clase que implemente la interfaz.
+ * @author Pedro Misael Rodríguez Jiménez
  */
 public interface EquipoImagenologiaService {
     

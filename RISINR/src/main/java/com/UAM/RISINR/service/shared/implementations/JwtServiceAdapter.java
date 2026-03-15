@@ -11,17 +11,36 @@ import org.springframework.stereotype.Service;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Implementación del servicio JWT. Utiliza la clase Cybersecurity con firma RS256
+ * para emitir tokens que contienen los datos de sesión en el subject, y los parsea
+ * de vuelta a un objeto JwtSessionInfo.
+ * @author Pedro Misael Rodríguez Jiménez
+ */
 @Service
 public class JwtServiceAdapter implements JwtService {
 
     private final Cybersecurity cybersecurity;
     private final ObjectMapper objectMapper;
 
+    /**
+     * Constructor con inyección de las dependencias de seguridad y serialización.
+     * @param cybersecurity Componente de firma y validación RS256
+     * @param objectMapper Mapper para serialización del subject JWT
+     */
     public JwtServiceAdapter(Cybersecurity cybersecurity, ObjectMapper objectMapper) {
         this.cybersecurity = cybersecurity;
         this.objectMapper = objectMapper;
     }
 
+    /**
+     * Emite un JWT con los datos mínimos de sesión en el subject (nme, curp, asi, hst).
+     * @param numEmpleado Número de empleado del usuario (parte de la PK de Sesion)
+     * @param curp CURP del usuario (parte de la PK de Sesion)
+     * @param horaInicio Marca de tiempo epoch en milisegundos del inicio de sesión
+     * @param aplicacionId Identificador de la aplicación que inicia la sesión
+     * @return Token JWT firmado con RS256
+     */
     @Override
     public String emitirToken(int numEmpleado,
                               String curp,
@@ -44,6 +63,11 @@ public class JwtServiceAdapter implements JwtService {
         }
     }
     
+    /**
+     * Valida y decodifica el token JWT, extrayendo los datos de sesión del subject.
+     * @param tokenJWT Token JWT a validar y parsear
+     * @return JwtSessionInfo con los campos nme, curp, hst y asi reconstruidos
+     */
     @Override
     public JwtSessionInfo parseToken(String tokenJWT) {
         try {

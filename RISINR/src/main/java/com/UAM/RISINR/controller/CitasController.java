@@ -48,10 +48,6 @@ import jakarta.servlet.http.HttpServletRequest;
 @RequestMapping("/citas")
 public class CitasController {
     
-    /**
-     * Interfaz que permite aislar la implementación de la lógica de negocio
-     * permitiendo un mayor desacoplamiento.
-     */
     private final CitasService citasService;
 
     

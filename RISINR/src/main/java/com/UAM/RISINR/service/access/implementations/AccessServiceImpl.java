@@ -43,9 +43,7 @@ import java.util.Map;
  * - Bloqueo automático de cuentas tras intentos fallidos
  * - Registro de eventos de seguridad
  * - Cierre de sesión
- * 
  * @author Pedro Misael Rodríguez Jiménez
- * 
  */
 @Service
 public class AccessServiceImpl implements AccessService {
