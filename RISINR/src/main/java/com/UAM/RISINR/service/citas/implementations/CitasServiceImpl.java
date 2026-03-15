@@ -30,8 +30,10 @@ import com.UAM.RISINR.model.dto.citas.AsignacionEstudioDTO;
 import com.UAM.RISINR.model.dto.citas.CancelaCitaDTO;
 import com.UAM.RISINR.model.dto.citas.CitaDTO;
 import com.UAM.RISINR.model.dto.citas.EstudioDTO;
+import com.UAM.RISINR.model.dto.citas.FiltroDTO;
 import com.UAM.RISINR.model.dto.citas.ReagendaCitaDTO;
 import com.UAM.RISINR.model.dto.citas.SalaDTO;
+import com.UAM.RISINR.model.dto.citas.SolicitudDeEstudioDTO;
 import com.UAM.RISINR.repository.AsignacionEstudioRepository;
 import com.UAM.RISINR.repository.ControlEstudiosRepository;
 import com.UAM.RISINR.repository.EquipoImagenologiaRepository;
@@ -136,21 +138,23 @@ public class CitasServiceImpl implements CitasService{
         }
         
         List<Equipo> equipos = equipoRepo.findByAreaDeServicioidArea(sesionUsr.getAreaidArea());
-        List<SalaDTO> salas = equipos.stream()
-                                     .map(e ->{
-                                        String sala = e.getUbicacion();
-                                        String ubicacion = "Sala " + e.getUbicacion();
-                                        return new SalaDTO(ubicacion,sala);
-                                     })
-                                     .distinct()
-                                     .collect(Collectors.toList());
-        return salas;
+        List<String> _ubicaciones = equipos.stream()
+                                        .map(e -> e.getUbicacion())
+                                        .distinct()
+                                        .collect(Collectors.toList());
+
+        List<SalaDTO> salasDto = _ubicaciones.stream()
+                                    .map(u -> {
+                                        return new SalaDTO(u);
+                                    })
+                                    .collect(Collectors.toList());
+        return salasDto;
     }
 
     @Override
-    public List<CitaDTO> getAll(String token) {
+    public List<CitaDTO> getAll(String token, FiltroDTO filtro) {
         long hora= System.currentTimeMillis();
-        String datos="";
+        String datos=" ";
         //Clase donde guardaremos los DatosJSON
         record EventoDatos(SesionPK SesionActiva) {}
         Usuario us= null;
@@ -170,7 +174,20 @@ public class CitasServiceImpl implements CitasService{
         List<String> estados = List.of("Programado", "Reprogramado");
 
         /* Entidad Principal */
-        List<ControlEstudios> ce = controlEstudiosRepo.findByEstudioInAndEstadoInAndCerradoIsFalse(es, estados);
+        List<ControlEstudios> ce;
+        if(filtro.getNombre()==null && filtro.getApellido()==null){
+            ce = controlEstudiosRepo.findByEstudioInAndEstadoInAndCerradoIsFalse(es, estados);
+        } else{
+            List<Paciente> pacientes = new ArrayList<>();
+            if(filtro.getApellido()==null){
+                pacientes = paRepo.findByNombreContaining(filtro.getNombre());
+            } else if(filtro.getNombre()==null){
+                pacientes = paRepo.findByApellidoPaternoContaining(filtro.getApellido());
+            } else {
+                pacientes = paRepo.findByNombreContainingAndApellidoPaternoContaining(filtro.getNombre(),filtro.getApellido());
+            }
+            ce = controlEstudiosRepo.findByEstudioInAndEstadoInAndPacienteInAndCerradoIsFalse(es, estados, pacientes);
+        }
         
         List<CitaDTO> citadto = ce.stream()
                                     .map(_ce -> {
@@ -207,14 +224,12 @@ public class CitasServiceImpl implements CitasService{
         // Estudio existe
         var es = estudioRepo.findById(dto.getIdestudio());
         if(es.isEmpty()){
-            System.out.println("1");
             registroEvento.log(AGENDA_INCORRECTA, APLICACION_AGENDA, hora, datos);
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Estudio no existe");
         }
         
         // Estudio no pertenece al area del usuario
         if(!es.get().getAreaDeServicioidArea().getIdArea().equals(area.getIdArea())){
-            System.out.println("2");
             registroEvento.log(AGENDA_INCORRECTA, APLICACION_AGENDA, hora, datos);
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Area no compatible");
         }
@@ -223,41 +238,35 @@ public class CitasServiceImpl implements CitasService{
         AsignacionEstudioPK aePK = new AsignacionEstudioPK(dto.getEqNoSerie(), dto.getIdestudio(), dto.getFechacontrolpk());
         var ae  = aeRepo.findById(aePK);
         if(ae.isEmpty()){
-            System.out.println("3");
             registroEvento.log(AGENDA_INCORRECTA, APLICACION_AGENDA, hora, datos);
             throw new ResponseStatusException(HttpStatus.CONFLICT, "AsignacionEstudio no existente");
         }
         // EquipoImagenologia existe
         var eqImag = eqpImagRepo.findById(dto.getEqNoSerie());
         if(eqImag.isEmpty()){
-            System.out.println("4");
             registroEvento.log(AGENDA_INCORRECTA, APLICACION_AGENDA, hora, datos);
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "EquipoImagenología no existe");
         }
 
         // EquipoImagenologia está disponible
         if(!eqImag.get().getEstado().equals("Disponible")){
-            System.out.println("5");
             registroEvento.log(AGENDA_INCORRECTA, APLICACION_AGENDA, hora, datos);
             throw new ResponseStatusException(HttpStatus.CONFLICT, "EquipoImagenología no disponible");
         }
 
         if(!ae.get().getEstado().equals("Activo")){
-            System.out.println("5.1");
             registroEvento.log(AGENDA_INCORRECTA, APLICACION_AGENDA, hora, datos);
             throw new ResponseStatusException(HttpStatus.CONFLICT, "AsignacionEstudio no activa");
         }
 
         // EquipoImagenologia pertenece al area del usuario
         if(!eqImag.get().getAreaDeServicioidArea().getIdArea().equals(area.getIdArea())){
-            System.out.println("6");
             registroEvento.log(AGENDA_INCORRECTA, APLICACION_AGENDA, hora, datos);
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Area no compatible");
         }
 
         // Disponibilidad del EquipoImagenologia en la fecha y hora solicitada
         if(!ae.get().getEstado().equals("Activo")){
-            System.out.println("7");
             registroEvento.log(AGENDA_INCORRECTA, APLICACION_AGENDA, hora, datos);
             throw new ResponseStatusException(HttpStatus.CONFLICT, "EquipoImagenología no disponible en la fecha y hora solicitada");
         }
@@ -266,7 +275,6 @@ public class CitasServiceImpl implements CitasService{
         SolicitudDeEstudioPK sePk = new SolicitudDeEstudioPK(dto.getIdpaciente(), dto.getMedNumEmpleado(), dto.getMedCurp(), dto.getFechacontrolpk());
         var se = seRepo.findById(sePk);
         if(se.isEmpty()){
-            System.out.println("8");
             registroEvento.log(AGENDA_INCORRECTA, APLICACION_AGENDA, hora, datos);
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "SolicitudDeEstudio no existe");
         }
@@ -274,7 +282,6 @@ public class CitasServiceImpl implements CitasService{
         // Paciente existe
         var pa = paRepo.findById(dto.getIdpaciente());
         if(pa.isEmpty()){
-            System.out.println("9");
             registroEvento.log(AGENDA_INCORRECTA, APLICACION_AGENDA, hora, datos);
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Paciente no se encontró");
         }
@@ -282,7 +289,6 @@ public class CitasServiceImpl implements CitasService{
         MedicoPK medPk = new MedicoPK(dto.getMedNumEmpleado(), dto.getMedCurp());
         var med = medicoRepo.findById(medPk);
         if(med.isEmpty()){
-            System.out.println("10");
             registroEvento.log(AGENDA_INCORRECTA, APLICACION_AGENDA, hora, datos);
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Médico no se encontró");
         }
@@ -298,7 +304,6 @@ public class CitasServiceImpl implements CitasService{
                                                        dto.getMedCurp());
         var _ce = controlEstudiosRepo.findById(cePk);
         if(_ce.isPresent()){
-            System.out.println("11");
             registroEvento.log(AGENDA_INCORRECTA, APLICACION_AGENDA, hora, datos);
             throw new ResponseStatusException(HttpStatus.CONFLICT, "ControlEstudio existente");
         }
@@ -344,14 +349,12 @@ public class CitasServiceImpl implements CitasService{
         // Estudio existe
         var es = estudioRepo.findById(dto.getIdestudio());
         if(es.isEmpty()){
-            System.out.println("1");
             registroEvento.log(ASIGNACION_INCORRECTA, APLICACION_AGENDA, hora, datos);
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Estudio no existe");
         }
         
         // Estudio no pertenece al area del usuario
         if(!es.get().getAreaDeServicioidArea().getIdArea().equals(area.getIdArea())){
-            System.out.println("2");
             registroEvento.log(ASIGNACION_INCORRECTA, APLICACION_AGENDA, hora, datos);
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Area no compatible");
         }
@@ -360,7 +363,6 @@ public class CitasServiceImpl implements CitasService{
         AsignacionEstudioPK aePK = new AsignacionEstudioPK(dto.getEqNoSerie(), dto.getIdestudio(), dto.getFechacontrolpk());
         var ae  = aeRepo.findById(aePK);
         if(ae.isPresent()){
-            System.out.println("3");
             registroEvento.log(ASIGNACION_INCORRECTA, APLICACION_AGENDA, hora, datos);
             throw new ResponseStatusException(HttpStatus.CONFLICT, "AsignacionEstudio existente");
         }
@@ -368,27 +370,23 @@ public class CitasServiceImpl implements CitasService{
         // EquipoImagenologia existe
         var eqImag = eqpImagRepo.findById(dto.getEqNoSerie());
         if(eqImag.isEmpty()){
-            System.out.println("4");
             registroEvento.log(ASIGNACION_INCORRECTA, APLICACION_AGENDA, hora, datos);
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "EquipoImagenología no existe");
         }
 
         // EquipoImagenologia está disponible
         if(!eqImag.get().getEstado().equals("Disponible")){
-            System.out.println("5");
             registroEvento.log(ASIGNACION_INCORRECTA, APLICACION_AGENDA, hora, datos);
             throw new ResponseStatusException(HttpStatus.CONFLICT, "EquipoImagenología no disponible");
         }
         // EquipoImagenologia pertenece al area del usuario
         if(!eqImag.get().getAreaDeServicioidArea().getIdArea().equals(area.getIdArea())){
-            System.out.println("6");
             registroEvento.log(ASIGNACION_INCORRECTA, APLICACION_AGENDA, hora, datos);
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Area no compatible");
         }
 
         // Disponibilidad del EquipoImagenologia en la fecha y hora solicitada
         if(!aeRepo.findByEquipoImagenologiaAndAsignacionEstudioPK_FechaPkAndEstado(eqImag.get(), dto.getFechacontrolpk(), "Activo").isEmpty()){
-            System.out.println("7");
             registroEvento.log(ASIGNACION_INCORRECTA, APLICACION_AGENDA, hora, datos);
             throw new ResponseStatusException(HttpStatus.CONFLICT, "EquipoImagenología no disponible en la fecha y hora solicitada");
         }
@@ -397,14 +395,12 @@ public class CitasServiceImpl implements CitasService{
         SolicitudDeEstudioPK sePk = new SolicitudDeEstudioPK(dto.getIdPaciente(), dto.getMedNumEmpleado(), dto.getMedCurp(), dto.getFechacontrolpk());
         var se = seRepo.findById(sePk);
         if(se.isEmpty()){
-            System.out.println("8");
             registroEvento.log(ASIGNACION_INCORRECTA, APLICACION_AGENDA, hora, datos);
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "SolicitudDeEstudio no existe");
         }
 
         //Validar que SolicitudDeEstudio == SOLICITADO
         if(!se.get().getEstado().equals("SOLICITADO")){
-            System.out.println("9");
             registroEvento.log(ASIGNACION_INCORRECTA, APLICACION_AGENDA, hora, datos);
             throw new ResponseStatusException(HttpStatus.CONFLICT, "SolicitudDeEstudio ya ha sido programado, reprogramado o cancelado 'Solicitado'");
         }
@@ -583,7 +579,7 @@ public class CitasServiceImpl implements CitasService{
         dto.setEq_Ubicacion(eq.getUbicacion());
         dto.setFechaProxima(se.getFechaProximaCita().toString());
         dto.setMedico(ce_usr.getApellidoPaterno()+" "+ce_usr.getApellidoMaterno()+" "+ce_usr.getNombre());
-        dto.setPaciente(paciente.getApellidoMaterno()+" "+ paciente.getApellidoMaterno()+" "+ paciente.getNombre());
+        dto.setPaciente(paciente.getApellidoPaterno()+" "+ paciente.getApellidoMaterno()+" "+ paciente.getNombre());
         dto.setIdPaciente(paciente.getIdPaciente());
         dto.setNoEmpleado(medico.getMedicoPK().getNumEmpleado());
         dto.setSe_Curp(medico.getMedicoPK().getCurp());
@@ -603,7 +599,7 @@ public class CitasServiceImpl implements CitasService{
                          domicilio.getAlcaldiaMunicipio()+", "+
                          domicilio.getEstado());
         dto.setNoEmpleadoUsuario(ce_usr.getUsuarioPK().getNumEmpleado());
-        dto.setEstudio(ce.getEstudio().getIdEstudio());
+        dto.setEstudio(ce.getEstudio().getNombre()+" / "+ce.getEstudio().getDescripcion());
 
 
         return dto;
@@ -682,5 +678,46 @@ public class CitasServiceImpl implements CitasService{
         }catch (Exception e){
         }
         registroEvento.log(CANCELA_CORRECTA, APLICACION_CANCELA, hora, datos);
-    }       
+    }
+
+    @Transactional
+    public List<SolicitudDeEstudioDTO> getStudyOrders (String token, FiltroDTO filtro){
+        Usuario sesionUsr= null;
+        try{
+            //Extaemos datos del token
+            JwtSessionInfo info= objectMapper.readValue(token, JwtSessionInfo.class);
+            sesionUsr = usuarioRepo.findById(new UsuarioPK(info.getNumEmpleado(), info.getCurp())).get();
+        }catch (Exception e){
+            
+        }
+        List<SolicitudDeEstudio> solicitudes;
+        solicitudes = seRepo.findByEstado("SOLICITADO");
+
+        // Mapeamos a DTO
+        List<SolicitudDeEstudioDTO> solicitudesDto = solicitudes.stream()
+                                    .map(se -> {
+                                        Usuario medicoUsr = usuarioRepo.findById(new UsuarioPK(se.getMedico().getMedicoPK().getNumEmpleado(),
+                                                                                             se.getMedico().getMedicoPK().getCurp())).get();
+                                        SolicitudDeEstudioDTO dto = new SolicitudDeEstudioDTO();
+                                        dto.setIdPaciente(se.getPaciente().getIdPaciente());
+                                        dto.setNoEmpleado(se.getMedico().getMedicoPK().getNumEmpleado());
+                                        dto.setCurp(se.getMedico().getMedicoPK().getCurp());
+                                        dto.setFechaSolicitud(se.getFechaSolicitud().toString());
+                                        dto.setDiagnostico(se.getDiagnostico());
+                                        dto.setObservaciones(se.getObservaciones());
+                                        dto.setFechaProxima(se.getFechaProximaCita().toString());
+                                        dto.setPaciente(se.getPaciente().getNombre()+ " " +
+                                                        se.getPaciente().getApellidoPaterno()+ " " +
+                                                        se.getPaciente().getApellidoMaterno());
+                                        dto.setMedico(medicoUsr.getNombre()+ " " +
+                                                      medicoUsr.getApellidoPaterno()+ " " +
+                                                      medicoUsr.getApellidoMaterno());
+                                        dto.setAreaProcedencia(se.getAreaProcedencia());
+                                        dto.setFechaSolicitudPK(se.getSolicitudDeEstudioPK().getFechaSolicitudPk());
+
+                                        return dto;
+                                    })
+                                    .collect(Collectors.toList());
+        return solicitudesDto;
+    }
 }

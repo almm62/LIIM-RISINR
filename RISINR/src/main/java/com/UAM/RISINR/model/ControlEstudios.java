@@ -6,7 +6,7 @@
 package com.UAM.RISINR.model;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDateTime;
 import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
 import jakarta.persistence.EmbeddedId;
@@ -31,7 +31,7 @@ public class ControlEstudios implements Serializable {
     @NotNull
     @Column(name = "FechaControl")
     @Temporal(TemporalType.TIMESTAMP)
-    private Date fechaControl;
+    private LocalDateTime fechaControl;
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 45)
@@ -74,7 +74,7 @@ public class ControlEstudios implements Serializable {
         this.controlEstudiosPK = controlEstudiosPK;
     }
 
-    public ControlEstudios(ControlEstudiosPK controlEstudiosPK, Date fechaControl, String estado, boolean cerrado, String observaciones) {
+    public ControlEstudios(ControlEstudiosPK controlEstudiosPK, LocalDateTime fechaControl, String estado, boolean cerrado, String observaciones) {
         this.controlEstudiosPK = controlEstudiosPK;
         this.fechaControl = fechaControl;
         this.estado = estado;
@@ -94,11 +94,11 @@ public class ControlEstudios implements Serializable {
         this.controlEstudiosPK = controlEstudiosPK;
     }
 
-    public Date getFechaControl() {
+    public LocalDateTime getFechaControl() {
         return fechaControl;
     }
 
-    public void setFechaControl(Date fechaControl) {
+    public void setFechaControl(LocalDateTime fechaControl) {
         this.fechaControl = fechaControl;
     }
 

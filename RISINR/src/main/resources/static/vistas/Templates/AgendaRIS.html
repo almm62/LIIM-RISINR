@@ -2,8 +2,14 @@
 <section>
     <section id="section-agendar">
         <div id="AGENDAR" class="tabcontent">
-            <h2 style="text-align:center">Administración de Agenda</h2>
+            <h2 style="text-align:center">Gestión de Citas</h2>
             <br>
+            <div class="flex-container flex-container-end">
+                <div></div>
+                <div></div>
+                <div></div> 
+                <button class="button button1 crud" id="consultarSOLICITUDES">Agendar Cita de Estudio</button> 
+            </div>
             <div class="contenedor">
                 <!--Contenedor para realizar la consulta de las solicitudes/consultas.-->
                 <div class="contenedor-contenido">
@@ -21,45 +27,56 @@
                                 <label class="label_registro">Apellido Paterno:</label>
                                 <input type="text" id="apellidopaternopaciente" name="apellidopaternopaciente"/>
                             </div>
-                            <div class="contenedor-formulario" id="filtro_materno">
-                                <label class="label_registro">Apellido Materno:</label>
-                                <input type="text" id="apellidomaternopaciente" name="apellidomaternopaciente"/>
-                            </div>
-                            <div class="contenedor-formulario" id="filtro_fecha">
-                                <label class="label_registro">Fecha:</label>
-                                <input name="fecha-min" id="fecha-min" type="date" onchange="asignamin(this.value);">
-                                <label class="label_registro">-</label>
-                                <input name="fecha-max" id="fecha-max" type="date">
-                            </div>
-                            <div class="contenedor-formulario" id="filtro_estudio">
-                                <label for="consultaestudio">Estudio:</label>
-                                <select class="custom-select" name="consultaestudio" id="consultaestudio">
-                                    <option value=""></option>
-                                </select>
-                            </div>
+                            <!---
                             <div class="contenedor-formulario" id="filtro_sala">
                                 <label for="consulta-sala">Sala:</label>
                                 <select class="custom-select" name="consultasala" id="consultasala">
                                     <option value=""></option>
                                 </select>
                             </div>
+                            -->
                         </form>
                     </div>
                 </div>
                 <div class="contenedor-footer" id="buscadoragenda">
-                    <button type="button" id="consultaAGENDA" onclick="activamodal('ConsultaAGENDA', this.form)" class="button button1">Consultar cita de estudio</button>
-                    <button type="button" id="limpiarFORMULARIO" onclick="activamodal('LimpiarFORMULARIO', this.form)" class="button button1">Limpiar</button>
+                    <button type="button" id="consultaAGENDA" class="button button1 crud">Consultar cita de estudio</button>
                 </div>
             </div>
             <br>
-            <div class="flex-container flex-container-end">
-                <div></div>
-                <div></div>
-                <div></div> 
-                <button onclick="consultasolicitud(this)" class="button button1" id="consultarSOLICITUDES">Agendar Cita de Estudio</button> 
-            </div>
             </br>
             <div id="showDataAgendar" class="scrollcell"></div> 
         </div>
     </section>
+
+    <dialog id="modalSOLICITUDES">
+        <div>
+            <h2>Solicitudes de Estudio</h2>
+        </div>
+        <div class="modalSOLICITUDES-content">
+            <div class="contenedor-formulario" id="filtro_solicitud">
+                <label class="label_registro">Número de Registro:</label>
+                <input type="text" id="noregistro_2" name="noregistro"/>
+                <label class="label_registro">Nombre:</label>
+                <input type="text" id="nombrepaciente_2" name="nombrepaciente"/>
+                <label class="label_registro">Apellido Paterno:</label>
+                <input type="text" id="apellidopaternopaciente_2" name="apellidopaternopaciente"/>
+            </div>
+            <div class="contenedor-formulario" id="filtro_estudio">
+                <label for="consultaestudio">Estudio:</label>
+                <select class="custom-select" name="consultaestudio" id="consultaestudio">
+                    <option value=""></option>
+                </select>
+            </div>
+            <div class="contenedor-footer" id="buscadorsolicitudes">
+                <button type="button" id="consultaSOLICITUD" class="button button1 crud">Buscar solicitud de estudio</button>
+            </div>
+            <!--Apartado para mostrar en un tabla las solicitudes de estudio-->
+            <div id="showDataSolicitudes" class="scrollcell"></div>
+            <!--Contenedor donde se muestra el boton para cancelar la accion para cancelar la busqueda de solicitudes de estudio y se desactiva el modal.-->
+            <div class="flex-container">
+                <button type="button" id="cancelarSOLICITUDES" class="button button1" style="flex-basis:200px; font-size: 15px;">Cancelar</button>
+            </div>
+        </div>
+    </dialog>
+    
 </section>

@@ -5,7 +5,6 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.Date;
 
 public class ReagendaCitaDTO{
 	private Integer medNumEmpleado;
@@ -17,8 +16,8 @@ public class ReagendaCitaDTO{
 	private Integer idestudio;
 	private Long fechacontrolpk_ant;
 	private Long fechacontrolpk_nueva;
-	private Date fechacontrol_ant;
-	private Date fechacontrol_nueva;
+	private LocalDateTime fechacontrol_ant;
+	private LocalDateTime fechacontrol_nueva;
 	private String estado;
 	private Boolean cerrado;
 	private String observaciones;
@@ -53,7 +52,7 @@ public class ReagendaCitaDTO{
     
 	public ReagendaCitaDTO(Integer medNumEmpleado, String medCurp, Integer userNumEmpleado, String userCurp, String NoSerie, String idpaciente, 
 						   Integer idestudio, Long fechacontrolpk_ant, Long fechacontrolpk_nueva,
-						   Date fechacontrol_ant, Date fechacontrol_nueva, String estado, 
+						   LocalDateTime fechacontrol_ant, LocalDateTime fechacontrol_nueva, String estado, 
 						   Boolean cerrado, String observaciones, String motivo) {
 		this.medNumEmpleado = medNumEmpleado;
 		this.medCurp = medCurp;
@@ -72,12 +71,12 @@ public class ReagendaCitaDTO{
 		this.motivo = motivo;
 	}
     
-    private Date parseFecha(String s) {
+    private LocalDateTime parseFecha(String s) {
         if (s == null || s.isBlank()) return null;
         try {
             LocalDateTime ldt = LocalDateTime.parse(s, formato);
             ZonedDateTime zdt = ldt.atZone(zona);
-            return Date.from(zdt.toInstant());
+            return LocalDateTime.from(zdt.toInstant());
         } catch (DateTimeParseException ex) {
 			return null;
 		}
@@ -112,10 +111,10 @@ public class ReagendaCitaDTO{
 	public Long getFechacontrolpk_nueva() { return fechacontrolpk_nueva; }
 	public void setFechacontrolpk_nueva(Long fechacontrolpk_nueva) { this.fechacontrolpk_nueva = fechacontrolpk_nueva; }
 
-	public Date getFechacontrol_ant() { return fechacontrol_ant; }
+	public LocalDateTime getFechacontrol_ant() { return fechacontrol_ant; }
 	public void setFechacontrol_ant(String fechacontrol_ant) { this.fechacontrol_ant = parseFecha(fechacontrol_ant); }
 
-	public Date getFechacontrol_nueva() { return fechacontrol_nueva; }
+	public LocalDateTime getFechacontrol_nueva() { return fechacontrol_nueva; }
 	public void setFechacontrol_nueva(String fechacontrol_nueva) { this.fechacontrol_nueva = parseFecha(fechacontrol_nueva); }
 
 	public String getEstado() { return estado; }

@@ -4,11 +4,14 @@ import com.UAM.RISINR.model.dto.access.LoginRequestDTO;
 import com.UAM.RISINR.model.dto.access.LoginResponseDTO;
 import com.UAM.RISINR.model.dto.access.SelectRolRequestDTO;
 
-
-/* 
-Definir por separado la interfaz y el servicio permitirá 
-cambiar la implementacion si se cambia la base de datos
-*/
+/**
+ * Interfaz para gestionar operaciones de acceso y autenticación en el sistema.
+ * Proporciona métodos para el inicio de sesión, selección de roles y cierre de sesión
+ * de usuarios, manejando la seguridad y el control de acceso de la aplicación.
+ * Implementa la lógica de negocio relacionada con la autenticación y autorización.
+ * 
+ * @author Pedro Misael Rodríguez Jiménez
+ */
 public interface AccessService {
 
     LoginResponseDTO login(LoginRequestDTO request, String ipDispositivo);

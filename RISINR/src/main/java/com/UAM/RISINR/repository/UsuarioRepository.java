@@ -8,6 +8,15 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+/**
+ * Repositorio JPA para gestionar operaciones de base de datos relacionadas con Usuario.
+ * Proporciona métodos para consultar y administrar información de usuarios
+ * en el sistema, incluyendo búsquedas por área de servicio, identificador compuesto
+ * y correo electrónico.
+ * Extiende JpaRepository para heredar operaciones CRUD básicas.
+ * 
+ * @author Pedro Misael Rodríguez Jiménez
+ */
 @Repository
 public interface UsuarioRepository extends JpaRepository<Usuario, UsuarioPK> {
     

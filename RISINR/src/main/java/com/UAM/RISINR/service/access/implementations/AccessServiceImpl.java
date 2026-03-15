@@ -33,6 +33,20 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Servicio de autenticación y gestión de sesiones.
+ * 
+ * Este servicio implementa la lógica de negocio para:
+ * - Autenticación de usuarios mediante usuario y contraseña
+ * - Gestión de múltiples roles por usuario
+ * - Creación y cierre de sesiones
+ * - Bloqueo automático de cuentas tras intentos fallidos
+ * - Registro de eventos de seguridad
+ * - Cierre de sesión
+ * 
+ * @author Pedro Misael Rodríguez Jiménez
+ * 
+ */
 @Service
 public class AccessServiceImpl implements AccessService {
     private final RegistroEventoRepository registroEventoRepo;
@@ -52,9 +66,25 @@ public class AccessServiceImpl implements AccessService {
     private static final int EVENTO_PWD_INCORRECTA = 1001; // "Contraseña Incorrecta en Login"
     private static final int EVENTO_USUARIO_INVALIDO = 1002; // "Usuario invalido"
     private static final int EVENTO_USUARIO_BLOQUEADO = 1003;//"Usuario con estado!=Activo"
+    
     // Aplicación que registra el evento
     private static final int APLICACION_ID = 0;
 
+
+    /**
+     * Constructor con inyección de dependencias.
+     * 
+     * @param accesoRepo Repositorio de credenciales de usuario
+     * @param perfilRepo Repositorio de perfiles usuario-rol
+     * @param rolRepo Repositorio de roles
+     * @param areaRepo Repositorio de áreas
+     * @param sesionRepo Repositorio de sesiones
+     * @param registroEventoRepo Repositorio de eventos de seguridad
+     * @param jwtService Servicio de generación y validación de tokens JWT
+     * @param blockAccount Servicio de bloqueo de cuentas
+     * @param registroEvento Servicio de registro de eventos
+     * @param objectMapper Mapper para serialización JSON
+     */
     public AccessServiceImpl(RegistroEventoRepository registroEventoRepo,
                              RegistroEventoService registroEvento,
                              AccountLockedService blockAccount,
@@ -77,11 +107,22 @@ public class AccessServiceImpl implements AccessService {
         this.objectMapper = objectMapper;
     }
 
-    /** LOGIN:
-     * - Autentica con UsuarioRepository.autenticar(...) (sin exponer Passwd).
-     * - Arma usuario/área.
-     * - Lee roles (Perfil) y detalla (Rol).
-     * - Si hay 1 rol: crea Sesión + emite token. Si >1: requiere selección (sin token).
+    /**
+     * Procesa el inicio de sesión de un usuario.
+     * 
+     * Flujo del método:
+     * 1. Valida credenciales (usuario/contraseña)
+     * 2. Verifica estado de la cuenta (activa/bloqueada)
+     * 3. Implementa protección contra fuerza bruta (máximo 5 intentos en 15 min)
+     * 4. Obtiene información del usuario, área y roles
+     * 5. Si el usuario tiene un solo rol: crea sesión y genera token
+     * 6. Si tiene múltiples roles: requiere selección posterior
+     * 
+     * @param request Objeto con credenciales (usuario y contraseña)
+     * @param ipDispositivo Dirección IP del cliente
+     * @return LoginResponseDTO con información del usuario, área, roles y token (si aplica)
+     * @throws ResponseStatusException Si las credenciales son inválidas, la cuenta está bloqueada,
+     *         o no hay roles asignados
      */
     @Override
     @Transactional
@@ -102,12 +143,10 @@ public class AccessServiceImpl implements AccessService {
 
         if (!match.isPresent()) {
             registroEvento.log(EVENTO_USUARIO_INVALIDO,APLICACION_ID, hora, datos);
-            System.out.println("Usuario invalido");
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "USER_INVALID");
         }
         if (!"Activo".equals(match.get().getEstado()) && !"Inicial".equals(match.get().getEstado())){
             registroEvento.log(EVENTO_USUARIO_BLOQUEADO, APLICACION_ID, hora, datos);
-            System.out.println("Usuario Bloqueado");
             throw new ResponseStatusException(HttpStatus.LOCKED, "USER_LOCKED");
         }
         if (!match.get().getContrasena().equals(request.getContrasena())){
@@ -132,7 +171,6 @@ public class AccessServiceImpl implements AccessService {
                 }
             }
             registroEvento.log(EVENTO_PWD_INCORRECTA, APLICACION_ID, hora, datos);
-            System.out.println("Contraseña invalida");
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "PASSWORD_INVALID");
         }
 
@@ -205,6 +243,25 @@ public class AccessServiceImpl implements AccessService {
         }
     }
 
+    /**
+     * Procesa la selección de rol cuando un usuario tiene múltiples roles disponibles.
+     * 
+     * Este método se invoca después de un login exitoso cuando el usuario debe elegir
+     * con qué rol desea trabajar en la sesión actual.
+     * 
+     * Flujo del método:
+     * 1. Valida los datos de entrada
+     * 2. Verifica la existencia del usuario
+     * 3. Valida que el usuario tenga un área asignada
+     * 4. Verifica que el rol elegido exista
+     * 5. Crea la sesión con el rol seleccionado
+     * 6. Genera el token JWT
+     * 
+     * @param request Objeto con el ID de usuario y el ID del rol seleccionado
+     * @param ipDispositivo Dirección IP del cliente
+     * @return LoginResponseDTO con información del usuario, área, rol elegido y token
+     * @throws ResponseStatusException Si hay errores de validación o el rol no existe
+     */
     @Override
     @Transactional
     public LoginResponseDTO seleccionarRol(SelectRolRequestDTO request, String ipDispositivo) {
@@ -276,6 +333,16 @@ public class AccessServiceImpl implements AccessService {
         return new LoginResponseDTO(usuariodto, area, List.of(rolElegido), token, false);
     }
     
+    /**
+     * Cierra la sesión de un usuario actualizando el registro en la base de datos.
+     * 
+     * Este método marca el fin de una sesión activa, registrando la hora de finalización
+     * y el tipo de cierre (normal, timeout, etc.).
+     * 
+     * @param subjectJson String JSON con la información de la sesión extraída del token JWT.
+     *                    Debe contener: numEmpleado, curp, horaInicio y aplicacionId
+     * @param tipoCierre Tipo de cierre de sesión (ej: "NORMAL", "TIMEOUT")
+     */
     @Override
     @Transactional
     public void logout(String subjectJson, String tipoCierre) {
@@ -307,12 +374,32 @@ public class AccessServiceImpl implements AccessService {
     }
     
     
+    /**
+     * Metodo auxiliar para normalizar una dirección IP para que 
+     * cumpla con el límite de la base de datos.
+     * 
+     * La columna de IP en la base de datos es VARCHAR(15), lo cual es suficiente
+     * para direcciones IPv4 pero puede ser insuficiente para IPv6. Este método
+     * trunca la IP si excede el límite.
+     * 
+     * @param ip Dirección IP a normalizar
+     * @return IP normalizada (máximo 15 caracteres) o null si la entrada es null
+     */
     private String normalizarIp(String ip) {
         if (ip == null) return null;
         // Columna VARCHAR(15) → IPv4
         return (ip.length() > 15) ? ip.substring(0, 15) : ip;
     }
     
+    /**
+     * Metodo auxiliar par normalizar el tipo de cierre de sesión para cumplir con límites de base de datos.
+     * 
+     * La columna tipoCierre es VARCHAR(25). Este método limpia y trunca el valor
+     * si es necesario.
+     * 
+     * @param tc Tipo de cierre a normalizar
+     * @return Tipo de cierre normalizado (máximo 25 caracteres) o null si la entrada es null
+     */
     private String normalizarTipoCierre(String tc) {
         if (tc == null) return null;
         // Columna VARCHAR(25)

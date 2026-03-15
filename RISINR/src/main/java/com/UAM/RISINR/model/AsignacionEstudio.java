@@ -18,7 +18,7 @@ import jakarta.persistence.TemporalType;
 import jakarta.validation.constraints.NotNull;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 
 @Entity
@@ -34,7 +34,7 @@ public class AsignacionEstudio implements Serializable {
     @Basic(optional = false)
     @Column(name = "Fecha")
     @Temporal(TemporalType.TIMESTAMP)
-    private Date fecha;
+    private LocalDateTime fecha;
     @Basic(optional = false)
     @NotNull
     @Column(name = "Estado")
@@ -55,7 +55,7 @@ public class AsignacionEstudio implements Serializable {
         this.asignacionEstudioPK = asignacionEstudioPK;
     }
 
-    public AsignacionEstudio(AsignacionEstudioPK asignacionEstudioPK, Date fecha, String estado) {
+    public AsignacionEstudio(AsignacionEstudioPK asignacionEstudioPK, LocalDateTime fecha, String estado) {
         this.asignacionEstudioPK = asignacionEstudioPK;
         this.fecha = fecha;
         this.estado = estado;
@@ -73,11 +73,11 @@ public class AsignacionEstudio implements Serializable {
         this.asignacionEstudioPK = asignacionEstudioPK;
     }
 
-    public Date getFecha() {
+    public LocalDateTime getFecha() {
         return fecha;
     }
 
-    public void setFecha(Date fecha) {
+    public void setFecha(LocalDateTime fecha) {
         this.fecha = fecha;
     }
 

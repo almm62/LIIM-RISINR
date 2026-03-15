@@ -448,19 +448,22 @@ h2{
     padding: 10px 20px 0 20px;
 }
 
-
-/* ------ Modal Configuracion ------ */
-#configDialog {
+/* ------------  MODALES ------------------*/
+dialog{
+  max-width: 80%;
   padding: 2rem;
   border: none;
   border-radius: 8px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  max-width: 500px;
-  width: 90%;
 }
 
-#configDialog::backdrop {
+dialog::backdrop {
   background: rgba(0, 0, 0, 0.5);
+}
+/* ------ Modal Configuracion ------ */
+#configDialog {
+  /*max-width: 500px;]*/
+  width: 400px;
 }
 
 .config-section h3 {
@@ -556,6 +559,16 @@ button {
     box-sizing: border-box;
 }
 
+.contenedor-formulario#filtro_solicitud input[type="text"] {
+    width: 40%;
+    padding: 3px 10px;
+    margin: 2px 0;
+    display: inline-block;
+    border: 1px solid #cccccc;
+    border-radius: 2px;   
+    box-sizing: border-box;
+}
+
 .contenedor-formulario input[type="date"] {
     width: 35%;
     margin: 2px 0;
@@ -565,8 +578,7 @@ button {
     box-sizing: border-box;
 }
 
-.contenedor {
-    max-width: 500px;    
+.contenedor {    
     justify-content: flex-start;
     padding-left: 20px;
 }

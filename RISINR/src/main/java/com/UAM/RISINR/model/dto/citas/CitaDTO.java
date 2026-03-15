@@ -1,42 +1,39 @@
 package com.UAM.RISINR.model.dto.citas;
 
 public class CitaDTO {
-
-    private String ce_usr_curp;//private String ce_usr_curp;
+    
+    private String idPaciente;
+    private String paciente;      
+    private String domicilio;
+    private String estudio;           
+    private Integer idEstudio;
     private String eq_NoSerie;
     private String eq_Ubicacion;
+    private Integer idArea;
+    private String nombreArea;
+    private String turno;
+    private String medico;
+    private String fechaSolicitud;    
+    private String fechaProxima;  
+    private Integer noEmpleado;
+    private String areaProcedencia;
+    private String diagnostico;
+    private String observaciones;
+    private String ce_usr_curp;
+    private Integer noEmpleadoUsuario;
+    private Long fechaAsignPk;    
+    private String se_curp;
     private String ce_estado;
 
-    private Long fechaAsignPk;        // epoch millis
-    private String fechaProxima;      // "YYYY-MM-DD HH:mm:ss.S"
-    private String turno;
 
-    private String idPaciente;
-    private String domicilio;
 
-    private Integer noEmpleado;
-    private String fechaSolicitud;    // "YYYY-MM-DD HH:mm:ss.S"
-    private String nombreArea;
-
-    private String paciente;          // nombre del paciente compuesto
-    private Integer estudio;           // nombre del estudio
-    private String areaProcedencia;
-
-    private String se_curp;
-    private Integer noEmpleadoUsuario;
-
-    private Integer idEstudio;
-    private Integer idArea;
-
-    private String diagnostico;
-    private String medico;
-    private String observaciones;
+    
 
     public CitaDTO() {}
     public CitaDTO(String ce_usr_curp, String eq_NoSerie, String eq_Ubicacion, String ce_estado,
                    Long fechaAsignPk, String fechaProxima, String turno, String idPaciente,
                    String domicilio, Integer noEmpleado,
-                   String fechaSolicitud, String nombreArea, String paciente, Integer estudio,
+                   String fechaSolicitud, String nombreArea, String paciente, String estudio,
                    String areaProcedencia, String se_curp,
                    Integer noEmpleadoUsuario, Integer idEstudio,
                    Integer idArea, String diagnostico, String medico, String observaciones) {
@@ -103,8 +100,8 @@ public class CitaDTO {
     public String getPaciente() { return paciente; }
     public void setPaciente(String paciente) { this.paciente = paciente; }
 
-    public Integer getEstudio() { return estudio; }
-    public void setEstudio(Integer estudio) { this.estudio = estudio; }
+    public String getEstudio() { return estudio; }
+    public void setEstudio(String estudio) { this.estudio = estudio; }
 
     public String getAreaProcedencia() { return areaProcedencia; }
     public void setAreaProcedencia(String areaProcedencia) { this.areaProcedencia = areaProcedencia; }

@@ -5,13 +5,12 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.Date;
 
 public class AgendaCitaDTO{
 	private String idpaciente;
 	private Integer idestudio;
 	private Long fechacontrolpk;
-	private Date fechacontrol;
+	private LocalDateTime fechacontrol;
 	private String estado;
 	private Boolean cerrado;
 	private String observaciones;
@@ -41,7 +40,7 @@ public class AgendaCitaDTO{
 	}
     
 	public AgendaCitaDTO(String idpaciente, Integer idestudio, Long fechacontrolpk, 
-	Date fechacontrol, String estado, Boolean cerrado, String observaciones, 
+	LocalDateTime fechacontrol, String estado, Boolean cerrado, String observaciones, 
 	String eqNoSerie, Integer medNumEmpleado, String medCurp) {
 		this.idpaciente = idpaciente;
 		this.idestudio = idestudio;
@@ -55,12 +54,12 @@ public class AgendaCitaDTO{
 		this.medCurp = medCurp;
 	}
     
-    private Date parseFecha(String s) {
+    private LocalDateTime parseFecha(String s) {
         if (s == null || s.isBlank()) return null;
         try {
             LocalDateTime ldt = LocalDateTime.parse(s, formato);
             ZonedDateTime zdt = ldt.atZone(zona);
-            return Date.from(zdt.toInstant());
+            return LocalDateTime.from(zdt.toInstant());
         } catch (DateTimeParseException ex) {
 			return null;
 		}
@@ -75,7 +74,7 @@ public class AgendaCitaDTO{
 	public Long getFechacontrolpk() { return fechacontrolpk; }
 	public void setFechacontrolpk(Long fechacontrolpk) { this.fechacontrolpk = fechacontrolpk; }
 
-	public Date getFechacontrol() { return fechacontrol; }
+	public LocalDateTime getFechacontrol() { return fechacontrol; }
 	public void setFechacontrol(String fechacontrol) { this.fechacontrol = parseFecha(fechacontrol); }
 
 	public String getEstado() { return estado; }
