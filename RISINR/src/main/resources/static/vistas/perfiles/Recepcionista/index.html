@@ -9,6 +9,7 @@
   <script src="http://code.jquery.com/jquery-2.2.0.min.js"></script> <!-- CDN de jQuery-->
   <script src="../../../js/main.js"></script>
   <script src="../../../js/lib2.js"></script>
+  <script src="../../../js/Control/Citas/ControlCitas.js"></script>
   <script src="../../../js/sessionWatch.js"></script>
   <script>
       sessionWatcher.init();
@@ -19,14 +20,13 @@
   <div id="header"></div>
   <!-- DECLARAMOS AQUÍ los botones del menú -->
   <template id="menuButtons">
-    <button class="tablinks" data-tab="ESTUDIOSTAB">Agenda Estudios</button>
+    <button class="tablinks" data-tab="AGENDAADMIN" data-rol="RECEP" >Agendar Estudios</button>
   </template>
 
 
   <main>
-    <h1>Perfil de Recepcionista</h1>
     <div id="ESTUDIOSTAB" class="tabcontent">
-      <div id="includeCitas"></div>
+      <div id="includeTBL"></div>
     </div>
   </main>
 

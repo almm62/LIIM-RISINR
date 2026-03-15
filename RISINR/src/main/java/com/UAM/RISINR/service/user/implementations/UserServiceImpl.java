@@ -12,6 +12,8 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.UAM.RISINR.model.DatosAcceso;
 import com.UAM.RISINR.model.DatosAccesoPK;
+import com.UAM.RISINR.model.Medico;
+import com.UAM.RISINR.model.MedicoPK;
 import com.UAM.RISINR.model.Perfil;
 import com.UAM.RISINR.model.PerfilPK;
 import com.UAM.RISINR.model.SesionPK;
@@ -24,6 +26,7 @@ import com.UAM.RISINR.model.dto.userManager.CrearUsuarioDTO;
 import com.UAM.RISINR.model.dto.userManager.UsuarioResumenDTO;
 import com.UAM.RISINR.repository.AreaDeServicioRepository;
 import com.UAM.RISINR.repository.DatosAccesoRepository;
+import com.UAM.RISINR.repository.MedicoRepository;
 import com.UAM.RISINR.repository.PerfilRepository;
 import com.UAM.RISINR.repository.RolRepository;
 import com.UAM.RISINR.repository.SesionRepository;
@@ -33,6 +36,13 @@ import com.UAM.RISINR.service.shared.RegistroEventoService;
 import com.UAM.RISINR.service.user.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+/**
+ * Implementación del servicio de gestión de usuarios. Maneja el ciclo de vida
+ * completo del usuario: consulta, creación, actualización, cambio de contraseña,
+ * cambio de correo y control de estados (activo, bloqueado, dado de baja).
+ * Registra en bitácora cada operación realizada.
+ * @author Pedro Misael Rodríguez Jiménez
+ */
 @Service
 public class UserServiceImpl implements UserService{
     private final RegistroEventoService registroEvento;
@@ -42,6 +52,7 @@ public class UserServiceImpl implements UserService{
     private final PerfilRepository perfilRepo;
     private final RolRepository rolRepo;
     private final SesionRepository sesionRepo;
+    private final MedicoRepository medicoRepo;
     private final ObjectMapper objectMapper;
     
     private static final int USER_CREATE_SUCCESS=6;
@@ -60,8 +71,20 @@ public class UserServiceImpl implements UserService{
     private static final int APLICACION_ACTUALIZACION_USUARIOS = 5; // Separar por aplicaciones:
     
     
-public UserServiceImpl(RegistroEventoService registroEvento, UsuarioRepository usuarioRepo, DatosAccesoRepository datosAccesoRepo, 
-                        AreaDeServicioRepository areaDeServicioRepo, PerfilRepository perfilRepo, RolRepository rolRepo, 
+/**
+ * Constructor con inyección de todos los repositorios y servicios del módulo de gestión de usuarios.
+ * @param registroEvento Servicio de bitácora de eventos
+ * @param usuarioRepo Repositorio de usuarios
+ * @param datosAccesoRepo Repositorio de datos de acceso
+ * @param areaDeServicioRepo Repositorio de áreas de servicio
+ * @param perfilRepo Repositorio de perfiles usuario-rol
+ * @param rolRepo Repositorio de roles
+ * @param medicoRepo Repositorio de médicos
+ * @param objectMapper Mapper para serialización JSON
+ * @param sesionRepo Repositorio de sesiones activas
+ */
+public UserServiceImpl(RegistroEventoService registroEvento, UsuarioRepository usuarioRepo, DatosAccesoRepository datosAccesoRepo,
+                        AreaDeServicioRepository areaDeServicioRepo, PerfilRepository perfilRepo, RolRepository rolRepo, MedicoRepository medicoRepo,
                         ObjectMapper objectMapper, SesionRepository sesionRepo){
     this.registroEvento=registroEvento;
     this.areaDeServicioRepo=areaDeServicioRepo;
@@ -69,10 +92,17 @@ public UserServiceImpl(RegistroEventoService registroEvento, UsuarioRepository u
     this.datosAccesoRepo=datosAccesoRepo;
     this.perfilRepo=perfilRepo;
     this.rolRepo= rolRepo;
+    this.medicoRepo=medicoRepo;
     this.objectMapper=objectMapper;
     this.sesionRepo = sesionRepo;
     }
 
+    /**
+     * Retorna el resumen de todos los usuarios; si el rol en sesión es JefedelServicio,
+     * filtra por el área del usuario autenticado.
+     * @param token JSON del subject JWT con datos de la sesión activa
+     * @return Lista de UsuarioResumenDTO con los usuarios visibles para el rol en sesión
+     */
     @Override
     @Transactional
     public List<UsuarioResumenDTO> getAll(String token) {
@@ -100,6 +130,12 @@ public UserServiceImpl(RegistroEventoService registroEvento, UsuarioRepository u
             .collect(Collectors.toList());
     }
 
+    /**
+     * Crea un nuevo usuario en el sistema junto con sus datos de acceso y perfiles de rol.
+     * @param dto Datos del usuario a crear
+     * @param token JSON del subject JWT con datos de la sesión activa
+     * @return UsuarioResumenDTO con la información del usuario recién creado
+     */
     @Override
     @Transactional
     public UsuarioResumenDTO create(CrearUsuarioDTO dto, String token) {
@@ -174,6 +210,13 @@ public UserServiceImpl(RegistroEventoService registroEvento, UsuarioRepository u
                 registroEvento.log(INVALID_ROLE, APLICACION_ALTA_USUARIOS, hora, datos);
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Rol no existe");
             }
+            if(matchRol.get().getIdRol()==3){ // Si se asigna rol de Radiologo, crear registro en Medico
+                MedicoPK medicoPK = new MedicoPK(dto.getNumEmpleado(), dto.getCurp());
+                if (!medicoRepo.findById(medicoPK).isPresent()) {
+                    Medico medico = new Medico(medicoPK);
+                    medicoRepo.save(medico);
+                }
+            }
             perfiles.add(matchRol.get().getNombre());
             var perfPK = new PerfilPK(dto.getNumEmpleado(), dto.getCurp(), matchRol.get().getIdRol());
             var perf = new Perfil(perfPK,0);
@@ -192,6 +235,12 @@ public UserServiceImpl(RegistroEventoService registroEvento, UsuarioRepository u
         );
     }
 
+    /**
+     * Actualiza los datos de un usuario existente, incluyendo área, correo, estado y roles.
+     * @param dto Datos actualizados del usuario
+     * @param token JSON del subject JWT con datos de la sesión activa
+     * @return UsuarioResumenDTO con la información del usuario actualizado
+     */
     @Override
     @Transactional
     public UsuarioResumenDTO update(ActualizarUsuarioDTO dto, String token) {
@@ -292,6 +341,11 @@ public UserServiceImpl(RegistroEventoService registroEvento, UsuarioRepository u
                 usr.getDatosAcceso().getEstado());            
     }
     
+    /**
+     * Cambia la contraseña del usuario autenticado, validando la contraseña actual.
+     * @param dto Contraseña actual y la nueva contraseña (dos veces para confirmación)
+     * @param token JSON del subject JWT con datos de la sesión activa
+     */
     @Override
     @Transactional
     public void changePswd(ChangePswdDTO dto, String token){
@@ -337,6 +391,11 @@ public UserServiceImpl(RegistroEventoService registroEvento, UsuarioRepository u
         datosAccesoRepo.save(usrAccess);
     }
     
+    /**
+     * Cambia el correo electrónico del usuario autenticado, validando la contraseña actual.
+     * @param dto Correo nuevo (dos veces para confirmación) y contraseña actual
+     * @param token JSON del subject JWT con datos de la sesión activa
+     */
     @Override
     @Transactional
     public void changeMail(ChangeMailDTO dto, String token){
@@ -379,6 +438,11 @@ public UserServiceImpl(RegistroEventoService registroEvento, UsuarioRepository u
         usuarioRepo.save(usr);
     }
     
+    /**
+     * Retorna el resumen del usuario dueño de la sesión activa.
+     * @param token JSON del subject JWT con datos de la sesión activa
+     * @return UsuarioResumenDTO con los datos del usuario autenticado
+     */
     @Override
     public UsuarioResumenDTO getUserSesion(String token) {
         long hora= System.currentTimeMillis();

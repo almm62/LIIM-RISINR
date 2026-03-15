@@ -107,7 +107,7 @@ public class EquipoImagenologiaController {
     @PostMapping("/editEquipo")
     public ResponseEntity<Object> editEquipo(@RequestBody EquipoImagenologiaRequest equipoRequest) {
             EquipoImagenologiaDTO equipo = service.edit(equipoRequest);
-            List<Object> equipos = new ArrayList();
+            List<Object> equipos = new ArrayList<>();
             
             if (equipo == null) {
                 equipos.add("0");

@@ -6,7 +6,7 @@
 package com.UAM.RISINR.model;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDateTime;
 import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
 import jakarta.persistence.EmbeddedId;
@@ -14,8 +14,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinColumns;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.NamedQueries;
-import jakarta.persistence.NamedQuery;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
@@ -33,7 +31,7 @@ public class SolicitudDeEstudio implements Serializable {
     @NotNull
     @Column(name = "FechaSolicitud")
     @Temporal(TemporalType.TIMESTAMP)
-    private Date fechaSolicitud;
+    private LocalDateTime fechaSolicitud;
     @Size(max = 45)
     @Column(name = "AreaProcedencia")
     private String areaProcedencia;
@@ -41,7 +39,7 @@ public class SolicitudDeEstudio implements Serializable {
     @NotNull
     @Column(name = "FechaProximaCita")
     @Temporal(TemporalType.TIMESTAMP)
-    private Date fechaProximaCita;
+    private LocalDateTime fechaProximaCita;
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 250)
@@ -73,7 +71,7 @@ public class SolicitudDeEstudio implements Serializable {
         this.solicitudDeEstudioPK = solicitudDeEstudioPK;
     }
 
-    public SolicitudDeEstudio(SolicitudDeEstudioPK solicitudDeEstudioPK, Date fechaSolicitud, String areaProcedencia, Date fechaProximaCita, String diagnostico, String observaciones, String estado) {
+    public SolicitudDeEstudio(SolicitudDeEstudioPK solicitudDeEstudioPK, LocalDateTime fechaSolicitud, String areaProcedencia, LocalDateTime fechaProximaCita, String diagnostico, String observaciones, String estado) {
         this.solicitudDeEstudioPK = solicitudDeEstudioPK;
         this.fechaSolicitud = fechaSolicitud;
         this.areaProcedencia = areaProcedencia;
@@ -83,7 +81,7 @@ public class SolicitudDeEstudio implements Serializable {
         this.estado = estado;
     }    
     
-    public SolicitudDeEstudio(SolicitudDeEstudioPK solicitudDeEstudioPK, Date fechaSolicitud, Date fechaProximaCita, String diagnostico, String observaciones, String estado) {
+    public SolicitudDeEstudio(SolicitudDeEstudioPK solicitudDeEstudioPK, LocalDateTime fechaSolicitud, LocalDateTime fechaProximaCita, String diagnostico, String observaciones, String estado) {
         this.solicitudDeEstudioPK = solicitudDeEstudioPK;
         this.fechaSolicitud = fechaSolicitud;
         this.fechaProximaCita = fechaProximaCita;
@@ -104,11 +102,11 @@ public class SolicitudDeEstudio implements Serializable {
         this.solicitudDeEstudioPK = solicitudDeEstudioPK;
     }
 
-    public Date getFechaSolicitud() {
+    public LocalDateTime getFechaSolicitud() {
         return fechaSolicitud;
     }
 
-    public void setFechaSolicitud(Date fechaSolicitud) {
+    public void setFechaSolicitud(LocalDateTime fechaSolicitud) {
         this.fechaSolicitud = fechaSolicitud;
     }
 
@@ -120,11 +118,11 @@ public class SolicitudDeEstudio implements Serializable {
         this.areaProcedencia = areaProcedencia;
     }
 
-    public Date getFechaProximaCita() {
+    public LocalDateTime getFechaProximaCita() {
         return fechaProximaCita;
     }
 
-    public void setFechaProximaCita(Date fechaProximaCita) {
+    public void setFechaProximaCita(LocalDateTime fechaProximaCita) {
         this.fechaProximaCita = fechaProximaCita;
     }
 
@@ -177,7 +175,6 @@ public class SolicitudDeEstudio implements Serializable {
 
     @Override
     public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
         if (!(object instanceof SolicitudDeEstudio)) {
             return false;
         }

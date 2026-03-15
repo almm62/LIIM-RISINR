@@ -313,6 +313,13 @@ async function inicial(e){
       await loadHTML("includeTBL", "../../Templates/CatEquipoRIS.html");
       asignaEventosEQP(e);
       break;
+      
+    case "AGENDAADMIN":
+      console.log("Entro a AGENDAADMIN");
+      await loadHTML("includeTBL", "../../Templates/AgendaRIS.html");
+      await getServiciosAgenda(e);
+      asignaEventosAGENDA(e);
+      break;
     
     default:
       alert("Boton sin implementacion")

@@ -129,12 +129,6 @@ function tableRowColorCellSelection(tablName, coledit, coldelete) {
     cellKnSelection(tablName, "deleteRegister(this,'" + tablName + "')", coldelete); //asignar funcion de seleccion para la celda kn de la tabla                 
 }
 
-function tableHeaderSelection(tablName, columnas) {
-    for (let x = 0; x < columnas.length; x++) {
-        cellHeaderSelection(tablName, "sortTable(" + columnas[x] + ",'" + tablName + "');", columnas[x]); //asignar funcion de seleccion para la celda kn de la tabla    
-    }
-}
-
 
 
 //servicio rest para guardar datos
@@ -453,7 +447,8 @@ async function CrudUSR(e){
                     } finally{
                         cambiaEstadoModal(".modalUSUARIOS", false);
                         document.getElementById("USUARIOS").reset(); //Borra datos del formulario
-                        await ConsultaCatalogoUSRS();;
+                        html_HideElement("btnEdtUsrtbl");
+                        await ConsultaCatalogoUSRS();
                     }
                 } else {
                     alert("Seleccione un registro de la tabla");

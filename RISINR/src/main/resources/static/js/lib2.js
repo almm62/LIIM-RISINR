@@ -289,6 +289,11 @@ function CreateTableFromJSON(divnameref, tablename, refhed) {
     divContainer.appendChild(table);
 }
 
+function tableHeaderSelection(tablName, columnas) {
+    for (let x = 0; x < columnas.length; x++) {
+        cellHeaderSelection(tablName, "sortTable(" + columnas[x] + ",'" + tablName + "');", columnas[x]); //asignar funcion de seleccion para la celda kn de la tabla    
+    }
+}
 
 function UpdateTableRows(tablename, jsonarray) {
     // ADD JSON DATA TO THE TABLE AS ROWS.
@@ -312,7 +317,9 @@ function UpdateTableRows(tablename, jsonarray) {
             var tabCell = document.createElement('td');          // TABLE DEFINITION.
             tabCell = tr.insertCell(-1);
             tabCell.innerHTML = jsonarray[i][col[j]];// ADD VALUES TO EACH CELL.
-            
+            if (i===0){
+            console.log(col[j]);
+            }
         }
     }
 }

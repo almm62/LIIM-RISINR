@@ -8,6 +8,7 @@ import com.UAM.RISINR.exceptions.IncompleteFormException;
 import com.UAM.RISINR.exceptions.ResourceNotFoundException;
 import com.UAM.RISINR.exceptions.ResourceFoundException;
 import com.UAM.RISINR.model.AreaDeServicio;
+import com.UAM.RISINR.model.Equipo;
 import com.UAM.RISINR.model.EquipoImagenologia;
 import com.UAM.RISINR.model.SesionPK;
 import com.UAM.RISINR.model.Usuario;
@@ -15,6 +16,7 @@ import com.UAM.RISINR.model.UsuarioPK;
 import com.UAM.RISINR.model.dto.equipoImagenologia.EquipoImagenologiaDTO;
 import com.UAM.RISINR.model.dto.equipoImagenologia.EquipoImagenologiaRequest;
 import com.UAM.RISINR.repository.EquipoImagenologiaRepository;
+import com.UAM.RISINR.repository.EquipoRepository;
 import com.UAM.RISINR.repository.SesionRepository;
 import com.UAM.RISINR.repository.UsuarioRepository;
 import com.UAM.RISINR.service.areaDeServicio.AreaDeServicioService;
@@ -52,6 +54,9 @@ public class EquipoImagenologiaServiceImpl implements EquipoImagenologiaService{
     
     /** Repositorio de equipos de imagenología */
     private final EquipoImagenologiaRepository repository;
+    
+    /** Repositorio de equipos de imagenología */
+    private final EquipoRepository eqRepository;
 
     /** Repositorio que permite recuperar datos de la sesión activa */
     private final SesionRepository sesionRepo;
@@ -98,10 +103,11 @@ public class EquipoImagenologiaServiceImpl implements EquipoImagenologiaService{
      * @param objtMapper mapper para convertir objetos a JSON
      */
     public EquipoImagenologiaServiceImpl(AreaDeServicioService areaService, EquipoImagenologiaRepository repository, 
-                                        RegistroEventoService registroEvento,ObjectMapper objtMapper,JwtService jwtService,
+                                        EquipoRepository eqRepository, RegistroEventoService registroEvento,ObjectMapper objtMapper,JwtService jwtService,
                                         UsuarioRepository usuarioRepository, SesionRepository sesionRepo) {
         this.areaService = areaService;
         this.repository = repository;
+        this.eqRepository = eqRepository;
         this.registroEvento = registroEvento;
         this.objMapper = objtMapper; 
         this.jwtService = jwtService;
@@ -142,7 +148,7 @@ public class EquipoImagenologiaServiceImpl implements EquipoImagenologiaService{
         } else{
             equipos = repository.findAll();
         }
-        List<EquipoImagenologiaDTO> equiposDTO = new ArrayList();
+        List<EquipoImagenologiaDTO> equiposDTO = new ArrayList<>();
         
         for (EquipoImagenologia eqp: equipos){
             EquipoImagenologiaDTO equipoDTO = convertirDTO(eqp);
@@ -202,6 +208,13 @@ public class EquipoImagenologiaServiceImpl implements EquipoImagenologiaService{
                 e.printStackTrace();  // valor por defecto para no romper la app
             }
             registroEvento.log(EQUIPO_AGREGADO_EXITOSAMENTE, APLICACION_CREAR, hora, datos);
+
+
+            
+            Equipo eq = new Equipo(nSerie, equipoRequest.getUbicacion());
+            eq.setAreaDeServicioidArea(equipo.getAreaDeServicioidArea());
+            eqRepository.save(eq);   
+
             return equipoDTO;
         }
     }
@@ -257,6 +270,11 @@ public class EquipoImagenologiaServiceImpl implements EquipoImagenologiaService{
             }
             
             registroEvento.log(EQUIPO_EDITADO_EXITOSAMENTE, APLICACION_EDITAR, hora, datos);
+
+            
+            Equipo eq = eqRepository.findById(equipoRequest.getnSerie()).get();
+            eq.setUbicacion(equipoRequest.getUbicacion());
+            eqRepository.save(eq);
             return equipoDTO;
         }
     }

@@ -21,6 +21,9 @@ public class Medico implements Serializable {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "medico")
     private Collection<AgendaDeServicio> agendaDeServicioCollection;
 
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "medico")
+    private Collection<ControlEstudios> controlEstudiosCollection;
+
     public Medico() {
     }
 
@@ -65,6 +68,13 @@ public class Medico implements Serializable {
 
     public void setAgendaDeServicioCollection(Collection<AgendaDeServicio> agendaDeServicioCollection) {
         this.agendaDeServicioCollection = agendaDeServicioCollection;
+    }
+
+    public Collection<ControlEstudios> getControlEstudiosCollection() {
+        return controlEstudiosCollection;
+    }
+    public void setControlEstudiosCollection(Collection<ControlEstudios> controlEstudiosCollection) {
+        this.controlEstudiosCollection = controlEstudiosCollection;
     }
 
     @Override

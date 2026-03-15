@@ -9,17 +9,33 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
 import org.springframework.stereotype.Service;
 
+/**
+ * Implementación del servicio de datos iniciales. Consulta las áreas de servicio
+ * y los roles en la base de datos y los serializa como listas de cadenas JSON
+ * mediante ObjectMapper.
+ * @author Pedro Misael Rodríguez Jiménez
+ */
 @Service
 public class InitialServiceImpl implements InitialService {
     private final AreaDeServicioRepository areaRepo;
     private final RolRepository rolRepo;
     private final ObjectMapper mapper;
     
+    /**
+     * Constructor con inyección de repositorios y mapper para la serialización de datos iniciales.
+     * @param areaRepo Repositorio de áreas de servicio
+     * @param rolRepo Repositorio de roles
+     * @param mapper Mapper para serialización a JSON
+     */
     public InitialServiceImpl(AreaDeServicioRepository areaRepo, RolRepository rolRepo, ObjectMapper mapper){
         this.areaRepo=areaRepo;
         this.rolRepo=rolRepo;
         this.mapper=mapper;
     }
+    /**
+     * Retorna la lista de todas las áreas de servicio serializadas como cadenas JSON.
+     * @return Lista de cadenas JSON, una por cada AreaDeServicio registrada
+     */
     @Override
     public List<String> getAreas() {
         return areaRepo.findAll()
@@ -39,6 +55,10 @@ public class InitialServiceImpl implements InitialService {
                 .toList();
     }
 
+    /**
+     * Retorna la lista de todos los roles disponibles serializados como cadenas JSON.
+     * @return Lista de cadenas JSON, una por cada Rol registrado
+     */
     @Override
     public List<String> getRoles() {
         return rolRepo.findAll()
